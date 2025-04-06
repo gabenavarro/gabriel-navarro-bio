@@ -1,0 +1,79 @@
+# Version control
+.git/
+.gitignore
+.svn/
+.hg/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE specific files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+.project
+.pydevproject
+.settings/
+
+# Application specific
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# Docker specific
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Local development files
+*.log
+logs/
+temp/
+tmp/
+/assets/secrets/*
+*.sqlite3
+
+# Documentation
+docs/
+*.md
+LICENSE
+
+# Other unnecessary files
+*.bak
+*.tmp
+*.orig

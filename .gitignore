@@ -8,7 +8,6 @@ __pycache__/
 
 # Distribution / packaging
 .Python
-build/
 develop-eggs/
 dist/
 downloads/
@@ -172,3 +171,14 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# FastHTML
+.sesskey
+
+# Secret files
+*.key
+*.pem
+*.p12
+
+# Secret directories
+/assets/secrets/*
