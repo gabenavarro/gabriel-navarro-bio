@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Calculate initial and target positions based on requirements
         // Add 60vh below the original position
-        const initialTop = topValue + 60;
+        const initialTop = topValue + 80;
         const targetPositionTop = topValue; // Original top position
         
         // Store info for this sphere

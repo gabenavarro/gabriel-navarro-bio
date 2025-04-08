@@ -1,7 +1,6 @@
 from fasthtml.common import Style, Div, H1, Span, P, Script, Button
 from src.lib.statics import HERO_SKILLS, HERO_SKILLS_DESCRIPTION
 from src.components.buttons import button_primary, button_outline
-from src.components.backgrounds import BALL, VERTICAL_LINES
 
 _script = f"""
 htmx.onLoad(function() {{
@@ -247,8 +246,14 @@ _style = """
     font-size: 3.5rem;
     font-weight: 800;
     color: var(--white);
-    margin-bottom: 1.5rem;
     line-height: 1.2;
+    margin-bottom: 1.5rem;
+}
+
+@keyframes hero-typing {
+    from {
+        width
+    }
 }
 
 .accent {
@@ -324,7 +329,6 @@ _style = """
 HERO_SECTION = Div(
     Style(_style),
     Script(_script),
-    VERTICAL_LINES,
     Div(
                     
         # Hero content wrapper
