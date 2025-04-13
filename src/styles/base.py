@@ -22,6 +22,36 @@ body {
     background-color: var(--black); /* rgba(154, 83, 48, 1); */
     overflow-x: hidden;
 }
+
+/* Native Scroll-Based Animation */
+.scroll-left-hidden {
+    opacity: 0;
+    filter: blur(5px);
+    transform: translateX(-100%);
+    transition: all 1s ease;
+}
+
+.scroll-show {
+    opacity: 1;
+    filter: blur(0);
+    transform: translateX(0);
+}
+
+@media (prefers-reduced-motion) {
+    .scroll-left-hidden {
+        transition: none;
+    }
+}
+
+
+.primary-color {
+    color: var(--primary-color);
+}
+
+. {
+    font-weight: bold;
+}
+
 """
 
 

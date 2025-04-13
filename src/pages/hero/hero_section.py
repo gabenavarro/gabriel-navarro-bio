@@ -1,9 +1,10 @@
-from fasthtml.common import Style, Div, H1, Span, P, Script, Button
+from fasthtml.common import Style, Div, H1, Span, P, Script, Button, Section
 from src.lib.statics import HERO_SKILLS, HERO_SKILLS_DESCRIPTION
 from src.components.buttons import button_primary, button_outline
 
 _script = f"""
 htmx.onLoad(function() {{
+    
     // Execute immediately on script load rather than waiting for DOMContentLoaded
     // Define and cache DOM elements
     const skills = {HERO_SKILLS};
@@ -250,12 +251,6 @@ _style = """
     margin-bottom: 1.5rem;
 }
 
-@keyframes hero-typing {
-    from {
-        width
-    }
-}
-
 .accent {
     color: var(--primary-color);
 }
@@ -324,11 +319,40 @@ _style = """
         gap: 20px;
     }
 }
+
+.css-typing p {
+  border-right: .15em solid orange;
+  font-family: "Courier";
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+/* First line */
+.css-typing p:nth-child(1) {
+  width: 7.3em;
+  animation: type 2s steps(40, end) forwards;
+}
+/* Second line */
+.css-typing p:nth-child(2) {
+  width: 11.5em;
+  opacity: 0;
+  animation: type2 2s steps(40, end) 2s forwards;
+}
+/* Third line */
+.css-typing p:nth-child(3) {
+  width: 7.3em;
+  opacity: 0;
+  animation: type3 5s steps(20, end) 4s forwards, blink 0.5s step-end infinite alternate 9s;
+}
+@keyframes type { 0% { width: 0 } 99.9% { border-right: .15em solid orange } 100% { border: none } }
+@keyframes type2 { 0% { width: 0 } 1% { opacity: 1 } 100% { opacity: 1; border: none } }
+@keyframes type3 { 0% { width: 0 } 1% { opacity: 1 } 100% { opacity: 1 } }
+@keyframes blink { 50% { border-color: transparent } }
 """
 
 HERO_SECTION = Div(
     Style(_style),
-    Script(_script),
+    Script(_script, defer=True),
     Div(
                     
         # Hero content wrapper
@@ -341,8 +365,9 @@ HERO_SECTION = Div(
                         id="hero-skill-text",
                         cls="accent animated-text"
                     ),
-                    cls="hero-title"
+                    cls="hero-title scroll-left-hidden"
                 ),
+
                 P(
                     "I employ cutting-edge computational methods to solve challenging scientific problems. Let's push the boundaries of research together!",
                     id="hero-skill-description",
