@@ -231,37 +231,8 @@ _style = """
     /* Ensure proper stacking context */
     isolation: isolate;
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 90%, var(--black) 100%);
-
 }
 
-.hero-container {
-    width: 100%;
-    max-width: var(--container-max-width);
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
-    padding: 0 1rem;
-}
-
-.hero-title {
-    font-size: 3.5rem;
-    font-weight: 800;
-    color: var(--white);
-    line-height: 1.2;
-    margin-bottom: 1.5rem;
-}
-
-.accent {
-    color: var(--primary-color);
-}
-
-.hero-subtitle {
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
-    color: var(--white);
-    max-width: 600px;
-    min-height: 150px;
-}
 
 .animated-text {
     display: inline-block;
@@ -277,13 +248,6 @@ _style = """
 
 /* Medium screens */
 @media (max-width: 992px) {
-    .hero-title {
-        font-size: 3rem;
-    }
-    
-    .hero-subtitle {
-        font-size: 1.1rem;
-    }
 
     .platform {
         grid-template-columns: repeat(2, 1fr);
@@ -298,15 +262,6 @@ _style = """
         padding-top: 5rem;
     }
     
-    .hero-title {
-        font-size: 2.3rem;
-    }
-    
-    .hero-subtitle {
-        font-size: 1rem;
-        margin-bottom: 1.5rem;
-    }
-
     .cta-buttons {
         flex-direction: column;
         gap: 0.75rem;
@@ -358,20 +313,22 @@ HERO_SECTION = Div(
         # Hero content wrapper
         Div(
             Div(
+
+                # Introduction section
                 H1(
                     "Hi, I'm Gabriel Navarro, a ",
                     Span(
                         "Computational Scientist",
                         id="hero-skill-text",
-                        cls="accent animated-text"
+                        cls="highlight animated-text"
                     ),
-                    cls="hero-title scroll-left-hidden"
+                    cls="title scroll-left-hidden"
                 ),
 
                 P(
                     "I employ cutting-edge computational methods to solve challenging scientific problems. Let's push the boundaries of research together!",
                     id="hero-skill-description",
-                    cls="hero-subtitle"
+                    cls="subtitle"
                 ),
 
                 # Skill Navigation Controls
@@ -391,7 +348,7 @@ HERO_SECTION = Div(
                     cls="cta-buttons"
                 ),
             ),
-            cls="hero-container"
+            cls="container"
         ),
         cls="hero-section"
     )

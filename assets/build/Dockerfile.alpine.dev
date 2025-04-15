@@ -25,7 +25,6 @@ RUN python -m venv /opt/venv && \
 # -----------------------------------------------
 # STAGE 2: Install development dependencies
 # -----------------------------------------------
-# Use Python 3.13 slim as base image
 FROM python:3.13-alpine AS develop
 
 # Set working directory
@@ -50,7 +49,6 @@ RUN python -m venv /opt/venv && \
 # ---------------------------------------------
 # STAGE 3: Create the final development image
 # ---------------------------------------------
-# Use Python 3.13 slim as base image
 FROM python:3.13-alpine
 
 # Set working directory

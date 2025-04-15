@@ -26,7 +26,7 @@ def transition_js_css(
     .sphere-1 {
         width: 40vw;
         height: 40vw;
-        background: linear-gradient(40deg, rgba(255, 0, 128, 0.8), rgba(255, 102, 0, 0.4));
+        background: linear-gradient(40deg, rgba(255, 0, 128, 0.4), rgba(255, 102, 0, 0.2));
         top: 10vh;
         left: -10vw;
         animation: float-1 15s ease-in-out infinite alternate;
@@ -38,7 +38,7 @@ def transition_js_css(
     .sphere-2 {
         width: 45vw;
         height: 45vw;
-        background: linear-gradient(240deg, rgba(72, 0, 255, 0.8), rgba(0, 183, 255, 0.4));
+        background: linear-gradient(240deg, rgba(72, 0, 255, 0.4), rgba(0, 183, 255, 0.2));
         top: 70vh;
         left: 70vw;
         animation: float-2 18s ease-in-out infinite alternate;
@@ -50,7 +50,7 @@ def transition_js_css(
     .sphere-3 {
         width: 30vw;
         height: 30vw;
-        background: linear-gradient(120deg, rgba(133, 89, 255, 0.5), rgba(98, 216, 249, 0.3));
+        background: linear-gradient(120deg, rgba(133, 89, 255, 0.25), rgba(98, 216, 249, 0.15));
         top: 50vh;
         left: 20vw;
         animation: float-3 20s ease-in-out infinite alternate;
@@ -128,7 +128,7 @@ def transition_js_css(
     }
 
     .particles-container {
-        position: relative;
+        position: absolute;
         top: 0;
         left: 0;
         width: 100%;
@@ -170,7 +170,7 @@ def transition_js_css(
     document.addEventListener('DOMContentLoaded', function() {{
         // Create particle effect
         const particlesContainer = document.getElementById('particles-container');
-        const particleCount = 80;
+        const particleCount = 280;
         
         // Get references to all spheres
         const spheres = document.querySelectorAll('.gradient-sphere');
@@ -423,7 +423,7 @@ def transition_js_css(
                 particle.style.top = `${{mouseY}}%`;
                 particle.style.opacity = '0.6';
                 
-                particlesContainer.appendChild(particle);
+                // particlesContainer.appendChild(particle);
                 
                 // Animate outward
                 setTimeout(() => {{
@@ -457,6 +457,28 @@ def transition_js_css(
     }});
     """
     return css, js
+
+
+def glow_object(
+    number: int = 0,
+    top: int = 80,
+    left: int = 70,
+    size: int = 30
+):
+    return f"""
+    .glow-{number} {{
+        position: absolute;
+        width: {size}vw;
+        height: {size}vh;
+        background: radial-gradient(circle, rgba(72, 0, 255, 0.15), transparent 70%);
+        top: {top}%;
+        left: {left}%;
+        transform: translate(-50%, -50%);
+        z-index: 2;
+        animation: pulse 8s infinite alternate;
+        filter: blur(30px);
+    }}
+    """
 
 
 _style,_script = transition_js_css()

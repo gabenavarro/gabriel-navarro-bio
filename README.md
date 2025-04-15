@@ -49,6 +49,7 @@ docker build -f ./assets/build/Dockerfile.dev -t gnbio:local .
 Run the application locally using Uvicorn:
 ```bash
 docker run -dt \
+  -p 8080:8080 \
   -v $(pwd)/:/app/ \
   --name gnbio \
   gnbio:local
