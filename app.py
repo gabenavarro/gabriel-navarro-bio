@@ -10,4 +10,4 @@ def get():
 def projects():
     return GENOMICS_PROJECT
 
-serve()
+serve(port=8080, reload=False)

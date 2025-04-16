@@ -42,7 +42,7 @@ _style = """
 }
 
 .nav-link:hover {
-    color: var(--accent-color);
+    color: var(--secondary-color);
 }
 
 @media (max-width: 992px) {

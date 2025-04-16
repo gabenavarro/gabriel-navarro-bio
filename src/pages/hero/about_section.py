@@ -1,242 +1,228 @@
-from fasthtml.common import Style, Div, H1, Span, P, Button, Img, H2, A
-from src.lib.statics import HERO_SKILLS, HERO_SKILLS_DESCRIPTION
+from fasthtml.common import Style, Script, Div, H1, Span, P, Button, Img, H2, H3, A, Section, Ul, Li, Strong
+from src.components.backgrounds import transition_js_css, glow_object
 from src.components.buttons import button_primary, button_outline
 
+transition_css, transition_js = transition_js_css("about-background")
+glow_3 = glow_object(3, 40, 22)
+glow_4 = glow_object(4, 10, 88)
+glow_5 = glow_object(5, 34, 68)
+glow_6 = glow_object(6, 73, 34)
+glow_7 = glow_object(7, 95, 14)
 
-_style = """
-/* About Me Section */
-.about-section {
-    padding: 6rem 0;
-    background-color: var(--light-bg);
-    position: relative;
-    overflow: hidden;
-    z-index: 2;
-    /* Ensure this section creates a new stacking context */
-    isolation: isolate;
-    /* Create solid background that fully covers any content below */
-    box-shadow: 0 0 0 100vmax var(--light-bg);
-    clip-path: inset(0 -100vmax);
-}
+_css = transition_css + """
 
-.about-container {
-    width: 100%;
-    max-width: var(--container-max-width);
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
-    padding: 0 1rem;
-}
-
-.about-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+.about-background {
     height: 100%;
-    z-index: -1;
-    background: linear-gradient(135deg, #f5f8ff 0%, #e6f0ff 100%);
-    overflow: hidden;
-}
-
-.about-bg::before {
-    content: '';
-    position: absolute;
-    width: 35%;
-    height: 35%;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary-color) 20%, var(--accent-color) 100%);
-    filter: blur(70px);
-    opacity: 0.05;
-    bottom: -10%;
-    right: -5%;
-}
-
-.about-bg::after {
-    content: '';
-    position: absolute;
-    width: 25%;
-    height: 25%;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent-color) 20%, var(--primary-color) 100%);
-    filter: blur(60px);
-    opacity: 0.05;
-    top: -5%;
-    left: -5%;
-}
-
-.about-image {
     width: 100%;
-    height: auto;
-    border-radius: 12px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-    position: relative;
-    z-index: 1;
-}
-
-.about-image-wrapper {
-    position: relative;
-    display: inline-block;
-}
-
-.about-image-wrapper::before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    border: 2px solid var(--primary-color);
-    border-radius: 12px;
-    top: 15px;
-    left: 15px;
-    z-index: 0;
-}
-
-.about-image:hover {
-    transform: translateY(-5px);
-}
-
-.about-info h2 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-    color: var(--text-color);
-}
-
-.about-info .section-subtitle {
-    font-size: 1.1rem;
-    color: var(--primary-color);
-    text-transform: uppercase;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    margin-bottom: 1rem;
-}
-
-.about-info p {
-    margin-bottom: 1.5rem;
-    font-size: 1.1rem;
-    line-height: 1.7;
-    color: var(--text-color);
-}
-
-
-/* Medium screens */
-@media (max-width: 992px) {
-    .about-content {
-        gap: 2rem;
-    }
-    
-    .about-info h2 {
-        font-size: 2.2rem;
-    }
-}
-
-.skills-list {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    margin-top: 2rem;
-}
-
-.skill-item {
     display: flex;
-    align-items: center;
-    gap: 0.5rem;
+    position: relative;
+    background-color: transparent;
+    z-index: 1;
 }
 
-.skill-icon {
-    color: var(--primary-color);
-    font-size: 1.2rem;
+.about-block {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 80vh;
+    padding: 2rem;
 }
 
-/* Small screens */
-@media (max-width: 768px) {
-    .about-content {
-        grid-template-columns: 1fr;
-    }
-    
-    .about-image-wrapper {
-        margin-bottom: 2rem;
-    }
-    
-    .about-info h2 {
-        font-size: 2rem;
-    }
-
-    .skills-list {
-        grid-template-columns: 1fr;
-    }
+.about-block-right-aligned {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    padding-right: 4rem;
 }
-"""
 
-ABOUT_SECTION  = Div(
-    Style(_style),
+""" + glow_3 + glow_4 + glow_5 + glow_6 + glow_7
+
+
+ABOUT_ME = Div(
+    Script(transition_js),
+    Style(_css),
+
+    # Years experience
     Div(
-        # Left Column - Image
-        Div(
-            Img(
-                src="/api/placeholder/400/500",
-                alt="Gabriel Navarro",
-                cls="about-image"
-            ),
-            cls="about-image-wrapper"
-        ),
-        
-        # Right Column - Information
-        Div(
-            Span("About Me", cls="section-subtitle"),
-            H2("Exploring the Intersection of Science and Computation"),
-            P(
-                "As a computational scientist with over 10 years of experience, I specialize in developing and applying advanced algorithms to solve complex scientific problems. My expertise spans across multiple domains including molecular dynamics, quantum chemistry, and machine learning applications in scientific research."
-            ),
-            P(
-                "I'm passionate about leveraging computational methods to accelerate scientific discovery and create innovative solutions that bridge the gap between theoretical models and practical applications."
-            ),
-            
-            # Skills List
+        Section(
             Div(
-                Div(
-                    Span("✓", cls="skill-icon"),
-                    Span("Molecular Modeling"),
-                    cls="skill-item"
-                ),
-                Div(
-                    Span("✓", cls="skill-icon"),
-                    Span("Quantum Chemistry"),
-                    cls="skill-item"
-                ),
-                Div(
-                    Span("✓", cls="skill-icon"),
-                    Span("Scientific Programming"),
-                    cls="skill-item"
-                ),
-                Div(
-                    Span("✓", cls="skill-icon"),
-                    Span("Machine Learning"),
-                    cls="skill-item"
-                ),
-                Div(
-                    Span("✓", cls="skill-icon"),
-                    Span("High-Performance Computing"),
-                    cls="skill-item"
-                ),
-                Div(
-                    Span("✓", cls="skill-icon"),
-                    Span("Data Visualization"),
-                    cls="skill-item"
-                ),
-                cls="skills-list"
+                H2("Experienced Computational Scientist", cls="section-title scroll-left-hidden"),
+                Ul(
+                    Li(
+                        Div(Strong("Cross-Disciplinary Expertise", cls="secondary-color subtitle")),
+                        "Over a decade of experience at the intersection of biology, chemistry, and machine learning—spanning ",
+                        Strong("metabolomics"), ", ",
+                        Strong("proteomics"), ", ",
+                        Strong("genomics"), ", and ", 
+                        Strong("drug discovery"), ".",
+                        cls="scroll-left-hidden"
+                    ),
+                    Li(
+                        Div(Strong("Industry-Backed Innovation", cls="secondary-color subtitle")),
+                        "Led high-impact projects at global companies and startups, including ",
+                        Strong("Datacca"), ", ",
+                        Strong("Triplebar"), ", ",
+                        Strong("Brightseed"), ", ",
+                        Strong("Amyris"), ", ",
+                        Strong("Hexagon Bio"), ", and ", 
+                        Strong("Mondelez"), ", building platforms used by R&D, regulatory, and commercial teams.",
+                        cls="scroll-left-hidden"
+                    ),
+                    Li(
+                        Div(Strong("Scientific Rigor & Engineering Precision", cls="secondary-color subtitle")),
+                        "Combines deep scientific knowledge with advanced software and cloud engineering to turn raw "
+                        "biological data into scalable, actionable systems.",
+                        cls="scroll-left-hidden"
+                    )
+                )
             ),
-            
-            # Buttons
             Div(
-                A("Download CV", href="#", cls="btn btn-primary"),
-                A("Contact Me", href="#contact", cls="btn btn-outline"),
-                cls="button-container cta-buttons"
+                button_outline("My Curriculum Vitae", href="#contact"),
+                cls="scroll-right-hidden about-block-right-aligned"
             ),
-            
-            cls="about-info"
+            cls="about-block"
         ),
-        cls="about-container"
+    
+        # Machine Learning
+        Section(
+            Div(
+                H2("Machine Learning in Biosciences", cls="section-title scroll-left-hidden"),
+                Ul(
+                    Li(
+                        Div(Strong("Molecule Fingerprints from Mass Spectrometry", cls="secondary-color subtitle")),
+                        "Developed machine learning models that mapped 20,000+ plant compounds to human health outcomes, driving a ",
+                        Strong("1000x increase"), " in phytonutrient discovery throughput.",
+                        cls="scroll-left-hidden"
+                    ),
+                    Li(
+                        Div(Strong("Fungal Compound Discovery", cls="secondary-color subtitle")),
+                        "Designed and deployed scalable workflows on Google Cloud Vertex AI using GATK, samtools, "
+                        "Dragen-OS, and other bioinformatics tools to streamline genomic analysis at scale.",
+                        cls="scroll-left-hidden"
+                    )
+                )
+            ),
+            Div(
+                button_outline("My Machine Learning Projects", href="#contact"),
+                cls="scroll-right-hidden about-block-right-aligned"
+            ),
+            cls="about-block"
+        ),
+
+        Section(
+            Div(
+                H2("AI in Genomics & Protein Design", cls="section-title scroll-left-hidden"),
+                Ul(
+                    Li(
+                        Div(Strong("Genome Language Models", cls="secondary-color subtitle")),
+                        "Trained and fine-tuned fungal genome language models to optimize ",
+                        Strong("protein expression and secretion"), ", accelerating synthetic biology applications.",
+                        cls="scroll-left-hidden"
+                    ),
+                    Li(
+                        Div(Strong("Protein Language Models", cls="secondary-color subtitle")),
+                        "Fine-tuned antibody-specific PLMs to enhance ",
+                        Strong("sequence design"), " with demonstrably improved functional outcomes",
+                        cls="scroll-left-hidden"
+                    )
+                )
+            ),
+            Div(
+                button_outline("My AI Projects", href="#contact"),
+                cls="scroll-right-hidden about-block-right-aligned"
+            ),
+            cls="about-block"
+        ),
+
+
+        Section(
+            Div(
+                H2("Omics Infrastructure & Pipelines", cls="section-title scroll-left-hidden"),
+                
+                H3("🧫 Genomics", cls="scroll-left-hidden"),
+                Ul(
+                    Li(
+                        Div(Strong("Scalable DNA Processing", cls="secondary-color subtitle")),
+                        "Designed and deployed scalable workflows on Google Cloud Vertex AI using GATK, samtools, Dragen-OS, "
+                        "and other bioinformatics tools to streamline genomic analysis at scale.",
+                        cls="scroll-left-hidden"
+                    ),
+                ),
+
+                H3("🧪 Proteomics", cls="scroll-left-hidden"),
+                Ul(
+                    Li(
+                        Div(Strong("End-to-End Proteomics Platform", cls="secondary-color subtitle")),
+                        "Built a comprehensive proteomics pipeline supporting the entire research workflow—from benchside "
+                        "experimentation to insights-driven decision-making by scientists.",
+                        cls="scroll-left-hidden"
+                    ),
+                ),
+
+                H3("🧉 Metabolomics", cls="scroll-left-hidden"),
+                Ul(
+                    Li(
+                        Div(Strong("Scalable DNA Processing", cls="secondary-color subtitle")),
+                        "Developed high-throughput metabolomics pipelines capable of processing terabyte-scale ",
+                        "LC-MS/MS datasets for accelerated discovery.",
+                        cls="scroll-left-hidden"
+                    ),
+                )
+            ),
+            Div(
+                button_outline("My Omics Projects", href="#contact"),
+                cls="scroll-right-hidden about-block-right-aligned"
+            ),
+            cls="about-block"
+        ),
+
+        Section(
+            Div(
+                H2("Data Science & Visualization", cls="section-title scroll-left-hidden"),
+                Ul(
+                    Li(
+                        Div(Strong("Multi-Omics Platform for R&D", cls="secondary-color subtitle")),
+                        "Built interactive Python Dash and FastHTML dashboards to empower scientists to explore complex "
+                        "datasets and extract actionable insights across multi-omics domains.",
+                        cls="scroll-left-hidden"
+                    ),
+                )
+            ),
+            Div(
+                button_outline("My Visualization Projects", href="#contact"),
+                cls="scroll-right-hidden about-block-right-aligned"
+            ),
+            cls="about-block"
+        ),
+
+        Section(
+            Div(
+                H2("Infrastructure & Scalability", cls="section-title scroll-left-hidden"),
+                Ul(
+                    Li(
+                        Div(Strong("Cloud Bioinformatics", cls="secondary-color subtitle")),
+                        "Architected and deployed scalable, production-ready infrastructure to support AI/ML-driven "
+                        "genome and antibody design workflows in cloud environments.",
+                        cls="scroll-left-hidden"
+                    ),
+                )
+            ),
+            Div(
+                button_outline("My Infrustcture Projects", href="#contact"),
+                cls="scroll-right-hidden about-block-right-aligned"
+            ),
+            cls="about-block"
+        ),
+
+        cls="container"
     ),
-    cls="about-section"
+    Div(cls="glow-1"),
+    Div(cls="glow-2"),
+    Div(cls="glow-3"),
+    Div(cls="glow-4"),
+    Div(cls="glow-5"),
+    Div(cls="glow-6"),
+    Div(cls="glow-7"),
+    Div(cls="particles-container", id="particles-container"),
+    cls="about-background"
 )

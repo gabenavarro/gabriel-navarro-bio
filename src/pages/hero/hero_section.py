@@ -1,9 +1,10 @@
-from fasthtml.common import Style, Div, H1, Span, P, Script, Button
+from fasthtml.common import Style, Div, H1, Span, P, Script, Button, Section
 from src.lib.statics import HERO_SKILLS, HERO_SKILLS_DESCRIPTION
 from src.components.buttons import button_primary, button_outline
 
 _script = f"""
 htmx.onLoad(function() {{
+    
     // Execute immediately on script load rather than waiting for DOMContentLoaded
     // Define and cache DOM elements
     const skills = {HERO_SKILLS};
@@ -230,43 +231,8 @@ _style = """
     /* Ensure proper stacking context */
     isolation: isolate;
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0) 90%, var(--black) 100%);
-
 }
 
-.hero-container {
-    width: 100%;
-    max-width: var(--container-max-width);
-    margin: 0 auto;
-    position: relative;
-    z-index: 1;
-    padding: 0 1rem;
-}
-
-.hero-title {
-    font-size: 3.5rem;
-    font-weight: 800;
-    color: var(--white);
-    line-height: 1.2;
-    margin-bottom: 1.5rem;
-}
-
-@keyframes hero-typing {
-    from {
-        width
-    }
-}
-
-.accent {
-    color: var(--primary-color);
-}
-
-.hero-subtitle {
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
-    color: var(--white);
-    max-width: 600px;
-    min-height: 150px;
-}
 
 .animated-text {
     display: inline-block;
@@ -282,13 +248,6 @@ _style = """
 
 /* Medium screens */
 @media (max-width: 992px) {
-    .hero-title {
-        font-size: 3rem;
-    }
-    
-    .hero-subtitle {
-        font-size: 1.1rem;
-    }
 
     .platform {
         grid-template-columns: repeat(2, 1fr);
@@ -303,15 +262,6 @@ _style = """
         padding-top: 5rem;
     }
     
-    .hero-title {
-        font-size: 2.3rem;
-    }
-    
-    .hero-subtitle {
-        font-size: 1rem;
-        margin-bottom: 1.5rem;
-    }
-
     .cta-buttons {
         flex-direction: column;
         gap: 0.75rem;
@@ -324,29 +274,61 @@ _style = """
         gap: 20px;
     }
 }
+
+.css-typing p {
+  border-right: .15em solid orange;
+  font-family: "Courier";
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+/* First line */
+.css-typing p:nth-child(1) {
+  width: 7.3em;
+  animation: type 2s steps(40, end) forwards;
+}
+/* Second line */
+.css-typing p:nth-child(2) {
+  width: 11.5em;
+  opacity: 0;
+  animation: type2 2s steps(40, end) 2s forwards;
+}
+/* Third line */
+.css-typing p:nth-child(3) {
+  width: 7.3em;
+  opacity: 0;
+  animation: type3 5s steps(20, end) 4s forwards, blink 0.5s step-end infinite alternate 9s;
+}
+@keyframes type { 0% { width: 0 } 99.9% { border-right: .15em solid orange } 100% { border: none } }
+@keyframes type2 { 0% { width: 0 } 1% { opacity: 1 } 100% { opacity: 1; border: none } }
+@keyframes type3 { 0% { width: 0 } 1% { opacity: 1 } 100% { opacity: 1 } }
+@keyframes blink { 50% { border-color: transparent } }
 """
 
 HERO_SECTION = Div(
     Style(_style),
-    Script(_script),
+    Script(_script, defer=True),
     Div(
                     
         # Hero content wrapper
         Div(
             Div(
+
+                # Introduction section
                 H1(
                     "Hi, I'm Gabriel Navarro, a ",
                     Span(
                         "Computational Scientist",
                         id="hero-skill-text",
-                        cls="accent animated-text"
+                        cls="highlight animated-text"
                     ),
-                    cls="hero-title"
+                    cls="title scroll-left-hidden"
                 ),
+
                 P(
                     "I employ cutting-edge computational methods to solve challenging scientific problems. Let's push the boundaries of research together!",
                     id="hero-skill-description",
-                    cls="hero-subtitle"
+                    cls="subtitle"
                 ),
 
                 # Skill Navigation Controls
@@ -366,7 +348,7 @@ HERO_SECTION = Div(
                     cls="cta-buttons"
                 ),
             ),
-            cls="hero-container"
+            cls="container"
         ),
         cls="hero-section"
     )

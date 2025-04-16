@@ -1,0 +1,76 @@
+# ---------------------------------------------
+# STAGE 1: Build the application
+# ---------------------------------------------
+FROM python:3.13-alpine AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Install build dependencies
+RUN apk add --no-cache --virtual .build-deps \
+    gcc \
+    musl-dev \
+    python3-dev
+
+# Copy requirements first to leverage Docker cache
+COPY /assets/build/requirements.prod.txt .
+
+# Install dependencies into a virtual environment to isolate them
+RUN python -m venv /opt/venv && \
+    /opt/venv/bin/pip install --no-cache-dir --upgrade pip && \
+    /opt/venv/bin/pip install --no-cache-dir -r requirements.prod.txt && \
+    rm requirements.prod.txt && \
+    apk del .build-deps
+
+# -----------------------------------------------
+# STAGE 2: Install development dependencies
+# -----------------------------------------------
+FROM python:3.13-alpine AS develop
+
+# Set working directory
+WORKDIR /app
+
+# Install build dependencies
+RUN apk add --no-cache --virtual .build-deps \
+    gcc \
+    musl-dev \
+    python3-dev
+
+# Copy requirements first to leverage Docker cache
+COPY /assets/build/requirements.dev.txt /app/
+
+# Install dependencies into a virtual environment to isolate them
+RUN python -m venv /opt/venv && \
+    /opt/venv/bin/pip install --no-cache-dir --upgrade pip && \
+    /opt/venv/bin/pip install --no-cache-dir -r requirements.dev.txt && \
+    rm requirements.dev.txt  && \
+    apk del .build-deps
+
+# ---------------------------------------------
+# STAGE 3: Create the final development image
+# ---------------------------------------------
+FROM python:3.13-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Install build dependencies
+RUN apk add --no-cache --update \
+    git \
+    curl \
+    which \
+    bash
+    
+# Install Google Cloud SDK for develompent authentication
+# Note: This is a workaround for the Google Cloud SDK installation
+RUN curl -sSL https://sdk.cloud.google.com | bash
+
+# Copy only necessary files from builder and dev stages
+COPY --from=builder /opt/venv /opt/venv
+COPY --from=develop /opt/venv /opt/venv
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PATH="/opt/venv/bin:$PATH" \
+    GOOGLE_CLOUD_CREDENTIALS="/app/assets/secrets/gcp_credentials.json"

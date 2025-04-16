@@ -168,6 +168,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 DOT_PARALLAX = Div(
     Style(_parallax_style),
-    Script(_parallax_script),
+    Script(_parallax_script, defer=True),
     cls="parallax-background", 
 )

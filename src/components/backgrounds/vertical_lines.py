@@ -20,7 +20,7 @@ _style = """
     bottom: 0;
     left: 10vw;
     overflow: hidden;
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.01);
     z-index: 100;
 }
 

@@ -1,0 +1,45 @@
+# Define the skills that will rotate in the animated text section
+HERO_SKILLS = [
+    "Computational Scientist",
+    "Machine Learning Researcher",
+    "Bioinformatician",
+    # "Data Engineer",
+    # "Cloud Architect",
+    # "Python Developer",
+    # "Database Specialist",
+    # "Genomics Expert",
+    # "Metabolomics Scientist",
+    # "Mass Spectrometrist",
+    # "Software Engineer",
+    # "Technical Mentor",
+    # "Team Leader",
+    # "Research Scientist",
+    # "Problem Solver",
+    # "Agile Practitioner",
+    # "Systems Integrator",
+    # "Project Manager",
+    # "Cross-Functional Expert"
+]
+
+HERO_SKILLS_DESCRIPTION = {
+    "Bioinformatician":"I decode complex biological datasets to uncover hidden insights and accelerate scientific breakthroughs. Let's transform data into discoveries together!",
+    "Data Engineer":"I build robust, scalable pipelines that efficiently handle petabyte-scale datasets. Let's turn massive data into actionable insights together!",
+    "Computational Scientist":"I employ cutting-edge computational methods to solve challenging scientific problems. Let's push the boundaries of research together!",
+    "Machine Learning Researcher":"I design and deploy machine learning models that extract valuable patterns from data. Let's unlock new possibilities with AI together!",
+    "Cloud Architect":"I create scalable, secure cloud infrastructures that power high-performance computing. Let's innovate in the cloud together!",
+    "Python Developer":"I craft efficient, maintainable Python solutions that simplify complex tasks. Let's build powerful applications together!",
+    "Database Specialist":"I design high-performance databases to store and retrieve vast amounts of information. Let's make data instantly accessible together!",
+    "Genomics Expert":"I analyze genomic sequences to reveal key biological insights and drive scientific progress. Let's decode life's blueprint together!",
+    "Metabolomics Scientist":"I map and interpret metabolic pathways to identify health-impacting compounds. Let's explore the chemistry of life together!",
+    "Mass Spectrometrist":"I harness advanced mass spectrometry techniques to detect and quantify complex molecules. Let's unveil the secrets in every sample together!",
+    "Software Engineer":"I develop reliable, efficient software systems to tackle intricate problems at scale. Let's code extraordinary solutions together!",
+    "Technical Mentor":"I guide teams through complex technical challenges, fostering growth and innovation. Let's develop tomorrow's experts together!",
+    "Team Leader":"I motivate and coordinate diverse teams to achieve ambitious goals. Let's build a culture of success together!",
+    "Research Scientist":"I conduct rigorous experiments and analyses to drive scientific advancements. Let's make groundbreaking discoveries together!",
+    "Problem Solver":"I excel at dissecting tough technical issues, delivering smart, efficient solutions. Let's transform obstacles into opportunities together!",
+    "Agile Practitioner":"I champion iterative development and continuous collaboration to adapt and innovate. Let's deliver top-quality results together!",
+    "Systems Integrator":"I piece together complex software components into a seamless whole. Let's create cohesive technology ecosystems together!",
+    "Project Manager":"I orchestrate plans, people, and resources to finish projects on time and under budget. Let's bring big ideas to life together!",
+    "Documentation Expert":"I create clear, comprehensive documentation to bridge technical and non-technical audiences. Let's keep everyone on the same page together!",
+    "Cross-Functional Expert":"I thrive at the intersection of disciplines, uniting diverse teams to solve multifaceted problems. Let's drive impactful collaboration together!"
+}

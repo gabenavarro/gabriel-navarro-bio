@@ -19,13 +19,14 @@ _css = """
 
 .btn-primary {
     background: var(--primary-color);
-    ccolor: var(--white);
+    color: var(--black);
     border: 2px solid var(--primary-color);
 }
 
 .btn-primary:hover {
     background: var(--accent-color);
     border-color: var(--accent-color);
+    color: var(--white);
     transform: translateY(-3px);
     box-shadow: 0 10px 25px rgba(106, 91, 255, 0.3);
 }
