@@ -1,5 +1,6 @@
 from fasthtml.common import fast_app, serve
-from src.pages import HERO_PAGE, GENOMICS_PROJECT
+from src.pages import HERO_PAGE, MASONRY_PAGE
+
 app, rt = fast_app()
 
 @rt("/")
@@ -8,6 +9,6 @@ def get():
 
 @rt("/projects")
 def projects():
-    return GENOMICS_PROJECT
+    return MASONRY_PAGE
 
 serve(port=8080, reload=False)
