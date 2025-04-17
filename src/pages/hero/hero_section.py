@@ -313,7 +313,6 @@ HERO_SECTION = Div(
         # Hero content wrapper
         Div(
             Div(
-
                 # Introduction section
                 H1(
                     "Hi, I'm Gabriel Navarro, PhD ",

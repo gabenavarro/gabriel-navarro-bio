@@ -10,7 +10,7 @@ HERO_PAGE = Div(
     Style(ROOT_CSS + BODY_CSS),
     Script(SCROLL_JS),
     NAVIGATION,
-    HERO_SECTION,
     VERTICAL_LINE,
-    ABOUT_ME
+    HERO_SECTION,
+    ABOUT_ME,
 )

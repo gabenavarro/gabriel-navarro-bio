@@ -11,6 +11,10 @@ ROOT_CSS = """
     --container-max-width: 900px;
     --medium-screen: 992px;
     --small-screen: 768px;
+
+    /* Darktheme newspaper */
+    --dark-newspaper-bg: #1a1a1a;
+    --dark-highlight-newspaper: #4B4B4B;
 }
 
 """
@@ -78,13 +82,14 @@ body {
 /* ----------------------------- */
 /*           Font                */
 /* ----------------------------- */
+
 .title {
     font-size: 3.5rem;
     font-weight: 800;
     color: var(--white);
     line-height: 1.2;
     margin-bottom: 1.5rem;
-
+    
     @media (max-width: 992px) {
         font-size: 2.75rem;
     }

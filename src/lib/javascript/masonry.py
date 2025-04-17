@@ -1,29 +1,29 @@
 from fasthtml.common import Script
 
 def MasonryJS(
-        sel='.masonry-grid',  # CSS selector for masonry grid container
-        item_selector='.masonry-item',  # CSS selector for grid items
-        gutter=10,  # Gutter between items (in pixels)
-        column_width='.masonry-sizer',  # Width of columns (can be a selector string or number)
-        percent_position=True,  # Set item positions in percent values instead of pixels
-        horizontal_order=False,  # Lay out items to maintain horizontal order
-        origin_left=True,  # Set positioning from left to right (false for right to left)
-        origin_top=True  # Set positioning from top to bottom (false for bottom to top)
+        sel: str = '.masonry-grid',
+        item_selector: str = '.masonry-item',
+        gutter: int = 10,
+        column_width: str | int = '.masonry-sizer',
+        percent_position: bool = True,
+        horizontal_order: bool = False,
+        origin_left: bool = True,
+        origin_top: bool = True
     ):
     """
     Implements browser-based Masonry layout library.
     
-    Args:
-        sel: CSS selector for masonry grid container
-        item_selector: CSS selector for grid items
-        gutter: Gutter between items (in pixels)
-        column_width: Width of columns (can be a selector string or number)
-        percent_position: Set item positions in percent values instead of pixels
-        horizontal_order: Lay out items to maintain horizontal order
-        origin_left: Set positioning from left to right (false for right to left)
-        origin_top: Set positioning from top to bottom (false for bottom to top)
+    ### Args:
+        - sel: CSS selector for masonry grid container
+        - item_selector: CSS selector for grid items
+        - gutter: Gutter between items (in pixels)
+        - column_width: Width of columns (can be a selector string or number)
+        - percent_position: Set item positions in percent values instead of pixels
+        - horizontal_order: Lay out items to maintain horizontal order
+        - origin_left: Set positioning from left to right (false for right to left)
+        - origin_top: Set positioning from top to bottom (false for bottom to top)
     
-    Returns:
+    # Returns:
         Script element with Masonry initialization
     """
     options = {
@@ -113,5 +113,5 @@ function initMasonry(element) {{
 
 proc_htmx('{sel}', initMasonry);
 """    
-    print(src)
+    # print(src) <== Good for debugging
     return Script(src, type='module')
