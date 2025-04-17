@@ -9,10 +9,8 @@ ROOT_CSS = """
     --light-bg: #f5f8ff;
     --white: #ffffff;
     --container-max-width: 900px;
-
     --medium-screen: 992px;
     --small-screen: 768px;
-
 }
 
 """
@@ -77,10 +75,8 @@ body {
 }
 
 
-
-
 /* ----------------------------- */
-/*          Font Sizes           */
+/*           Font                */
 /* ----------------------------- */
 .title {
     font-size: 3.5rem;
@@ -142,6 +138,9 @@ body {
     -webkit-text-fill-color: transparent;
 }
 
+.bold {
+    font-weight: bold;
+}
 
 
 /* ----------------------------- */
@@ -158,11 +157,6 @@ body {
 .tertiary-color {
     color: var(--tertiary-color);
 }
-
-. bold {
-    font-weight: bold;
-}
-
 
 """
 
