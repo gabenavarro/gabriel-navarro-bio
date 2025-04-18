@@ -3,6 +3,7 @@ HERO_SKILLS = [
     "Computational Scientist",
     "Machine Learning Researcher",
     "Bioinformatician",
+    "Synthetic Chemist",
     # "Data Engineer",
     # "Cloud Architect",
     # "Python Developer",
@@ -41,5 +42,6 @@ HERO_SKILLS_DESCRIPTION = {
     "Systems Integrator":"I piece together complex software components into a seamless whole. Let's create cohesive technology ecosystems together!",
     "Project Manager":"I orchestrate plans, people, and resources to finish projects on time and under budget. Let's bring big ideas to life together!",
     "Documentation Expert":"I create clear, comprehensive documentation to bridge technical and non-technical audiences. Let's keep everyone on the same page together!",
-    "Cross-Functional Expert":"I thrive at the intersection of disciplines, uniting diverse teams to solve multifaceted problems. Let's drive impactful collaboration together!"
+    "Cross-Functional Expert":"I thrive at the intersection of disciplines, uniting diverse teams to solve multifaceted problems. Let's drive impactful collaboration together!",
+    "Synthetic Chemist":"I design and synthesize novel compounds to advance scientific research. Let's innovate in the lab together!",
 }

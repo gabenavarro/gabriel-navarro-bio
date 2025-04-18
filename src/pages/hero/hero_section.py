@@ -313,10 +313,9 @@ HERO_SECTION = Div(
         # Hero content wrapper
         Div(
             Div(
-
                 # Introduction section
                 H1(
-                    "Hi, I'm Gabriel Navarro, a ",
+                    "Hi, I'm Gabriel Navarro, PhD ",
                     Span(
                         "Computational Scientist",
                         id="hero-skill-text",

@@ -9,10 +9,12 @@ ROOT_CSS = """
     --light-bg: #f5f8ff;
     --white: #ffffff;
     --container-max-width: 900px;
-
     --medium-screen: 992px;
     --small-screen: 768px;
 
+    /* Darktheme newspaper */
+    --dark-newspaper-bg: #1C1C1C;
+    --dark-highlight-newspaper: #2C2C2C;
 }
 
 """
@@ -77,18 +79,17 @@ body {
 }
 
 
-
-
 /* ----------------------------- */
-/*          Font Sizes           */
+/*           Font                */
 /* ----------------------------- */
+
 .title {
     font-size: 3.5rem;
     font-weight: 800;
     color: var(--white);
     line-height: 1.2;
     margin-bottom: 1.5rem;
-
+    
     @media (max-width: 992px) {
         font-size: 2.75rem;
     }
@@ -142,11 +143,22 @@ body {
     -webkit-text-fill-color: transparent;
 }
 
+.bold {
+    font-weight: bold;
+}
 
 
 /* ----------------------------- */
 /*              Colors           */
 /* ----------------------------- */
+.white {
+    color: var(--white);
+}
+
+.black {
+    color: var(--black);
+}
+
 .primary-color {
     color: var(--primary-color);
 }
@@ -158,11 +170,6 @@ body {
 .tertiary-color {
     color: var(--tertiary-color);
 }
-
-. bold {
-    font-weight: bold;
-}
-
 
 """
 
