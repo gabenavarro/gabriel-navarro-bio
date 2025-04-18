@@ -13,8 +13,8 @@ ROOT_CSS = """
     --small-screen: 768px;
 
     /* Darktheme newspaper */
-    --dark-newspaper-bg: #1a1a1a;
-    --dark-highlight-newspaper: #4B4B4B;
+    --dark-newspaper-bg: #1C1C1C;
+    --dark-highlight-newspaper: #2C2C2C;
 }
 
 """
@@ -151,6 +151,14 @@ body {
 /* ----------------------------- */
 /*              Colors           */
 /* ----------------------------- */
+.white {
+    color: var(--white);
+}
+
+.black {
+    color: var(--black);
+}
+
 .primary-color {
     color: var(--primary-color);
 }

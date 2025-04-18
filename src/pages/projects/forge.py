@@ -17,12 +17,25 @@ css = """
 }
 
 .masonry-card {
-    background-color: var(--black);
-    border-radius: 10px;
+    background-color: var(--dark-newspaper-bg);
+    border-radius: 5px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    padding: 1rem;
+    padding: 0.75rem;
     margin-bottom: 1rem;
     transition: transform 0.3s ease;
+}
+
+.masonry-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    z-index: 3;
+    background-color: var(--dark-highlight-newspaper);
+    color: var(--white);
+    text-decoration: none;
+    filter: brightness(1.05);
+
 }
 
 .masonry-sizer {
@@ -38,14 +51,24 @@ css = """
         max-width: 600px;
     }
 }
+
+.rounded-img {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+}
 """
 rando = random.Random()
 
 def image_card(i):
     return Div(
-        Img(src=f"https://picsum.photos/id/{i + 100}/600/{rando.randint(a=200,b=500)}", alt=f"Image {i}"),
-        H3(f"Image Title {i}"),
-        P(f"This is a description for image {i}"),
+        Img(
+            src=f"https://picsum.photos/id/{i + 100}/600/{rando.randint(a=200,b=500)}", 
+            alt=f"Image {i}",
+            cls="rounded-img",
+        ),
+        H3(f"Image Title {i}", cls="white"),
+        P(f"This is a description for image {i}", cls="white"),
         cls="masonry-card masonry-sizer"
     )
 
@@ -57,13 +80,14 @@ def create_blog_page():
             sel=".masonry-container",
             item_selector=".masonry-card",
             column_width=".masonry-sizer",
-            gutter=0,
+            gutter=20,
             percent_position=False,
             horizontal_order=True,
             origin_left=True,
             origin_top=True,
         ),
         NAVIGATION,
+        Div(style="height: 10vh;"),
         Div(
             Div(
                 *[image_card(i) for i in range(1, 20) if i != 5],
