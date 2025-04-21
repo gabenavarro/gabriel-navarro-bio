@@ -1,12 +1,13 @@
 # ---------------------------------------------
 # STAGE 1: Build the application
 # ---------------------------------------------
-FROM python:3.12-alpine
+FROM python:3.13-alpine
 
 # Set working directory
 WORKDIR /app
 
 # Install build dependencies
+# Adding packages for development debugging and testing
 RUN apk add --no-cache \
     gcc \
     musl-dev \
@@ -14,11 +15,12 @@ RUN apk add --no-cache \
     git \
     curl \
     which \
-    bash
+    bash \
+    linux-headers
 
 # Install Google Cloud SDK for develompent authentication
 # Note: This is a workaround for the Google Cloud SDK installation
-RUN curl -sSL https://sdk.cloud.google.com | bash
+# RUN curl -sSL https://sdk.cloud.google.com | bash
 
 # Copy requirements first to leverage Docker cache
 COPY /assets/build/requirements.prod.txt .
@@ -42,4 +44,5 @@ RUN python -m venv /opt/venv && \
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PATH="/opt/venv/bin:$PATH" \
-    GOOGLE_CLOUD_CREDENTIALS="/app/assets/secrets/gcp_credentials.json"
+    GOOGLE_CLOUD_CREDENTIALS="/app/assets/secrets/gcp_credentials.json" \
+    GOOGLE_APPLICATION_CREDENTIALS="/app/assets/secrets/gcp_credentials.json"
