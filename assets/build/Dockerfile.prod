@@ -1,26 +1,26 @@
 # ---------------------------------------------
 # STAGE 1: Build the application
 # ---------------------------------------------
-    FROM python:3.13-alpine AS builder
+FROM python:3.13-alpine AS builder
 
-    # Set working directory
-    WORKDIR /app
-    
-    # Install build dependencies
-    RUN apk add --no-cache --virtual .build-deps \
-        gcc \
-        musl-dev \
-        python3-dev
-    
-    # Copy requirements first to leverage Docker cache
-    COPY /assets/build/requirements.prod.txt .
-    
-    # Install dependencies into a virtual environment to isolate them
-    RUN python -m venv /opt/venv && \
-        /opt/venv/bin/pip install --no-cache-dir --upgrade pip && \
-        /opt/venv/bin/pip install --no-cache-dir -r requirements.prod.txt && \
-        rm requirements.prod.txt && \
-        apk del .build-deps    
+# Set working directory
+WORKDIR /app
+
+# Install build dependencies
+RUN apk add --no-cache --virtual .build-deps \
+    gcc \
+    musl-dev \
+    python3-dev
+
+# Copy requirements first to leverage Docker cache
+COPY /assets/build/requirements.prod.txt .
+
+# Install dependencies into a virtual environment to isolate them
+RUN python -m venv /opt/venv && \
+    /opt/venv/bin/pip install --no-cache-dir --upgrade pip && \
+    /opt/venv/bin/pip install --no-cache-dir -r requirements.prod.txt && \
+    rm requirements.prod.txt && \
+    apk del .build-deps    
 
 # ---------------------------------------------
 # STAGE 2: Create the final production image
