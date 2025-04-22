@@ -1,3 +1,8 @@
+'''
+Insertion of Javascript library MiniMasonry into FastHTML
+https://spope.github.io/MiniMasonry.js/
+'''
+
 from fasthtml.common import Script
 
 def MasonryJS(

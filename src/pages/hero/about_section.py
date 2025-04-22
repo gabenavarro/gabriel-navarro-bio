@@ -1,6 +1,6 @@
-from fasthtml.common import Style, Script, Div, H1, Span, P, Button, Img, H2, H3, A, Section, Ul, Li, Strong
+from fasthtml.common import Style, Script, Div, H2, H3, Section, Ul, Li, Strong
 from src.components.backgrounds import transition_js_css, glow_object
-from src.components.buttons import button_primary, button_outline
+from src.components.buttons import button_outline
 
 transition_css, transition_js = transition_js_css("about-background")
 glow_3 = glow_object(3, 40, 22)
