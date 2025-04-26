@@ -54,36 +54,49 @@ Detects unusual GC patterns that may indicate contamination or bias:
 
 ## Installing FastQC-RS
 
-### Conda
+### 🐍 Conda Local Installation
 Like most other genomics and transcriptomics software, FastQC is straightforward to install using any flavor of conda. My particular favorite for licensing purposes and improved speed is [mamba](https://mamba.readthedocs.io/en/latest/index.html), but [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) and [anaconda](https://www.anaconda.com/docs/getting-started/anaconda/install) will also work.
 
-```bash
-# Using Conda or Anaconda
-conda install -c bioconda -c conda-forge fastqc
-```
+1. Install FastQC-RS using conda or mamba:
 
-```bash
-# Using mamba
-mamba install -c bioconda -c conda-forge fastqc
-```
+    ```bash
+    # Using Conda or Anaconda
+    conda install -c bioconda -c conda-forge fastqc
+    ```
 
-### Docker
+    ```bash
+    # Using mamba
+    mamba install -c bioconda -c conda-forge fastqc
+    ```
+2. Verify the installation:
+
+    ```bash
+    fastqc --version
+    ```
+    This should return the version number, e.g., `fastqc 0.3.4`.
+
+    **Notes**: If you are using a conda environment, make sure to activate it first. Also, if you are using a different version of FastQC-RS, adjust the version number accordingly.
+
+### 🐳 Docker Local Installation
 A containerized setup ensures reproducibility and portability:
-<details>
 
-<summary>Example Dockerfile for FastQC-RS</summary>
-Here I provide a dockerfile that you can use to install FastQC-RS in a relatively slim image. For more examples, go to my [`SeqContainerLab`](https://github.com/gabenavarro/SeqContainerLab) repository. To install with the one provided below, just copy and paste Docker build code below into an empty file and save it as `dockerfile.fastqcrs`
+1. Create a `dockerfile.fastqcrs` in your working directory.
 
-```docker
-FROM mambaorg/micromamba:2.0-debian11
+    <details>
 
-RUN micromamba install \
-    -c bioconda \
-    -c conda-forge \
-    fastqc-rs==0.3.4 \
-    && micromamba clean -a -y
-```
-</details>
+    <summary>Example Dockerfile for FastQC-RS</summary>
+    Here I provide a dockerfile that you can use to install FastQC-RS in a relatively slim image. For more examples, go to my [`SeqContainerLab`](https://github.com/gabenavarro/SeqContainerLab) repository. To install with the one provided below, just copy and paste Docker build code below into an empty file and save it as `dockerfile.fastqcrs`
+
+    ```docker
+    FROM mambaorg/micromamba:2.0-debian11
+
+    RUN micromamba install \
+        -c bioconda \
+        -c conda-forge \
+        fastqc-rs==0.3.4 \
+        && micromamba clean -a -y
+    ```
+    </details>
 
 <br>
 
@@ -93,7 +106,6 @@ docker build \
 -f ./dockerfile.fastqcrs \
 -t fastqc-rs:0.3.4 .
 ```
-
 
 ## Basic Usage Example
 
