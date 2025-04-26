@@ -109,11 +109,12 @@ This installs FastP v0.24.1 inside a lightweight container — perfect for local
 
 ### 📥 Download Test FASTQ Files
 
-Let's grab a paired-end dataset for *Bacillus subtilis* from the European Nucleotide Archive:
+Let's grab a paired-end dataset for *Bacillus subtilis* ALBA01 strain from the European Nucleotide Archive:
 
 ```bash
+# Make data directory if it doesn't exist,
 mkdir -p data
-
+# Download FASTQ files for Bacillus subtilis ALBA01
 wget -nc -P ./data ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR331/005/SRR3317165/SRR3317165_1.fastq.gz
 wget -nc -P ./data ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR331/005/SRR3317165/SRR3317165_2.fastq.gz
 ```
