@@ -13,11 +13,10 @@ CREATE OR REPLACE TABLE `noble-office-299208.portfolio.gn-blog` (
 OPTIONS(
   description = 'Table containing content with id, title, date, body, views, likes, and tags'
 );
+
+A minimal BigQuery client using google-api-core and avoiding the full SDK.
 '''
 
-"""
-A minimal BigQuery client using google-api-core and avoiding the full SDK.
-"""
 import time
 from google.auth import default
 from google.auth.transport.requests import AuthorizedSession

@@ -2,6 +2,8 @@ from fasthtml.common import Style, Div, Script, Img, H1, H3, P
 from src.components import NAVIGATION
 from src.lib.css import ROOT_CSS, BODY_CSS
 from src.lib.javascript import MasonryJS, MarkedJS
+from typing import Optional
+from src.lib.google.bigquery import BigQueryClient
 import random
 
 
@@ -70,61 +72,69 @@ css = """
 """
 rando = random.Random()
 
-def image_card(i):
+def generate_cards(tag:Optional[str] = None):
+    """ Create a card with an image, title, and description."""
+    client = BigQueryClient()
+    blogs = client.query(sql="SELECT * FROM `noble-office-299208.portfolio.gn-blog` LIMIT 1000")
+    
     return Div(
-        Img(
-            src=f"https://picsum.photos/id/{i + 100}/600/{rando.randint(a=200,b=500)}", 
-            alt=f"Image {i}",
-            cls="rounded-img",
-        ),
-        H3(f"Image Title {i}", cls="white"),
-        P(f"This is a description for image {i}", cls="white"),
-        cls="masonry-card masonry-sizer"
+        *[
+            Div(
+                Img(
+                    src=entry["image"], 
+                    alt=f"",
+                    cls="rounded-img",
+                ),
+                H3(entry["title"], cls="white"),
+                P(entry["description"], cls="white"),
+                cls="masonry-card masonry-sizer"
+            ) for entry in blogs],
+        cls="masonry-container",
     )
 
 
 # TODO: Move this to bigquery for blog posts and for cards
-def marked_section():
-    """ Example of a section with Marked.js for Markdown parsing."""
-    return Div(
-        """
-# Mastering Quality Control in Omics with FastQC
+# def marked_section():
+#     """ Example of a section with Marked.js for Markdown parsing."""
+#     return Div(
+#         """
+# # Mastering Quality Control in Omics with FastQC
 
-Quality control (QC) of sequencing data is a foundational step in bioinformatics workflows, crucial for ensuring reliable and accurate results in omics analyses. Among the many available tools, **FastQC** has emerged as an industry-standard software for performing quality assessments of FASTQ files.
+# Quality control (QC) of sequencing data is a foundational step in bioinformatics workflows, crucial for ensuring reliable and accurate results in omics analyses. Among the many available tools, **FastQC** has emerged as an industry-standard software for performing quality assessments of FASTQ files.
 
-### Basic Usage Example
+# ### Basic Usage Example
 
-Running FastQC on single-end reads:
+# Running FastQC on single-end reads:
 
-```bash
-fastqc sample.fastq -o output_directory
-```
+# ```bash
+# fastqc sample.fastq -o output_directory
+# ```
 
-- `sample.fastq`: The FASTQ file to be assessed.
-- `-o`: Specifies the directory for output reports.
+# - `sample.fastq`: The FASTQ file to be assessed.
+# - `-o`: Specifies the directory for output reports.
 
-For paired-end data:
+# For paired-end data:
 
-```bash
-fastqc sample_R1.fastq sample_R2.fastq -o output_directory
-```
+# ```bash
+# fastqc sample_R1.fastq sample_R2.fastq -o output_directory
+# ```
 
-## Interpreting FastQC Reports
+# ## Interpreting FastQC Reports
 
-FastQC reports use traffic-light indicators:
+# FastQC reports use traffic-light indicators:
 
-- 🟢 **Pass**: The metric falls within an acceptable range.
-- 🟡 **Warn**: Potential issues; requires careful interpretation.
-- 🔴 **Fail**: Significant quality issues that require intervention.
+# - 🟢 **Pass**: The metric falls within an acceptable range.
+# - 🟡 **Warn**: Potential issues; requires careful interpretation.
+# - 🔴 **Fail**: Significant quality issues that require intervention.
 
-## Conclusion
+# ## Conclusion
 
-FastQC remains indispensable in modern bioinformatics, providing clear, actionable insights into sequencing data quality. Integrating FastQC into your omics workflows helps ensure robust and reliable data analysis outcomes.
+# FastQC remains indispensable in modern bioinformatics, providing clear, actionable insights into sequencing data quality. Integrating FastQC into your omics workflows helps ensure robust and reliable data analysis outcomes.
 
-Happy sequencing and quality checking!
-        """,
-        cls="marked"
-    )
+# Happy sequencing and quality checking!
+#         """,
+#         cls="marked"
+#     )
 
 
 def create_blog_page():
@@ -143,15 +153,10 @@ def create_blog_page():
         MarkedJS(),
         NAVIGATION,
         Div(style="height: 10vh;"),
-        marked_section(),
         Div(
-            Div(
-                *[image_card(i) for i in range(1, 20) if i != 5],
-                cls="masonry-container",
-            ),
+            generate_cards(),
         ),
         cls="container",
-        
     )
 
 
