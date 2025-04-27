@@ -32,6 +32,7 @@ body {
     background-color: var(--black); /* rgba(154, 83, 48, 1); */
     overflow-x: hidden;
     scroll-behavior: smooth;
+    padding-bottom: 2rem;
 }
 
 .container {
@@ -41,6 +42,7 @@ body {
     position: relative;
     z-index: 2;
     padding: 0 1rem;
+    padding-bottom: 2rem;
 }
 
 
