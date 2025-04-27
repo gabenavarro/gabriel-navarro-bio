@@ -1,3 +1,5 @@
+# Dev had bigquery to upload to bigquery
+google-cloud-bigquery==3.31.0
 ruff
 ipykernel
 jupyterlab
