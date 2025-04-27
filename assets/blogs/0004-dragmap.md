@@ -1,3 +1,13 @@
+@{id = "a10b19fa-8736-485e-b8b7-a0f0bd5ce22d"
+  title = "FastQC-RS: Quality Control for Omics Data"
+  date = "2025-04-26T00:00:00Z"
+  tags = ['docker', 'bioinformatics', 'genomics']
+  views = 0
+  likes = 0
+  image = "https://storage.googleapis.com/gn-portfolio/images/a10b19fa-8736-485e-b8b7-a0f0bd5ce22d.svg"
+  description = "FastQC-RS is a modern, Rust-based QC tool that delivers fast, reliable assessments and easy-to-read HTML reports—perfect for genomics and transcriptomics workflows."
+  type = "note"
+}
 # High-Performance Variant Calling with Dragen-GATK
 
 Accurate variant calling is fundamental to modern genomics research and clinical sequencing. With the rise of ever-larger datasets, **speed** and **precision** are no longer optional — they are mandatory.  

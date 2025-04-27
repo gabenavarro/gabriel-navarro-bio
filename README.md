@@ -50,6 +50,8 @@ Run the application locally using Uvicorn:
 ```bash
 docker run -dt \
   -p 8080:8080 \
+  --env GOOGLE_APPLICATION_CREDENTIALS="/app/assets/secrets/gcp_credentials.json" \
+  --env GOOGLE_CLOUD_CREDENTIALS="/app/assets/secrets/gcp_credentials.json" \
   -v $(pwd)/:/app/ \
   --name gnbio \
   gnbio:local

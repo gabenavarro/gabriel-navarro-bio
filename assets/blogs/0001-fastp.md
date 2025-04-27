@@ -1,3 +1,13 @@
+@{id = "63844571-3f9b-448e-b410-aac83af3f4ee"
+  title = "Speeding Up FASTQ Preprocessing with FastP"
+  date = "2025-04-26T00:00:00Z"
+  tags = ["bioinformatics", "docker", "genomics"]
+  views = 0
+  likes = 0
+  image = "https://storage.googleapis.com/gn-portfolio/images/63844571-3f9b-448e-b410-aac83af3f4ee.svg"
+  description = "FastP is a modern, ultra-efficient tool that performs both quality control and read cleaning in a single fast pass through your FASTQ files."
+  type = "note"
+}
 # Speeding Up FASTQ Preprocessing with FastP  
 In next-generation sequencing (NGS) workflows, **clean data is critical**. Low-quality reads, adapter sequences, and other artifacts can heavily impact downstream analyses like genome assembly, transcript quantification, or variant calling. **FastP** is a modern, ultra-efficient tool that performs **both quality control and read cleaning** — all in a single fast pass through your FASTQ files. Let's dive into how you can install and use FastP for your omics pipelines!
 
