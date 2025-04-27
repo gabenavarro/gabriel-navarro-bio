@@ -4,8 +4,8 @@
   tags = ["bioinformatics", "docker", "genomics"]
   views = 0
   likes = 0
-  image = "https://storage.googleapis.com/gn-portfolio/images/63844571-3f9b-448e-b410-aac83af3f4ee.svg"
-  description = "FastP is a modern, ultra-efficient tool that performs both quality control and read cleaning in a single fast pass through your FASTQ files."
+  image = "https://storage.googleapis.com/gn-portfolio/images/fastp-thumb.svg"
+  description = "FastP is an ultra-fast, all-in-one tool for trimming, filtering, and quality-checking FASTQ files, helping you quickly generate clean, high-quality datasets for genomics and transcriptomics projects. This guide walks you through installation, usage, and key features of FastP, making it an essential part of your NGS workflow."
   type = "note"
 }
 # Speeding Up FASTQ Preprocessing with FastP  

@@ -4,8 +4,8 @@
   tags = ['docker', 'bioinformatics', 'genomics']
   views = 0
   likes = 0
-  image = "https://storage.googleapis.com/gn-portfolio/images/f1f23d77-289f-4072-8788-cd7fced1d221.svg"
-  description = "FastQC-RS is a modern, Rust-based QC tool that delivers fast, reliable assessments and easy-to-read HTML reports—perfect for genomics and transcriptomics workflows."
+  image = "https://storage.googleapis.com/gn-portfolio/images/fastqc-thumb.svg"
+  description = "FastQC-RS is a modern, Rust-based tool for fast and efficient quality control of FASTQ files, delivering lightweight performance and detailed HTML reports—perfect for ensuring high-quality omics data in genomics and transcriptomics workflows. This guide walks you through Docker-based setup, usage, and key features."
   type = "note"
 }
 # Mastering Quality Control in Omics with FastQC-RS
