@@ -4,7 +4,7 @@ from src.lib.css import ROOT_CSS, BODY_CSS
 from src.lib.javascript import MasonryJS, MarkedJS
 from typing import Optional
 from src.lib.google.bigquery import BigQueryClient
-
+from src.components.modal import get_modal
 
 css = """
 .masonry-container {
@@ -35,6 +35,14 @@ css = """
     text-decoration: none;
     filter: brightness(1.05);
 
+}
+
+.masonary-card-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+    margin-top: 0.5rem;
 }
 
 .masonry-sizer {
@@ -83,7 +91,7 @@ def generate_cards(tag:Optional[str] = None):
                     alt=f"",
                     cls="rounded-img",
                 ),
-                H3(entry["title"], cls="white"),
+                H3(entry["title"], cls="masonary-card-title"),
                 P(entry["description"], cls="white"),
                 href=f"/projects/{entry['id']}",
                 cls="masonry-card masonry-sizer a-card" if not entry["disabled"] else "masonry-card masonry-sizer a-card disabled",
@@ -107,6 +115,7 @@ def create_masonry_page():
         ),
         MarkedJS(),
         NAVIGATION,
+        get_modal(),
         Div(style="height: 10vh;"),
         Div(
             generate_cards(),

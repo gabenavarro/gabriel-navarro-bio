@@ -65,7 +65,7 @@ ABOUT_ME = Div(
                         Strong("Brightseed"), ", ",
                         Strong("Amyris"), ", ",
                         Strong("Hexagon Bio"), ", and ", 
-                        Strong("Mondelez"), ", building platforms used by R&D, regulatory, and commercial teams.",
+                        Strong("Mondelez"), ", building platforms used by R&D and commercial teams.",
                         cls="scroll-left-hidden"
                     ),
                     Li(
@@ -76,10 +76,11 @@ ABOUT_ME = Div(
                     )
                 )
             ),
-            Div(
-                button_outline("My Curriculum Vitae", href="#contact"),
-                cls="scroll-right-hidden about-block-right-aligned"
-            ),
+            # TODO: Create a CV page, then link to it
+            # Div(
+            #     button_outline("My Curriculum Vitae", href="/cv"),
+            #     cls="scroll-right-hidden about-block-right-aligned"
+            # ),
             cls="about-block"
         ),
     

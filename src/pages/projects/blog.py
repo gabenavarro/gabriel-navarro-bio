@@ -4,6 +4,7 @@ from src.components import NAVIGATION
 from src.lib.css import ROOT_CSS, BODY_CSS
 from src.lib.javascript import MarkedJS
 from src.lib.google.bigquery import BigQueryClient
+from src.components.modal import get_modal
 
 
 css = """
@@ -49,6 +50,7 @@ def create_blog_page(uuid: str):
         Style(ROOT_CSS + BODY_CSS + css),
         MarkedJS(),
         NAVIGATION,
+        get_modal(),
         Div(style="height: 10vh;"),
         blog_div,
         cls="container"
