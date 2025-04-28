@@ -80,12 +80,15 @@ gcloud auth configure-docker
 
 Build and tag the image:
 ```bash
-docker build -t gcr.io/YOUR_PROJECT_ID/gabriel-navarro-bio -f assets/build/Dockerfile.prod .
+# Build the Docker image for production
+docker build -f ./assets/build/Dockerfile.prod -t gnbio:prod .
+# Tag the image for Google Container Registry
+docker tag gnbio:prod us-central1-docker.pkg.dev/noble-office-299208/mercy-of-toren/gnbio:prod
 ```
 
 Push the image to Google Container Registry:
 ```bash
-docker push gcr.io/YOUR_PROJECT_ID/gabriel-navarro-bio
+docker push us-central1-docker.pkg.dev/noble-office-299208/mercy-of-toren/gnbio:prod
 ```
 
 Deploy to Cloud Run:
