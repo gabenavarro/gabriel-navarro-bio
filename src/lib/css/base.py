@@ -35,6 +35,12 @@ body {
     padding-bottom: 2rem;
 }
 
+/* Make sure all elements respect the width constraints */
+* {
+  box-sizing: border-box;
+  max-width: 100vw;
+}
+
 .container {
     width: 100%;
     max-width: var(--container-max-width);
@@ -43,6 +49,7 @@ body {
     z-index: 2;
     padding: 0 1rem;
     padding-bottom: 2rem;
+    overflow-x: hidden; /* Add this line */
 }
 
 
@@ -51,16 +58,21 @@ body {
 /* ----------------------------- */
 
 .scroll-right-hidden {
+    width: 100%;
+    max-width: 100%;
+
     opacity: 0;
     filter: blur(5px);
-    transform: translateX(100%);
+    transform: translateX(30%);
     transition: all 1s ease;
 }
 
 .scroll-left-hidden {
+    width: 100%;
+    max-width: 100%;
     opacity: 0;
     filter: blur(5px);
-    transform: translateX(-100%);
+    transform: translateX(-30%);
     transition: all 1s ease;
 }
 
@@ -79,6 +91,34 @@ body {
         transition: none;
     }
 }
+
+
+/* ----------------------------- */
+/*          Mobile Apps         */
+/* ----------------------------- */
+
+/* Media query for mobile screens */
+@media (max-width: 768px) {
+  body {
+    position: relative;
+    width: 100%;
+    overflow-x: hidden;
+  }
+  
+  /* Ensure content is properly sized */
+  h1, h2, h3, p {
+    max-width: 100%;
+    word-wrap: break-word;
+  }
+  
+  /* Adjust any fixed width elements */
+  img, video, iframe {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+
 
 
 /* ----------------------------- */

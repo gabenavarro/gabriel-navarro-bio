@@ -75,7 +75,8 @@ _style = """
     .nav-container {
         padding: 0 0.5rem;
     }
-}"""
+}
+"""
 
 
 NAVIGATION =Div(
