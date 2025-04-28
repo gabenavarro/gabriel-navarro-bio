@@ -85,7 +85,7 @@ NAVIGATION =Div(
         Div(
             A("Home", href="/", cls="nav-link"),
             A("Projects", href="/projects", cls="nav-link"),
-            A("Contact", href="/contact", cls="nav-link"),
+            A("Contact", href="#contact", cls="nav-link"),
             cls="nav-links"
         ),
         cls="nav-container container"
