@@ -342,7 +342,7 @@ HERO_SECTION = Div(
                 # CTA Buttons
                 Div(
                     button_primary("View My Work", href="/projects"),   # Link to projects page
-                    button_outline("About Me", href="#aboutme"),        # Scroll to about me section
+                    # button_outline("About Me", href="#aboutme"),        # Scroll to about me section
                     # button_outline("Contact Me", href="#", modal_open=True),      # Scroll to contact section
                     cls="cta-buttons"
                 ),
