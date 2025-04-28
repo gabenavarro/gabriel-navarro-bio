@@ -103,7 +103,7 @@ ABOUT_ME = Div(
                 )
             ),
             Div(
-                button_outline("My Machine Learning Projects", href="#contact"),
+                button_outline("My Machine Learning Projects", href="/projects"),
                 cls="scroll-right-hidden about-block-right-aligned"
             ),
             cls="about-block"
@@ -128,7 +128,7 @@ ABOUT_ME = Div(
                 )
             ),
             Div(
-                button_outline("My AI Projects", href="#contact"),
+                button_outline("My AI Projects", href="/projects"),
                 cls="scroll-right-hidden about-block-right-aligned"
             ),
             cls="about-block"
@@ -170,7 +170,7 @@ ABOUT_ME = Div(
                 )
             ),
             Div(
-                button_outline("My Omics Projects", href="#contact"),
+                button_outline("My Omics Projects", href="/projects"),
                 cls="scroll-right-hidden about-block-right-aligned"
             ),
             cls="about-block"
@@ -189,7 +189,7 @@ ABOUT_ME = Div(
                 )
             ),
             Div(
-                button_outline("My Visualization Projects", href="#contact"),
+                button_outline("My Visualization Projects", href="/projects"),
                 cls="scroll-right-hidden about-block-right-aligned"
             ),
             cls="about-block"
@@ -208,7 +208,7 @@ ABOUT_ME = Div(
                 )
             ),
             Div(
-                button_outline("My Infrustcture Projects", href="#contact"),
+                button_outline("My Infrustcture Projects", href="/projects"),
                 cls="scroll-right-hidden about-block-right-aligned"
             ),
             cls="about-block"
