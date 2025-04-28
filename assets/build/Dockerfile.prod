@@ -1,42 +1,52 @@
 # ---------------------------------------------
-# STAGE 1: Build the application
+# STAGE 1: Build & install dependencies
 # ---------------------------------------------
 FROM python:3.13-alpine AS builder
 
-# Set working directory
+# 1) install only build-time deps
+RUN apk add --no-cache --virtual .build-deps \
+        gcc \
+        musl-dev \
+        python3-dev
+
 WORKDIR /app
 
-# Install build dependencies
-RUN apk add --no-cache --virtual .build-deps \
-    gcc \
-    musl-dev \
-    python3-dev
-
-# Copy requirements first to leverage Docker cache
-COPY /assets/build/requirements.prod.txt .
-
-# Install dependencies into a virtual environment to isolate them
-RUN python -m venv /opt/venv && \
-    /opt/venv/bin/pip install --no-cache-dir --upgrade pip && \
-    /opt/venv/bin/pip install --no-cache-dir -r requirements.prod.txt && \
-    rm requirements.prod.txt && \
-    apk del .build-deps    
+# 2) copy & install Python reqs into a venv
+COPY assets/build/requirements.prod.txt .
+RUN python -m venv /opt/venv \
+    && /opt/venv/bin/pip install --no-cache-dir --upgrade pip \
+    && /opt/venv/bin/pip install --no-cache-dir -r requirements.prod.txt \
+    \
+    # 3) purge build deps and clean pip cache
+    && apk del .build-deps \
+    && /opt/venv/bin/pip cache purge \
+    \
+    # 4) strip out bytecode & __pycache__ dirs
+    && find /opt/venv -type d -name "__pycache__" -exec rm -rf {} + \
+    && find /opt/venv -name "*.py[co]" -delete
 
 # ---------------------------------------------
-# STAGE 2: Create the final production image
+# STAGE 2: Final runtime image
 # ---------------------------------------------
-# Use Python 3.13 slim as base image
 FROM python:3.13-alpine
 
-# Install rest api curl
-RUN apk add --no-cache --update \
-    curl
+# 1) only runtime deps (curl here because you wanted it)
+RUN apk add --no-cache curl
+
+# 2) bring in a clean venv
+COPY --from=builder /opt/venv /opt/venv
+
+# 3) minimal environment setup
+ENV PATH="/opt/venv/bin:$PATH" \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /app
-
+    
 # Copy only necessary files from builder and dev stages
 COPY --from=builder /opt/venv /opt/venv
-COPY . .
+COPY app.py /app/app.py
+COPY /src /app/src
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
