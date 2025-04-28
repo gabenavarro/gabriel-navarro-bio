@@ -7,6 +7,7 @@
   image = "https://storage.googleapis.com/gn-portfolio/images/gatk-dragen-thumb.svg"
   description = "Dragen-GATK combines Illumina’s hardware acceleration with GATK’s best-practice workflows to deliver ultra-fast, clinically robust germline variant calling. This guide walks you through Docker-based setup, sample analysis, and key parameters to optimize high-performance variant discovery in genomics projects."
   type = "note"
+  disabled = false
 }
 # High-Performance Variant Calling with Dragen-GATK
 

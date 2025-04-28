@@ -7,6 +7,7 @@
   image = "https://storage.googleapis.com/gn-portfolio/images/fastp-thumb.svg"
   description = "FastP is an ultra-fast, all-in-one tool for trimming, filtering, and quality-checking FASTQ files, helping you quickly generate clean, high-quality datasets for genomics and transcriptomics projects. This guide walks you through installation, usage, and key features of FastP, making it an essential part of your NGS workflow."
   type = "note"
+  disabled = false
 }
 # Speeding Up FASTQ Preprocessing with FastP  
 In next-generation sequencing (NGS) workflows, **clean data is critical**. Low-quality reads, adapter sequences, and other artifacts can heavily impact downstream analyses like genome assembly, transcript quantification, or variant calling. **FastP** is a modern, ultra-efficient tool that performs **both quality control and read cleaning** — all in a single fast pass through your FASTQ files. Let's dive into how you can install and use FastP for your omics pipelines!

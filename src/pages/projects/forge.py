@@ -61,6 +61,13 @@ css = """
     text-decoration: none;
 }
 
+a.disabled {
+  pointer-events: none;   /* no mouse events at all */
+  cursor: default;        /* normal arrow, not the hand */
+  color: #999;            /* visually muted */
+  text-decoration: none;  /* remove underline */
+}
+
 """
 
 def generate_cards(tag:Optional[str] = None):
@@ -79,7 +86,7 @@ def generate_cards(tag:Optional[str] = None):
                 H3(entry["title"], cls="white"),
                 P(entry["description"], cls="white"),
                 href=f"/projects/{entry['id']}",
-                cls="masonry-card masonry-sizer a-card",
+                cls="masonry-card masonry-sizer a-card" if not entry["disabled"] else "masonry-card masonry-sizer a-card disabled",
             ) for entry in blogs],
         cls="masonry-container",
     )
