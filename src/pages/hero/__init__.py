@@ -1,4 +1,5 @@
 from fasthtml.common import Style, Div, Script
+from src.components.modal import get_modal
 from src.components import NAVIGATION
 from src.lib.css import ROOT_CSS, BODY_CSS
 from src.lib.javascript import SCROLL_JS
@@ -13,4 +14,5 @@ HERO_PAGE = Div(
     VERTICAL_LINE,
     HERO_SECTION,
     ABOUT_ME,
+    get_modal(),
 )

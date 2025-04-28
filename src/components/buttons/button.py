@@ -79,7 +79,7 @@ def button_primary(text: str, href: str) -> A:
     return A(text, Style(_css), href=href, _class="btn btn-primary")
 
 
-def button_outline(text: str, href: str) -> A:
+def button_outline(text: str, href: str, modal_open: bool = False) -> A:
     """Secondary Button
     ---
 
@@ -88,8 +88,14 @@ def button_outline(text: str, href: str) -> A:
     ### Args:
         * text (str): The text to display on the button.
         * href (str): The URL to link to when the button is clicked.
+        * id (str, optional): The optional ID for the button element.
 
     ### Returns:
         A: An anchor element representing the button.
     """
-    return A(text, Style(_css), href=href, _class="btn btn-outline")
+    return A(
+        text, 
+        Style(_css), 
+        href=href, 
+        cls="btn btn-outline" + (" open-modal-btn" if modal_open else ""),
+    )
