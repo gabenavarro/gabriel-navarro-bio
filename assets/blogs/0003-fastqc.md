@@ -1,5 +1,17 @@
+@{id = "87c228cf-446b-4600-9277-e27274a5bd87"
+  title = "FastQC: Quality Control for Omics Data"
+  date = "2025-04-27T00:00:00Z"
+  tags = ['docker', 'bioinformatics', 'genomics']
+  views = 0
+  likes = 0
+  image = "https://storage.googleapis.com/gn-portfolio/images/fastqc-original-thumb.svg"
+  description = "COMING SOON"
+  type = "note"
+  disabled = "true"
+}
 # TODO: COMPLETE Mastering Quality Control in Omics with FastQC
 
+# FastQC: Quality Control for Omics Data
 Quality control (QC) of sequencing data is a foundational step in bioinformatics workflows, crucial for ensuring reliable and accurate results in omics analyses. Among the many available tools, **FastQC** has emerged as an industry-standard software for performing quality assessments of FASTQ files.
 
 ## What is FastQC?

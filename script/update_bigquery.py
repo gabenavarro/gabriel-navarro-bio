@@ -60,7 +60,8 @@ def update_bq_row(
           likes       = @likes,
           image       = @image,
           description = @description,
-          `type`      = @type
+          `type`      = @type,
+          disabled    = @disabled
         WHERE id = @id
         """
 
@@ -76,6 +77,7 @@ def update_bq_row(
                 bigquery.ScalarQueryParameter("description", "STRING", row["description"]),
                 bigquery.ScalarQueryParameter("type",        "STRING", row["type"]),
                 bigquery.ScalarQueryParameter("id",          "STRING", row["id"]),
+                bigquery.ScalarQueryParameter("disabled",    "BOOL",   row["disabled"]),
             ]
         )
 
@@ -150,8 +152,6 @@ def parse_markdown_file(filepath: str, bucket: str = "gn-portfolio") -> dict:
     if 'id' not in metadata:
         new_id = str(uuid.uuid4())
         metadata['id'] = new_id
-
-        metadata["image"] = f"https://storage.googleapis.com/{bucket}/images/{new_id}.svg"
         
         def fmt_val(v):
             if isinstance(v, str):
@@ -182,7 +182,7 @@ def parse_markdown_file(filepath: str, bucket: str = "gn-portfolio") -> dict:
             f.writelines(body_lines)
 
     # Assert all keys are now in metadata
-    required_keys = ['id', 'title', 'tags', 'date', 'body', 'views', 'likes', 'image', 'description', 'type']
+    required_keys = ['id', 'title', 'tags', 'date', 'body', 'views', 'likes', 'image', 'description', 'type', 'disabled']
     for key in required_keys:
         if key not in metadata:
             raise ValueError(f"Missing required metadata key: {key}")

@@ -7,6 +7,7 @@
   image = "https://storage.googleapis.com/gn-portfolio/images/fastqc-thumb.svg"
   description = "FastQC-RS is a modern, Rust-based tool for fast and efficient quality control of FASTQ files, delivering lightweight performance and detailed HTML reports—perfect for ensuring high-quality omics data in genomics and transcriptomics workflows. This guide walks you through Docker-based setup, usage, and key features."
   type = "note"
+  disabled = false
 }
 # Mastering Quality Control in Omics with FastQC-RS
 High-throughput sequencing generates massive amounts of data, but raw reads can contain errors, adapter remnants or biases that compromise downstream analyses. Performing quality control (QC) on FASTQ files *before and after* trimming is essential to catch these issues early. **FastQC-RS** is a modern, Rust-based QC tool that delivers fast, reliable assessments and easy-to-read HTML reports—perfect for genomics and transcriptomics workflows.
