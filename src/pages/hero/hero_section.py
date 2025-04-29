@@ -52,13 +52,11 @@ htmx.onLoad(function() {{
             if (target.id === 'skill-pause' || target.closest('#skill-pause')) {{
                 if (isPaused) {{
                     // Resume
-                    pauseBtn.classList.remove('playing');
-                    pauseBtn.classList.add('paused');
+                    pauseBtn.classList.remove('highlighted');
                     startInterval();
                 }} else {{
                     // Pause
-                    pauseBtn.classList.remove('paused');
-                    pauseBtn.classList.add('playing');
+                    pauseBtn.classList.add('highlighted');
                     clearInterval(intervalId);
                 }}
                 isPaused = !isPaused;
@@ -199,19 +197,15 @@ htmx.onLoad(function() {{
             margin-left: 4px;
         }}
         
-        /* Play button (when paused) */
-        .skill-pause.playing::before {{
-            width: 0;
-            height: 0;
-            background-color: transparent;
-            border-top: 7px solid transparent;
-            border-bottom: 7px solid transparent;
-            border-left: 14px solid rgba(255, 255, 255, 0.8);
-            margin-left: 2px;
+        /* Highlighted pause button */
+        .skill-pause.highlighted {{
+            background-color: rgba(74, 156, 247, 0.2);
+            border-color: var(--primary-color);
         }}
         
-        .skill-pause.playing::after {{
-            content: none;
+        .skill-pause.highlighted::before,
+        .skill-pause.highlighted::after {{
+            background-color: var(--primary-color, rgba(74, 156, 247, 0.8));
         }}
     `;
     document.head.appendChild(styleEl);
