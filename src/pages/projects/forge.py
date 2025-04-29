@@ -1,10 +1,9 @@
 from fasthtml.common import Style, Div, Img, H3, P, A
-from src.components import NAVIGATION
+from src.components import simple_navigation, contact_me_modal
 from src.lib.css import ROOT_CSS, BODY_CSS
 from src.lib.javascript import MasonryJS, MarkedJS
 from typing import Optional
 from src.lib.google.bigquery import BigQueryClient
-from src.components.modal import get_modal
 
 css = """
 .masonry-container {
@@ -114,8 +113,8 @@ def create_masonry_page():
             origin_top=True,
         ),
         MarkedJS(),
-        NAVIGATION,
-        get_modal(),
+        simple_navigation(),
+        contact_me_modal(),
         Div(style="height: 10vh;"),
         Div(
             generate_cards(),
