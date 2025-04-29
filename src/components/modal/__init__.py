@@ -1,1 +1,0 @@
-from src.components.modal.modal import get_modal

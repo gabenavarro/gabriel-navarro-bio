@@ -1,7 +1,7 @@
 from fasthtml.common import Div, A, Style
 
 # TODO: Colors based on var from ROOT colors
-_style = """
+css = """
 /* Navigation */
 .navbar {
     position: fixed;
@@ -79,10 +79,12 @@ _style = """
 """
 
 
-NAVIGATION =Div(
-    Style(_style),
+def simple_navigation(logo: str = "Gabriel Navarro"):
+    """ Returns the navigation bar. """
+    return Div(
+    Style(css),
     Div(
-        A("Gabriel Navarro", href="/", cls="logo"),
+        A(logo, href="/", cls="logo"),
         Div(
             A("Home", href="/", cls="nav-link"),
             A("Projects", href="/projects", cls="nav-link"),

@@ -1,11 +1,9 @@
 from fasthtml.common import Style, Div
 from typing import List, Dict
-from src.components import NAVIGATION
+from src.components import simple_navigation, contact_me_modal
 from src.lib.css import ROOT_CSS, BODY_CSS
 from src.lib.javascript import MarkedJS
 from src.lib.google.bigquery import BigQueryClient
-from src.components.modal import get_modal
-
 
 css = """
 /* marked test section */
@@ -30,7 +28,6 @@ css = """
 
 """
 
-
 def blog_div_from_blog(blog: List[Dict]):
     """ Example of a section with Marked.js for Markdown parsing."""
     return Div(
@@ -49,8 +46,8 @@ def create_blog_page(uuid: str):
     return Div(
         Style(ROOT_CSS + BODY_CSS + css),
         MarkedJS(),
-        NAVIGATION,
-        get_modal(),
+        simple_navigation(),
+        contact_me_modal(),
         Div(style="height: 10vh;"),
         blog_div,
         cls="container"
