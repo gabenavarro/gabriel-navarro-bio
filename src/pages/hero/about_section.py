@@ -208,7 +208,7 @@ ABOUT_ME = Div(
                 )
             ),
             Div(
-                button_outline("My Infrustcture Projects", href="/projects"),
+                button_outline("My Infrastructure Projects", href="/projects"),
                 cls="scroll-right-hidden about-block-right-aligned"
             ),
             cls="about-block"
