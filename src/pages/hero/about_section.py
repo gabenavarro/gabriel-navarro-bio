@@ -76,11 +76,10 @@ ABOUT_ME = Div(
                     )
                 )
             ),
-            # TODO: Create a CV page, then link to it
-            # Div(
-            #     button_outline("My Curriculum Vitae", href="/cv"),
-            #     cls="scroll-right-hidden about-block-right-aligned"
-            # ),
+            Div(
+                button_outline("My Curriculum Vitae", href="/cv"),
+                cls="scroll-right-hidden about-block-right-aligned"
+            ),
             cls="about-block"
         ),
     

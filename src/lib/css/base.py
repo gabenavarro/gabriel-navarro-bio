@@ -6,6 +6,7 @@ ROOT_CSS = """
     --black: rgb(20, 20, 20);
     --white: rgb(238, 238, 238);
     --text-color: #333;
+    --text-color-secondary: rgba(255, 255, 255, 0.6);
     --light-bg: #f5f8ff;
     --white: #ffffff;
     --container-max-width: 900px;
@@ -15,6 +16,7 @@ ROOT_CSS = """
     /* Darktheme newspaper */
     --dark-newspaper-bg: #1C1C1C;
     --dark-highlight-newspaper: #2C2C2C;
+    --dark-secondary: #2C2C2C;  /* Added for consistency */
 }
 
 """
@@ -120,10 +122,14 @@ body {
 
 
 
-
 /* ----------------------------- */
 /*           Font                */
 /* ----------------------------- */
+
+.banner-title-spacing {
+    margin-top: 6rem;
+    padding-bottom: 3rem;
+}
 
 .title {
     font-size: 3.5rem;
@@ -131,7 +137,7 @@ body {
     color: var(--white);
     line-height: 1.2;
     margin-bottom: 1.5rem;
-    
+
     @media (max-width: 992px) {
         font-size: 2.75rem;
     }

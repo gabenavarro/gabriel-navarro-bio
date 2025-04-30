@@ -115,7 +115,6 @@ def create_masonry_page():
         MarkedJS(),
         simple_navigation(),
         contact_me_modal(),
-        Div(style="height: 10vh;"),
         Div(
             generate_cards(),
         ),
