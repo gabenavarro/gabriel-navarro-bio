@@ -82,16 +82,19 @@ css = """
 def simple_navigation(logo: str = "Gabriel Navarro"):
     """ Returns the navigation bar. """
     return Div(
-    Style(css),
-    Div(
-        A(logo, href="/", cls="logo"),
         Div(
-            A("Home", href="/", cls="nav-link"),
-            A("Projects", href="/projects", cls="nav-link"),
-            A("Contact", href="#", cls="nav-link open-modal-btn"), # To open modal
-            cls="nav-links"
+            Style(css),
+            Div(
+                A(logo, href="/", cls="logo"),
+                Div(
+                    A("Home", href="/", cls="nav-link"),
+                    A("Projects", href="/projects", cls="nav-link"),
+                    A("Contact", href="#", cls="nav-link open-modal-btn"), # To open modal
+                    cls="nav-links"
+                ),
+                cls="nav-container container"
+            ),
+            cls="navbar"
         ),
-        cls="nav-container container"
-    ),
-    cls="navbar"
-)
+        Div(style="height: 10vh;"),
+    )

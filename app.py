@@ -1,5 +1,5 @@
-from fasthtml.common import fast_app, serve, Title, Main, database
-from src.pages import HERO_PAGE, MASONRY_PAGE, create_blog_page
+from fasthtml.common import fast_app, serve, Title, Main
+from src.pages import HERO_PAGE, MASONRY_PAGE, CV_PAGE, create_blog_page
 import argparse
 
 # Parse command line argument for port
@@ -23,5 +23,10 @@ def projects():
 @rt("/projects/{blog_id}")
 def get(blog_id: str):
     return Title("Gabriel - Projects"), create_blog_page(blog_id)
+
+# CV page
+@rt("/cv")
+def cv():
+    return Title("Gabriel - CV"), CV_PAGE
 
 serve(port=args.port, reload=False)
