@@ -30,16 +30,8 @@ RUN python -m venv /opt/venv \
 # ---------------------------------------------
 FROM python:3.13-alpine
 
-# 1) only runtime deps (curl here because you wanted it)
-RUN apk add --no-cache curl
-
 # 2) bring in a clean venv
 COPY --from=builder /opt/venv /opt/venv
-
-# 3) minimal environment setup
-ENV PATH="/opt/venv/bin:$PATH" \
-    PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /app
     
