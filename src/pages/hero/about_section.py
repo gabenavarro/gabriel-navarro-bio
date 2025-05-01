@@ -17,6 +17,7 @@ _css = transition_css + """
     display: flex;
     position: relative;
     background-color: transparent;
+    overflow: hidden;
     z-index: 1;
 }
 
@@ -213,7 +214,6 @@ ABOUT_ME = Div(
             ),
             cls="about-block"
         ),
-
         cls="container"
     ),
     Div(cls="glow-1"),
