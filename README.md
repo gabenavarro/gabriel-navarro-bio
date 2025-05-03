@@ -1,45 +1,44 @@
 # gabriel-navarro-bio
 Bio webpage for a modern, Python-based portfolio website built with FastHTML and deployed on Google Cloud Run using Uvicorn.
+
+
 ## 🚀 Overview
 This repository contains code for a personal portfolio website built with FastHTML - a Python library that provides a 1:1 mapping to HTML and HTTP, allowing for powerful web development using Python's full ecosystem. The application is designed to be deployed on Google Cloud Run for scalable, serverless hosting with minimal configuration.
 
-### ✨ Features
 
+### ✨ Features
 * Python-First Development: Leverage the full power of Python for building a modern portfolio website
 * Simple Deployment: Optimized for Google Cloud Run's serverless architecture
 * High Performance: Uses Uvicorn ASGI server for fast, efficient request handling
 * Developer Friendly: Clean codebase with best practices for maintainability
 * Responsive Design: Mobile-first approach for a great experience on all devices
 
-### 🛠️ Tech Stack
 
+### 🛠️ Tech Stack
 * FastHTML: Python library that maps directly to HTML and HTTP
 * Uvicorn: Lightning-fast ASGI server implementation
 * Google Cloud Run: Fully managed serverless platform
 * Docker: Containerization for consistent deployment
 * GitHub Actions: CI/CD pipeline for automated deployment (optional)
 
-### 📋 Prerequisites
 
+### 📋 Prerequisites
 * Python 3.11+
 * Docker (for local testing and deployment)
 * Google Cloud account
 * Google Cloud CLI (for deployment)
 
 
-
 ## 🚦 Getting Started
-
 ### Installation
-
 1. Clone this repository:
 ```bash
 git clone https://github.com/gabenavarro/gabriel-navarro-bio.git
 cd gabriel-navarro-bio
 ```
 
-### Local Development
 
+### Local Development
 1. Setup local envrionment and install dependencies:
 ```bash
 docker build -f ./assets/build/Dockerfile.dev -t gnbio:local . 
@@ -68,7 +67,6 @@ The site will be available at http://localhost:8000.
 
 
 ### 🚢 Deployment to Google Cloud Run
-
 Authenticate with Google Cloud:
 ```bash
 gcloud auth login
@@ -99,4 +97,3 @@ gcloud run deploy gabriel-navarro-bio \
   --allow-unauthenticated \
   --region us-central1
 ```
-
