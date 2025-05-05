@@ -4,6 +4,7 @@ from src.lib.css import ROOT_CSS, BODY_CSS
 from src.lib.javascript import MasonryJS, MarkedJS
 from typing import Optional
 from src.lib.google.bigquery import BigQueryClient
+from src.components.chips import filter_chips
 
 css = """
 .masonry-container {
@@ -114,6 +115,7 @@ def create_masonry_page():
         ),
         MarkedJS(),
         simple_navigation(),
+        filter_chips([("Test", "red"), ("Test2", "blue"), ("Test3", "green"), ("Test4", "yellow")]),
         contact_me_modal(),
         Div(
             generate_cards(),

@@ -97,3 +97,26 @@ gcloud run deploy gabriel-navarro-bio \
   --allow-unauthenticated \
   --region us-central1
 ```
+
+## 📁 Code Structure 
+
+```txt
+/src/
+├── components/
+│   ├── backgrounds/
+│   ├── buttons/
+│   ├── chips/
+│   ├── modal/
+│   ├── navigation/
+│   ├── parallax/
+│   └── svg/
+├── lib/
+│   ├── css/
+│   ├── google/
+│   └── javascript/
+├── pages/
+│   ├── cv/
+│   ├── hero/
+│   └── projects/
+└── statics.py
+```
