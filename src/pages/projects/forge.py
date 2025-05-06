@@ -1,10 +1,25 @@
-from fasthtml.common import Style, Div, Img, H3, P, A
+from fasthtml.common import Style, Div, Img, H3, P, A, Span
 from src.components import simple_navigation, contact_me_modal
 from src.lib.css import ROOT_CSS, BODY_CSS
 from src.lib.javascript import MasonryJS, MarkedJS
 from typing import Optional
 from src.lib.google.bigquery import BigQueryClient
 from src.components.chips import filter_chips
+
+CATEGORY_MAP = {
+    "bioinformatics": "omics",
+    "docker": "infrastructure",
+    "genomics": "omics",
+    "protein folding": "machine-learning",
+    "machine learning": "machine-learning",
+    "deep-learning": "machine-learning",
+    "flashattention": "machine-learning",
+    "transformers": "machine-learning",
+    "webdevelopment": "visualization",
+    "html": "visualization",
+    "css": "visualization",
+    "javascript": "visualization",
+}
 
 css = """
 .masonry-container {
@@ -45,6 +60,11 @@ css = """
     margin-top: 0.5rem;
 }
 
+/* Hidden cards when filtered out */
+.masonry-card.hidden {
+    display: none;
+}
+
 .masonry-sizer {
     max-width: 250px;
 
@@ -76,13 +96,30 @@ a.disabled {
   text-decoration: none;  /* remove underline */
 }
 
+/* Card category badges - updated for multi-category display */
+.card-category {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 5px;
+    margin-bottom: 10px;
+}
+
+.category-machine-learning { background-color: #c70445; color: white; }
+.category-omics { background-color: #0064b6; color: white; }
+.category-infrastructure { background-color: #a48404; color: white; }
+.category-visualization { background-color: #00a405; color: white; }
+
 """
+
+
 
 def generate_cards(tag:Optional[str] = None):
     """ Create a card with an image, title, and description."""
     client = BigQueryClient()
     blogs = client.query(sql="SELECT * FROM `noble-office-299208.portfolio.gn-blog` LIMIT 1000")
-    
     return Div(
         *[
             A(
@@ -92,13 +129,17 @@ def generate_cards(tag:Optional[str] = None):
                     cls="rounded-img",
                 ),
                 H3(entry["title"], cls="masonary-card-title"),
+                *[Span(i["v"], cls=f"card-category category-{CATEGORY_MAP.get(i['v'], 'omics')}") for i in entry["tags"]],
                 P(entry["description"], cls="white"),
                 href=f"/projects/{entry['id']}",
+                data_category=",".join(
+                    sorted(list(set([CATEGORY_MAP.get(i["v"], "omics") for i in entry["tags"]])))
+                ),
                 cls="masonry-card masonry-sizer a-card" if not entry["disabled"] else "masonry-card masonry-sizer a-card disabled",
-            ) for entry in blogs],
+            ) for entry in blogs
+        ],
         cls="masonry-container",
     )
-
 
 def create_masonry_page():
     return Div(
@@ -115,7 +156,7 @@ def create_masonry_page():
         ),
         MarkedJS(),
         simple_navigation(),
-        filter_chips([("Test", "red"), ("Test2", "blue"), ("Test3", "green"), ("Test4", "yellow")]),
+        filter_chips([("Machine Learning", "red"), ("Omics", "blue"), ("Visualization", "green"), ("Infrastructure", "yellow")]),
         contact_me_modal(),
         Div(
             generate_cards(),
