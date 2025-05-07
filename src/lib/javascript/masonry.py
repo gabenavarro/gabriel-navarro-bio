@@ -71,49 +71,6 @@ function initMasonry(element) {{
     const items = element.querySelectorAll('{item_selector}');
     items.forEach(item => resizeObserver.observe(item));
     
-    // Set up a MutationObserver to watch for new masonry items
-    const mutationObserver = new MutationObserver(mutations => {{
-        let needsUpdate = false;
-        
-        mutations.forEach(mutation => {{
-            if (mutation.type === 'childList') {{
-                // New nodes added
-                if (mutation.addedNodes.length) {{
-                    mutation.addedNodes.forEach(node => {{
-                        if (node.nodeType === 1) {{ // Element node
-                            if (node.matches('{item_selector}')) {{
-                                resizeObserver.observe(node);
-                                needsUpdate = true;
-                            }} else {{
-                                // Check for masonry items inside the added node
-                                const nestedItems = node.querySelectorAll('{item_selector}');
-                                if (nestedItems.length) {{
-                                    nestedItems.forEach(item => resizeObserver.observe(item));
-                                    needsUpdate = true;
-                                }}
-                            }}
-                        }}
-                    }});
-                }}
-                
-                // Nodes removed
-                if (mutation.removedNodes.length) {{
-                    needsUpdate = true;
-                }}
-            }}
-            
-            // Also watch for class changes that might affect visibility
-            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {{
-                needsUpdate = true;
-            }}
-        }});
-        
-        if (needsUpdate) {{
-            // Delay layout to allow browser to render new content
-            setTimeout(() => msnry.layout(), 10);
-        }}
-    }});
-    
     // Start observing the container for added/removed items AND attribute changes
     mutationObserver.observe(element, {{ 
         childList: true, 
@@ -169,13 +126,6 @@ function filterCards() {{
         }}
     }});
     
-    // If we have a masonry instance and visibility changes occurred, force a relayout
-    if (container.msnry && hasVisibilityChanges) {{
-        // Small delay to ensure DOM updates have processed
-        setTimeout(() => {{
-            container.msnry.layout();
-        }}, 50);
-    }}
 }}
 
 proc_htmx('{sel}', initMasonry);

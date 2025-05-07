@@ -144,4 +144,3 @@ def filter_chips(chips: List[Tuple[str,str]]):
         *[Button(name, cls=f"chip {color}", data_filter=CATEGORY_MAP[name]) for name, color in chips],
         cls="chip-container",
     )
-

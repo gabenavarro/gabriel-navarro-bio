@@ -28,6 +28,7 @@ css = """
     position: relative;
     z-index: 2;
     padding: 0 1rem;
+    min-height: 100vh;
 }
 
 .masonry-card {
@@ -62,7 +63,11 @@ css = """
 
 /* Hidden cards when filtered out */
 .masonry-card.hidden {
-    display: none;
+    height: 0%;
+    overflow: hidden;
+    padding: 0;
+    margin: 0;
+    visibility: hidden;
 }
 
 .masonry-sizer {
