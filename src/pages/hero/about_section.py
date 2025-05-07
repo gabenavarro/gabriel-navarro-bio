@@ -90,6 +90,18 @@ ABOUT_ME = Div(
                 H2("Machine Learning in Biosciences", cls="section-title scroll-left-hidden"),
                 Ul(
                     Li(
+                        Div(Strong("Genome Language Models", cls="secondary-color subtitle")),
+                        "Trained and fine-tuned fungal genome language models to optimize ",
+                        Strong("protein expression and secretion"), ", accelerating synthetic biology applications.",
+                        cls="scroll-left-hidden"
+                    ),
+                    Li(
+                        Div(Strong("Protein Language Models", cls="secondary-color subtitle")),
+                        "Fine-tuned antibody-specific PLMs to enhance ",
+                        Strong("sequence design"), " with demonstrably improved functional outcomes",
+                        cls="scroll-left-hidden"
+                    ),
+                    Li(
                         Div(Strong("Molecule Fingerprints from Mass Spectrometry", cls="secondary-color subtitle")),
                         "Developed machine learning models that mapped 20,000+ plant compounds to human health outcomes, driving a ",
                         Strong("1000x increase"), " in phytonutrient discovery throughput.",
@@ -109,32 +121,6 @@ ABOUT_ME = Div(
             ),
             cls="about-block"
         ),
-
-        Section(
-            Div(
-                H2("AI in Genomics & Protein Design", cls="section-title scroll-left-hidden"),
-                Ul(
-                    Li(
-                        Div(Strong("Genome Language Models", cls="secondary-color subtitle")),
-                        "Trained and fine-tuned fungal genome language models to optimize ",
-                        Strong("protein expression and secretion"), ", accelerating synthetic biology applications.",
-                        cls="scroll-left-hidden"
-                    ),
-                    Li(
-                        Div(Strong("Protein Language Models", cls="secondary-color subtitle")),
-                        "Fine-tuned antibody-specific PLMs to enhance ",
-                        Strong("sequence design"), " with demonstrably improved functional outcomes",
-                        cls="scroll-left-hidden"
-                    )
-                )
-            ),
-            Div(
-                button_outline("My AI Projects", href="/projects"),
-                cls="scroll-right-hidden about-block-right-aligned"
-            ),
-            cls="about-block"
-        ),
-
 
         Section(
             Div(
@@ -214,6 +200,17 @@ ABOUT_ME = Div(
             ),
             cls="about-block"
         ),
+
+        # TODO: DELETE THIS, IT'S JUST A PLACEHOLDER, needed to work around a bug in fasthtml
+        Section(
+            cls="about-block"
+        ),
+
+        # TODO: DELETE THIS, IT'S JUST A PLACEHOLDER, needed to work around a bug in fasthtml
+        Section(
+            cls="about-block"
+        ),
+
         cls="container"
     ),
     Div(cls="glow-1"),
