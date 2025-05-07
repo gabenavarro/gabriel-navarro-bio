@@ -1,5 +1,5 @@
 from fasthtml.common import fast_app, serve, Title, Main
-from src.pages import HERO_PAGE, MASONRY_PAGE, CV_PAGE, create_blog_page
+from src.pages import HERO_PAGE, create_masonry_page, CV_PAGE, create_blog_page
 import argparse
 
 # This is a simple FastHTML app that serves a page with a title and a main content area.
@@ -12,11 +12,19 @@ def get():
 
 # Projects page
 @rt("/projects")
-def projects():
-    return Title("Gabriel - Projects"), MASONRY_PAGE
+def projects(tag: str = None):
+    """
+    Projects page with a masonry layout and filter chips.
+    ### Args:
+        - tag (str): Optional tag to filter projects by. ?tag=machine-learning, etc.
+    ### Returns:
+        - Title: Page title.
+        - Div: Main content of the page.
+    """
+    return Title("Gabriel - Projects"), create_masonry_page(tag)
 
 @rt("/projects/{blog_id}")
-def get(blog_id: str):
+def get_project(blog_id: str):
     return Title("Gabriel - Projects"), create_blog_page(blog_id)
 
 # CV page
