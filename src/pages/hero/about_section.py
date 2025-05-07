@@ -201,10 +201,12 @@ ABOUT_ME = Div(
             cls="about-block"
         ),
 
+        # TODO: DELETE THIS, IT'S JUST A PLACEHOLDER, needed to work around a bug in fasthtml
         Section(
             cls="about-block"
         ),
 
+        # TODO: DELETE THIS, IT'S JUST A PLACEHOLDER, needed to work around a bug in fasthtml
         Section(
             cls="about-block"
         ),
