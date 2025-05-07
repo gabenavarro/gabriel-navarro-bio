@@ -53,10 +53,13 @@ def MasonryJS(
 import Masonry from 'https://cdn.jsdelivr.net/npm/masonry-layout@4/+esm';
 
 function initMasonry(element) {{
-    // Create Masonry instance and store it
+    // Create Masonry instance and store it globally so we can access it from the filter function
     const msnry = new Masonry(element, {{
         {options_str}
     }});
+    
+    // Store the masonry instance on the element for easy access
+    element.msnry = msnry;
 
     // Set up a ResizeObserver to watch for size changes in items
     const resizeObserver = new ResizeObserver(entries => {{
@@ -68,46 +71,13 @@ function initMasonry(element) {{
     const items = element.querySelectorAll('{item_selector}');
     items.forEach(item => resizeObserver.observe(item));
     
-    // Set up a MutationObserver to watch for new masonry items
-    const mutationObserver = new MutationObserver(mutations => {{
-        let needsUpdate = false;
-        
-        mutations.forEach(mutation => {{
-            if (mutation.type === 'childList') {{
-                // New nodes added
-                if (mutation.addedNodes.length) {{
-                    mutation.addedNodes.forEach(node => {{
-                        if (node.nodeType === 1) {{ // Element node
-                            if (node.matches('{item_selector}')) {{
-                                resizeObserver.observe(node);
-                                needsUpdate = true;
-                            }} else {{
-                                // Check for masonry items inside the added node
-                                const nestedItems = node.querySelectorAll('{item_selector}');
-                                if (nestedItems.length) {{
-                                    nestedItems.forEach(item => resizeObserver.observe(item));
-                                    needsUpdate = true;
-                                }}
-                            }}
-                        }}
-                    }});
-                }}
-                
-                // Nodes removed
-                if (mutation.removedNodes.length) {{
-                    needsUpdate = true;
-                }}
-            }}
-        }});
-        
-        if (needsUpdate) {{
-            // Delay layout to allow browser to render new content
-            setTimeout(() => msnry.layout(), 10);
-        }}
+    // Start observing the container for added/removed items AND attribute changes
+    mutationObserver.observe(element, {{ 
+        childList: true, 
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class'] 
     }});
-    
-    // Start observing the container for added/removed items
-    mutationObserver.observe(element, {{ childList: true, subtree: true }});
     
     // Store the observers on the element to prevent memory leaks
     element._masonryObservers = {{
@@ -116,7 +86,50 @@ function initMasonry(element) {{
     }};
 }}
 
+// Function to filter cards based on selected chips with Masonry integration
+function filterCards() {{
+    // Get all selected filters
+    const selectedFilters = Array.from(document.querySelectorAll('.chip.selected'))
+        .map(chip => chip.dataset.filter);
+    
+    // Show all cards if no filters are selected
+    const showAll = selectedFilters.length === 0;
+    
+    // Get the container with Masonry
+    const container = document.querySelector('.card-container');
+    
+    // Show/hide cards based on filters
+    const cards = document.querySelectorAll('.card');
+    let hasVisibilityChanges = false;
+    
+    cards.forEach(card => {{
+        // Get all categories for this card (split by comma)
+        const cardCategories = card.dataset.category.split(',');
+        
+        // Check if any of the card's categories match any selected filter
+        const hasMatchingCategory = cardCategories.some(category => 
+            selectedFilters.includes(category)
+        );
+        
+        // Check if visibility would change
+        const isCurrentlyHidden = card.classList.contains('hidden');
+        const shouldBeHidden = !(showAll || hasMatchingCategory);
+        
+        if (isCurrentlyHidden !== shouldBeHidden) {{
+            hasVisibilityChanges = true;
+        }}
+        
+        if (showAll || hasMatchingCategory) {{
+            card.classList.remove('hidden');
+        }} else {{
+            card.classList.add('hidden');
+        }}
+    }});
+    
+}}
+
 proc_htmx('{sel}', initMasonry);
-"""    
+proc_htmx(filterCards);
+"""
     # print(src) <== Good for debugging
     return Script(src, type='module')
