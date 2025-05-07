@@ -146,7 +146,13 @@ def generate_cards(tag:Optional[str] = None):
         cls="masonry-container",
     )
 
-def create_masonry_page():
+def create_masonry_page(tag: str = None):
+    chips = [
+        ("Machine Learning", "red", "machine-learning", True if tag == "machine-learning" else False), 
+        ("Omics", "blue", "omics", True if tag == "omics" else False), 
+        ("Visualization", "green", "visualization", True if tag == "visualization" else False), 
+        ("Infrastructure", "yellow", "infrastructure", True if tag == "infrastructure" else False)
+    ]
     return Div(
         Style(ROOT_CSS + BODY_CSS + css),
         MasonryJS(
@@ -161,14 +167,10 @@ def create_masonry_page():
         ),
         MarkedJS(),
         simple_navigation(),
-        filter_chips([("Machine Learning", "red"), ("Omics", "blue"), ("Visualization", "green"), ("Infrastructure", "yellow")]),
+        filter_chips(chips),
         contact_me_modal(),
         Div(
             generate_cards(),
         ),
         cls="container",
     )
-
-
-
-MASONRY_PAGE = create_masonry_page()

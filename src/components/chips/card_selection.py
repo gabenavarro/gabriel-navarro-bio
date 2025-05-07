@@ -86,6 +86,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const chips = document.querySelectorAll('.chip');
     const cards = document.querySelectorAll('.""" + card_selector + """');
 
+    // Check URL for tag parameters and select chips accordingly
+    function applyUrlFilters() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const tagParam = urlParams.get('tag');
+        
+        if (tagParam) {
+            // Find chips that match the tag parameter
+            chips.forEach(chip => {
+                if (chip.dataset.filter === tagParam) {
+                    chip.classList.add('selected');
+                }
+            });
+            
+            // Apply filtering based on selected chips
+            showHideCards();
+        }
+    }
+
     // Add click event listeners to all chips
     chips.forEach(chip => {
         chip.addEventListener('click', function() {
@@ -97,12 +115,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             // Apply filters to cards
-            filterCards();
+            showHideCards();
         });
     });
 
     // Function to filter cards based on selected chips
-    function filterCards() {
+    function showHideCards() {
         // Get all selected filters
         const selectedFilters = Array.from(document.querySelectorAll('.chip.selected'))
             .map(chip => chip.dataset.filter);
@@ -127,20 +145,23 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Apply URL filters when the page loads
+    applyUrlFilters();
 });
 """
 
-CATEGORY_MAP = {
-    "Omics": "omics",
-    "Infrastructure": "infrastructure",
-    "Machine Learning": "machine-learning",
-    "Visualization": "visualization",
-}
-
-def filter_chips(chips: List[Tuple[str,str]]):
+def filter_chips(chips: List[Tuple[str,str, str, bool]]) -> Div:
+    chip_list = [
+        Button(
+            name, 
+            cls=f"chip {color} selected" if selected else f"chip {color}", 
+            data_filter=data
+        ) for name, color, data, selected in chips
+    ]
     return Div(
         Style(css),
         Script(get_chip_javascript("masonry-card")),
-        *[Button(name, cls=f"chip {color}", data_filter=CATEGORY_MAP[name]) for name, color in chips],
+        *chip_list,
         cls="chip-container",
     )
