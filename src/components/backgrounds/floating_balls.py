@@ -41,6 +41,7 @@ ball_background
     backface-visibility: hidden;
     animation: move linear infinite;
     z-index: 0;
+    pointer-events: none;
 }
 
 .ball:nth-child(odd) {

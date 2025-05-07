@@ -101,6 +101,7 @@ def transition_js_css(
         z-index: 2;
         animation: pulse 8s infinite alternate;
         filter: blur(30px);
+        pointer-events: none;
     }
 
     .glow-2 {
@@ -114,6 +115,7 @@ def transition_js_css(
         z-index: 2;
         animation: pulse 8s infinite alternate;
         filter: blur(30px);
+        pointer-events: none;
     }
 
     @keyframes pulse {
@@ -477,6 +479,7 @@ def glow_object(
         z-index: 2;
         animation: pulse 8s infinite alternate;
         filter: blur(30px);
+        pointer-events: none;
     }}
     """
 
