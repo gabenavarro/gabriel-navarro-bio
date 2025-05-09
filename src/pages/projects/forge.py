@@ -29,6 +29,7 @@ css = """
     z-index: 2;
     padding: 0 1rem;
     min-height: 100vh;
+    overflow-y: hidden;
 }
 
 .masonry-card {
