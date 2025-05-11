@@ -17,19 +17,19 @@ import * as bash from "https://cdn.jsdelivr.net/npm/prismjs@1.30.0/components/pr
 import * as python from "https://cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-python.min.js";
 import * as dockerfile from "https://cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-docker.min.js";
 import * as yaml from "https://cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-yaml.min.js";
-import * as json from "https://cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-json.min.js";
-import * as typescript from "https://cdn.jsdelivr.net/npm/prismjs@1.30.0/components/prism-typescript.min.js";
 
-marked.setOptions({
-  highlight: function(code, lang) {
-    if (prism.languages[lang]) {
-      return prism.highlight(code, prism.languages[lang], lang);
-    } else {
-      return code;
+document.addEventListener('DOMContentLoaded', () => {
+  marked.setOptions({
+    highlight: function(code, lang) {
+      if (prism.languages[lang]) {
+        return prism.highlight(code, prism.languages[lang], lang);
+      } else {
+        return code;
+      }
     }
-  }
-});
+  });
 
-proc_htmx('%s', e => e.innerHTML = marked.parse(e.textContent));
+  proc_htmx('%s', e => e.innerHTML = marked.parse(e.textContent));
+});
     """ % sel
     return (Script(src, type='module'), highlight_link)

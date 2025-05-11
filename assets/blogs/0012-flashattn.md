@@ -1,149 +1,209 @@
 @{id = "1badff63-f31f-40c3-b508-d1381bcd9f47"
   title = "FlashAttention: Accelerating Deep Learning with Docker"
-  date = "2025-04-27T00:00:00Z"
-  tags = ['docker', 'machine learning', 'deep-learning', 'flashattention']
+  date = "2025-05-11T00:00:00Z"
+  tags = ['machine learning', 'deep-learning', 'flashattention']
   views = 0
   likes = 0
   image = "https://storage.googleapis.com/gn-portfolio/images/flashattn-thumb.svg"
-  description = "COMING SOON"
+  description = "A concise, step-by-step demo of how to containerize FlashAttention and train a simple autoregressive Transformer on minimally preprocessed Bitcoin minute-by-minute data."
   type = "note"
-  disabled = "true"
+  disabled = "false"
 }
-# TODO: COMPLETE
-
 # Accelerating Deep Learning with FlashAttention and Docker
 
-FlashAttention is a high-performance, memory-efficient CUDA kernel for exact attention, powering faster Transformers at scale. This guide shows you how to containerize FlashAttention with Docker and run a simple example.
+*By Gabriel Navarro*
 
-⸻
+---
 
-1. Prerequisites
-	•	Docker v20.10+ (with NVIDIA GPU support if you want GPU acceleration)
-	•	NVIDIA Container Toolkit (nvidia-docker2) for GPU passthrough (optional)
-	•	16 GB+ RAM and CUDA Toolkit (>=11.6) installed on the host
-	•	Basic familiarity with the command line
+## Introduction
 
-⸻
+Transformer models and the FlashAttention kernel have revolutionized natural-language processing by making self-attention faster and more memory-efficient. In this quick study, we treat minute-by-minute Bitcoin market data as if it were a “language”—each price/volume snapshot is like a token—and build a small autoregressive Transformer that learns to predict the next step.
 
-2. FlashAttention Overview
+Because this is a proof-of-concept on a small, minimally featurized dataset, we skip more advanced techniques—such as learned embeddings of engineered technical indicators, multi-scale tokenization (e.g. grouping minutes into hours), or external data fusion (order-book depth, sentiment)—that could further boost forecasting accuracy. For the sake of clarity and simplicity, we’ll leave those extensions for another deep dive and focus here purely on demonstrating how FlashAttention can power an autoregressive Transformer on raw market data.
 
-FlashAttention delivers:
-	•	2–4× speedups over naïve attention kernels
-	•	Lower memory footprint via IO-aware tiling
-	•	Support for FlashAttention-2 (better parallelism) and FlashAttention-3 (Hopper GPUs)
-	•	APIs for exact, causal, sliding-window, ALiBi-biased, and key-value-cached attention
+We’ll cover:
+1. **Containerizing FlashAttention** with Docker  
+2. **Processing raw BTC–USD data** into z-scored, autoregressive sequences  
+3. **Defining a lightweight Transformer** using the FlashAttention MHA operator  
+4. **Training & evaluating** with PyTorch Lightning  
+5. **Inspecting performance** via loss curves, test metrics, and prediction plots  
+6. **Conclusions & next steps** for improving the model
 
-⸻
+---
 
-3. Writing Your Dockerfile
+## 1. FlashAttention in Docker
 
-Create a Dockerfile alongside your project:
+Rather than wrestling with CUDA builds on your host machine, we package FlashAttention in a dedicated Docker image:
 
-# Use NVIDIA PyTorch container for CUDA support
-FROM nvcr.io/nvidia/pytorch:23.03-py3
+```bash
+# 1. Clone the MLContainerLab repo
+git clone https://github.com/gabenavarro/MLContainerLab.git
+cd MLContainerLab
 
-# Avoid Python buffering and interactive prompts
-ENV PYTHONUNBUFFERED=1 \
-    DEBIAN_FRONTEND=noninteractive
+# 2. Build FlashAttention image (CUDA 12.8, Python 3.12)
+docker build -f ./assets/build/Dockerfile.flashattn.cu128py26cp312 \
+             -t flash-attention:cu128-py312 .
 
-# Install build essentials and Python tools
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        git ninja-build python3-pip \
-    && rm -rf /var/lib/apt/lists/*
+# 3. Run container with GPUs & mount code
+docker run -dt --gpus all \
+      -v "$(pwd):/workspace" \
+      --name flash-attn-dev \
+      flash-attention:cu128-py312
 
-# Upgrade pip and install FlashAttention
-RUN pip install --upgrade pip packaging ninja \
-    && pip install flash-attn --no-build-isolation
+# 4. Attach VSCode to container
+code --folder-uri vscode-remote://dev-container+flash-attn-dev/workspace
+````
 
-# Set working directory
-WORKDIR /workspace
+This setup ensures you can iterate on CPU/GPU code, experiment with FlashAttention, and easily extend to cloud environments later.
 
-# Default entrypoint: drop into bash
-ENTRYPOINT ["bash"]
+---
 
-Notes
-	•	The --no-build-isolation flag allows FlashAttention’s setup to see the ninja binary for parallel builds.
-	•	If you face RAM exhaustion during build, set MAX_JOBS to limit compilation concurrency, e.g.:
+## 2. Data Preparation
 
-ENV MAX_JOBS=4
+We download a minute-resolution Bitcoin CSV from Kaggle, then:
 
+1. **Log-transform** price columns to tame exponential growth
+2. **Log₁ₚₗᵤₛ**-transform volume to reduce skew
+3. **Z-score** each feature (mean 0, std 1)
+4. **Window** into autoregressive sequences of length 2048
 
+```python
+import pandas as pd, numpy as np
 
-⸻
+df = pd.read_csv("btc_usd_1-min.csv").sort_values("Timestamp")
+for col in ["Open","High","Low","Close"]:
+    df[col] = np.log(df[col].clip(lower=0.01))
+df["Volume"] = np.log1p(df["Volume"].clip(lower=0))
 
-4. Building the Docker Image
+# Z-score normalization per feature
+stats = {}
+for feat in ["Open","High","Low","Close","Volume"]:
+    μ, σ = df[feat].mean(), df[feat].std() or 1.0
+    stats[feat] = (μ, σ)
+    df[feat] = (df[feat] - μ) / σ
+```
 
-From your project root:
+We then slide a 2 048-step window across the timeline (25% overlap), filter out any NaNs, and materialize the dataset with `litdata.optimize`.
 
-docker build -t flash-attn:latest .
+---
 
-For GPU support (requires NVIDIA Container Toolkit), add --gpus when running.
+## 3. Model Architecture
 
-⸻
+We build an **autoregressive Transformer**:
 
-5. Running a FlashAttention Example
+* **Input projection**: Maps five features to a 64-dim embedding
+* **4× Transformer layers** with:
 
-Below is a minimal PyTorch script that compares standard scaled-dot-product attention vs. FlashAttention:
+  * **FlashAttention MHA** for O( N · d ) memory
+  * **RMSNorm** and FusedMLP blocks
+* **Output projection**: Predicts the next step’s five features
+* **Smooth L₁ loss** (Huber) with per-feature weighting (volume down-weighted)
 
-# flash_example.py
-import torch
-import torch.nn.functional as F
-from flash_attn import flash_attn_func
+```python
+from flash_attn.modules.mha import MHA
+from flash_attn.ops.rms_norm import RMSNorm
+import torch.nn as nn
 
-# Define batch, sequence, heads, and head dimension
-B, S, H, D = 2, 128, 8, 64
-q = torch.randn(B, S, H, D, device='cuda', dtype=torch.float16)
-k = torch.randn(B, S, H, D, device='cuda', dtype=torch.float16)
-v = torch.randn(B, S, H, D, device='cuda', dtype=torch.float16)
+class TransformerLayer(nn.Module):
+    def __init__(self, dim, heads):
+        super().__init__()
+        self.attn = MHA(dim, heads, causal=True, use_flash_attn=True)
+        self.norm1 = RMSNorm(dim)
+        self.mlp   = nn.Sequential(nn.Linear(dim, 4*dim), nn.GELU(), nn.Linear(4*dim, dim))
+        self.norm2 = RMSNorm(dim)
+    def forward(self, x):
+        x = x + self.attn(self.norm1(x))
+        x = x + self.mlp(self.norm2(x))
+        return x
 
-# Standard attention
-qk = torch.einsum('bshd,bthd->bhts', q, k) * (D ** -0.5)
-attn_std = torch.einsum('bhts,bthd->bshd', F.softmax(qk, dim=-1), v)
+class BTCTransformer(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.in_proj  = nn.Linear(5, 64)
+        self.layers   = nn.ModuleList([TransformerLayer(64,8) for _ in range(4)])
+        self.out_proj = nn.Linear(64, 5)
+    def forward(self, x):
+        x = self.in_proj(x)
+        for l in self.layers: x = l(x)
+        return self.out_proj(x)
+```
 
-# FlashAttention
-attn_flash = flash_attn_func(q, k, v, causal=False)
+This slim model fits in memory even with long (2 048) sequences, thanks to FlashAttention’s kernel fusion.
 
-# Verify they match (up to fp16 tolerance)
-print("Max difference:", (attn_std - attn_flash).abs().max().item())
+---
 
-Running inside Docker
-	1.	Copy your script into the container context (e.g. project folder).
-	2.	Run with GPU enabled:
+## 4. Training with Lightning
 
-docker run --rm --gpus all \
-  -v $(pwd):/workspace \
-  flash-attn:latest \
-  bash -c "python /workspace/flash_example.py"
+We wrap our model in a `pl.LightningModule` to handle:
 
+* **Autoregressive loss** (shifted prediction)
+* **AdamW + ReduceLROnPlateau**
+* **Gradient clipping** & **mixed-precision (bf16)**
+* **Early stopping** & **best-model checkpointing**
 
+```python
+trainer = pl.Trainer(
+    max_epochs=10,
+    accelerator="gpu", devices=1,
+    precision="bf16-mixed",
+    gradient_clip_val=0.5,
+    callbacks=[EarlyStopping("val_loss", patience=5),
+               ModelCheckpoint(monitor="val_loss")]
+)
+trainer.fit(model, train_loader, val_loader)
+```
 
-You should see a small maximum difference, confirming FlashAttention’s correctness.
+### Loss Curves
 
-⸻
+<p align="center">
+  <img src="https://storage.googleapis.com/gn-portfolio/images/0012-flash-attn/flash_attn_tensorBoard_scalars.svg" max-width="700">
+</p>
 
-6. Tips & Best Practices
-	•	Version Pinning
-Tag your Docker image (e.g., flash-attn:2.5.5) to lock in a tested version.
-	•	Windows Support
-FlashAttention wheels for Windows are emerging; test on CUDA-enabled Windows setups after v2.3.2.
-	•	ROCm (AMD GPUs)
-To enable Triton-based ROCm backend, set FLASH_ATTENTION_TRITON_AMD_ENABLE=TRUE and install from source in a ROCm container.
-	•	FlashAttention-2 / FlashAttention-3
-	•	For FlashAttention-2 features (better parallelism), install flash-attn>=2.x.
-	•	For FlashAttention-3 on H100/H800, build from hopper/ subdirectory after cloning the repo.
-	•	Memory vs. Speed
-Causal or sliding-window attention can trade memory for speed. Adjust window_size and deterministic flags at the API call.
+> **Insight:** Training loss (blue) drops rapidly, and validation loss (orange) follows—no signs of severe overfitting.
 
-⸻
+---
 
-7. Further Resources
-	•	FlashAttention Papers
-	•	FlashAttention v1: https://arxiv.org/abs/2205.14135
-	•	FlashAttention v2: https://tridao.me/publications/flash2/
-	•	FlashAttention v3 (H100 beta): https://tridao.me/blog/2024/flash3/
-	•	GitHub Repo: https://github.com/Dao-AILab/flash-attention
-	•	MLPerf 2.0 Benchmark: IEEE Spectrum article (search “FlashAttention MLPerf”)
+## 5. Evaluation & Results
 
-⸻
+After loading the best checkpoint, we run `trainer.test()` and compute:
 
-Happy accelerated attention!
+| Metric       |   Value |
+| ------------ | ------: |
+| **Avg MSE**  |  0.2545 |
+| **Avg RMSE** |  0.2472 |
+| **Avg MAE**  |  0.1724 |
+| **Avg MAPE** | 80.82 % |
+| **Avg R²**   |  0.8242 |
+
+* **Prices** (Open/High/Low/Close) achieve R² ≈ 0.99
+* **Volume** is far noisier (R² ≈ 0.17), reflecting extreme spikes
+
+### Prediction Examples
+
+<p align="center">
+  <img src="https://storage.googleapis.com/gn-portfolio/images/0012-flash-attn/flash_attn_all_features_predictions.svg" max-width="700">
+</p>
+
+> Notice that the model captures smooth price trends but underestimates sudden volume surges.
+
+---
+
+## 6. Conclusions & Next Steps
+
+* **FlashAttention** makes long-sequence Transformers practical on a single GPU
+* Treating financial time series “like language” yields strong predictive performance on prices
+* Volume remains challenging—future work could explore:
+
+  * Adaptive weighting or specialized volume heads
+  * Incorporating external signals (order-book depth, sentiment)
+  * Hierarchical time scales (minutes → hours → days)
+
+By combining Docker-ized FlashAttention with PyTorch Lightning and streaming datasets, this proof of concept lays the groundwork for **scalable, production-ready** forecasting models in quantitative finance.
+
+---
+
+**Ready to try it yourself?**
+The full notebook and Docker setup are on GitHub:
+🔗 [https://github.com/gabenavarro/MLContainerLab/tree/main/examples/flash-attn-example](https://github.com/gabenavarro/MLContainerLab/blob/main/documentation/flash-attn.ipynb)
+
+Feel free to fork, experiment with hyperparameters, or plug in your favorite time series!
