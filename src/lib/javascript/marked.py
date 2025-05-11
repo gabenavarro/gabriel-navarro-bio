@@ -33,15 +33,3 @@ marked.setOptions({
 proc_htmx('%s', e => e.innerHTML = marked.parse(e.textContent));
     """ % sel
     return (Script(src, type='module'), highlight_link)
-
-
-# marked.setOptions({
-#   highlight: function(code, lang) {
-#     if (prism.languages[lang]) {
-#       return prism.highlight(code, prism.languages[lang], lang);
-#     } else {
-#       return code;
-#     }
-#   }
-# });
-# https://cdnjs.cloudflare.com/ajax/libs/prism/1.30.0/components/prism-bash.min.js
