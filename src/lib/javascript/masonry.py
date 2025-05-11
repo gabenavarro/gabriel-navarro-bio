@@ -71,19 +71,13 @@ function initMasonry(element) {{
     const items = element.querySelectorAll('{item_selector}');
     items.forEach(item => resizeObserver.observe(item));
     
-    // Start observing the container for added/removed items AND attribute changes
-    mutationObserver.observe(element, {{ 
-        childList: true, 
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['class'] 
-    }});
-    
+   
     // Store the observers on the element to prevent memory leaks
     element._masonryObservers = {{
         resize: resizeObserver,
-        mutation: mutationObserver
     }};
+
+    msnry.layout();
 }}
 
 // Function to filter cards based on selected chips with Masonry integration
@@ -125,11 +119,12 @@ function filterCards() {{
             card.classList.add('hidden');
         }}
     }});
-    
 }}
 
-proc_htmx('{sel}', initMasonry);
-proc_htmx(filterCards);
+document.addEventListener('DOMContentLoaded', () => {{
+    proc_htmx('{sel}', initMasonry);
+    proc_htmx(filterCards);
+}});
 """
     # print(src) <== Good for debugging
     return Script(src, type='module')
