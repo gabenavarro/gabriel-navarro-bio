@@ -7,7 +7,7 @@
   image = "https://storage.googleapis.com/gn-portfolio/images/vertex-ai-thumb.svg"
   description = "This blog is a step-by-step guide to scaling machine learning training with Vertex AI Custom Jobs on Google Cloud, covering Docker image creation, data upload, job submission, and GPU optimization for efficient cloud-based workflows."
   type = "note"
-  disabled = "true"
+  disabled = "False"
 }
 # Scaling Your ML Training with Vertex AI Custom Jobs on GCP
 
