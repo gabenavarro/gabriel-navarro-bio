@@ -1,4 +1,4 @@
-@{
+@{id = "eacbeecc-3062-4bd4-83a7-8671829caaea"
   title = "Scaling Your ML Training with Vertex AI Custom Jobs on GCP"
   date = "2025-05-14T00:00:00Z"
   tags = ['cloud', 'gcp', 'machine learning']
