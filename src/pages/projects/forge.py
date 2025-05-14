@@ -19,6 +19,8 @@ CATEGORY_MAP = {
     "html": "visualization",
     "css": "visualization",
     "javascript": "visualization",
+    "cloud": "infrastructure",
+    "gcp": "infrastructure",
 }
 
 css = """
