@@ -9,11 +9,12 @@
   type = "note"
   disabled = "False"
 }
-# Scaling Your ML Training with Vertex AI Custom Jobs on GCP
 
 <p align="center">
   <img src="https://storage.googleapis.com/gn-portfolio/images/vertex-ai-thumb.svg" max-width="700">
 </p>
+
+# Scaling Your ML Training with Vertex AI Custom Jobs on GCP
 
 *By Gabriel Navarro* <br/>
 May 14, 2025 <br/>

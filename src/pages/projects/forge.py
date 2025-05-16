@@ -8,8 +8,10 @@ from src.components.chips import filter_chips
 
 CATEGORY_MAP = {
     "bioinformatics": "omics",
-    "docker": "infrastructure",
     "genomics": "omics",
+    "transcriptomics": "omics",
+    "metabolomics": "omics",
+    "proteomics": "omics",
     "protein folding": "machine-learning",
     "machine learning": "machine-learning",
     "deep-learning": "machine-learning",
@@ -19,6 +21,7 @@ CATEGORY_MAP = {
     "html": "visualization",
     "css": "visualization",
     "javascript": "visualization",
+    "docker": "infrastructure",
     "cloud": "infrastructure",
     "gcp": "infrastructure",
 }
