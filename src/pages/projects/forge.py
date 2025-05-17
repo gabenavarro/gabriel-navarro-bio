@@ -15,6 +15,7 @@ CATEGORY_MAP = {
     "protein folding": "machine-learning",
     "machine learning": "machine-learning",
     "deep-learning": "machine-learning",
+    "state-space-models": "machine-learning",
     "flashattention": "machine-learning",
     "transformers": "machine-learning",
     "webdevelopment": "visualization",
@@ -57,10 +58,9 @@ css = """
     color: var(--white);
     text-decoration: none;
     filter: brightness(1.05);
-
 }
 
-.masonary-card-title {
+.masonry-card-title {
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--white);
@@ -132,6 +132,10 @@ def generate_cards(tag:Optional[str] = None):
     """ Create a card with an image, title, and description."""
     client = BigQueryClient()
     blogs = client.query(sql="SELECT * FROM `noble-office-299208.portfolio.gn-blog` LIMIT 1000")
+
+    if isinstance(blogs, dict):
+        blogs = [blogs]
+
     return Div(
         *[
             A(
@@ -140,7 +144,7 @@ def generate_cards(tag:Optional[str] = None):
                     alt=f"",
                     cls="rounded-img",
                 ),
-                H3(entry["title"], cls="masonary-card-title"),
+                H3(entry["title"], cls="masonry-card-title"),
                 *[Span(i["v"], cls=f"card-category category-{CATEGORY_MAP.get(i['v'], 'omics')}") for i in entry["tags"]],
                 P(entry["description"], cls="white"),
                 href=f"/projects/{entry['id']}",
@@ -153,7 +157,7 @@ def generate_cards(tag:Optional[str] = None):
         cls="masonry-container",
     )
 
-def create_masonry_page(tag: str = None):
+def create_masonry_page(tag: str | None = None):
     chips = [
         ("Machine Learning", "red", "machine-learning", True if tag == "machine-learning" else False), 
         ("Omics", "blue", "omics", True if tag == "omics" else False), 
