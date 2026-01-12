@@ -113,10 +113,10 @@ Without GeneMark, Funannotate will rely on BUSCO/Augustus for ab initio predicti
 
 Assume files in working directory:
 ```
-assembly.fasta  
-left_R1.fq.gz   right_R1.fq.gz  
-left_R2.fq.gz   right_R2.fq.gz  
-nanopore_rna.fq.gz  
+assembly.fasta
+left_R1.fq.gz   right_R1.fq.gz
+left_R2.fq.gz   right_R2.fq.gz
+nanopore_rna.fq.gz
 ```
 
 ```bash
@@ -175,21 +175,20 @@ funannotate annotate -i fun_run_genome_only --cpus 12
 
 ## 6. Tips & Best Practices
 
-- **`--dont_overwrite`**: protect existing outputs.  
-- **Resume pipeline**: use `--resume` if interrupted.  
-- **Metagenomes**: add `--meta` in `predict` step for uneven coverage.  
-- **Max intron length**: adjust with `--max_intronlen` for non-fungal genomes.  
+- **`--dont_overwrite`**: protect existing outputs.
+- **Resume pipeline**: use `--resume` if interrupted.
+- **Metagenomes**: add `--meta` in `predict` step for uneven coverage.
+- **Max intron length**: adjust with `--max_intronlen` for non-fungal genomes.
 - **Repeat-aware EVM**: use `--repeats2evm` in predict to reduce false positives in large genomes.
 
 ---
 
 ## 7. Further Resources
 
-- **Funannotate docs:** http://funannotate.readthedocs.io  
-- **GitHub:** https://github.com/nextgenusfs/funannotate  
+- **Funannotate docs:** http://funannotate.readthedocs.io
+- **GitHub:** https://github.com/nextgenusfs/funannotate
 - **Bandage** for GFA visualization: https://github.com/rrwick/Bandage
 
 ---
 
 *Happy annotating!*
-

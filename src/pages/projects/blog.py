@@ -1,65 +1,52 @@
-from fasthtml.common import Style, Div, Script
-from typing import List, Dict
-from src.components import simple_navigation, contact_me_modal
-from src.lib.css import ROOT_CSS, BODY_CSS
-from src.lib.javascript import MarkedJS
-from src.lib.google.bigquery import BigQueryClient
+from fasthtml.common import *
+from monsterui.all import *
+from src.components import StandardPage
+from src.services.projects import ProjectService
 
-css = """
-/* marked test section */
-.marked {
-    max-width: var(--container-max-width);
-    margin: auto auto;
-    position: relative;
-    z-index: 2;
-    padding: 0 1rem;
-}
-
-.centered-not-found {
-    max-width: var(--container-max-width);
-    margin: auto auto;
-    position: relative;
-    z-index: 2;
-    padding: 0 1rem;
-    text-align: center;
-    font-size: 1.5rem;
-    color: var(--dark-newspaper-bg);
-}
-
-/*!
-  Theme: Default
-  Description: Original highlight.js style
-  Author: (c) Ivan Sagalaev <maniac@softwaremaniacs.org>
-  Maintainer: @highlightjs/core-team
-  Website: https://highlightjs.org/
-  License: see project LICENSE
-  Touched: 2021
-*/pre code.hljs{display:block;overflow-x:auto;padding:1em}code.hljs{padding:3px 5px}.hljs{background:#f3f3f3;color:#444}.hljs-comment{color:#697070}.hljs-punctuation,.hljs-tag{color:#444a}.hljs-tag .hljs-attr,.hljs-tag .hljs-name{color:#444}.hljs-attribute,.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-name,.hljs-selector-tag{font-weight:700}.hljs-deletion,.hljs-number,.hljs-quote,.hljs-selector-class,.hljs-selector-id,.hljs-string,.hljs-template-tag,.hljs-type{color:#800}.hljs-section,.hljs-title{color:#800;font-weight:700}.hljs-link,.hljs-operator,.hljs-regexp,.hljs-selector-attr,.hljs-selector-pseudo,.hljs-symbol,.hljs-template-variable,.hljs-variable{color:#ab5656}.hljs-literal{color:#695}.hljs-addition,.hljs-built_in,.hljs-bullet,.hljs-code{color:#397300}.hljs-meta{color:#1f7199}.hljs-meta .hljs-string{color:#38a}.hljs-emphasis{font-style:italic}.hljs-strong{font-weight:700}
-
-"""
-
-
-def blog_div_from_blog(blog: List[Dict]):
-    """ Example of a section with Marked.js for Markdown parsing."""
-    return Div(
-        "No blog found",
-        cls="centered-not-found"
-    ) if not blog else Div(
-        blog[0]["body"],
-        cls="marked"
-    )
 
 def create_blog_page(uuid: str):
-    """ Create a blog page with a specific UUID. """
-    client = BigQueryClient()
-    blog = client.query(sql="SELECT * FROM `noble-office-299208.portfolio.gn-blog` WHERE id = @uuid", params={"uuid": uuid})
-    blog_div = blog_div_from_blog(blog)
-    return Div(
-        Style(ROOT_CSS + BODY_CSS + css),
-        MarkedJS(),
-        simple_navigation(),
-        contact_me_modal(),
-        Div(style="height: 10vh;"),
-        blog_div,
-        cls="container"
-    )
+    """Create a Factory-style project detail page."""
+    service = ProjectService()
+    project = service.get_project_by_id(uuid)
+
+    if not project:
+        return StandardPage("Not Found", H1("PROJECT NOT FOUND", cls="factory-title"))
+
+    content = [
+        Div("TECHNICAL OVERVIEW", cls="factory-label"),
+        H1(project.title.upper(), cls="factory-title"),
+        P(
+            f"SYSTEM / {' / '.join(project.tags).upper()}",
+            style="font-weight: 700; color: var(--color-accent-100); font-size: 0.75rem; border-bottom: 1px solid var(--color-base-900); padding-bottom: 1rem; margin-bottom: 2.5rem; letter-spacing: 0.05em;",
+        ),
+        # Featured Image
+        # TODO: Review blogs and make sure not double displaying
+        # Img(
+        #     src=project.image,
+        #     style="width: 100%; border: 1px solid var(--color-base-900); border-radius: var(--radius-lg); margin-bottom: 3rem; filter: grayscale(100%); transition: filter 0.5s ease;",
+        #     onmouseover="this.style.filter='grayscale(0%)'",
+        #     onmouseout="this.style.filter='grayscale(100%)'"
+        # )
+        # if project.image
+        # else None,
+        # Project Content
+        Div(
+            render_md(project.body),
+            cls="factory-markdown-content",
+            style="font-size: 1rem; color: var(--color-base-300); line-height: 1.8;",
+        ),
+        # Back Link
+        Div(
+            A(
+                "← RETURN TO SYSTEMS",
+                href="/projects",
+                cls="factory-accent",
+                style="font-weight: 700; font-size: 0.75rem; text-decoration: none; letter-spacing: 0.05em;",
+            ),
+            cls="uk-margin-large-top",
+        ),
+    ]
+
+    return StandardPage(project.title, *content)
+
+    return StandardPage(project.title, *content)

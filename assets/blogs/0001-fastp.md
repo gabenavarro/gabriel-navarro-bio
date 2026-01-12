@@ -9,7 +9,7 @@
   type = "note"
   disabled = false
 }
-# Speeding Up FASTQ Preprocessing with FastP  
+# Speeding Up FASTQ Preprocessing with FastP
 In next-generation sequencing (NGS) workflows, **clean data is critical**. Low-quality reads, adapter sequences, and other artifacts can heavily impact downstream analyses like genome assembly, transcript quantification, or variant calling. **FastP** is a modern, ultra-efficient tool that performs **both quality control and read cleaning** — all in a single fast pass through your FASTQ files. Let's dive into how you can install and use FastP for your omics pipelines!
 
 ---
@@ -30,10 +30,10 @@ FastP highlights:
 
 ## Why Choose FastP?
 
-- 🚀 **Lightning speed**: Preprocess large FASTQ files in minutes, not hours.  
-- 🛠 **Built-in quality control**: Get clean data *and* QC reports without extra tools.  
-- 🧹 **All-in-one solution**: No need to chain multiple tools like cutadapt + Trimmomatic + FastQC.  
-- ☁️ **Cloud ready**: Easily containerized with Docker for scalable workflows.  
+- 🚀 **Lightning speed**: Preprocess large FASTQ files in minutes, not hours.
+- 🛠 **Built-in quality control**: Get clean data *and* QC reports without extra tools.
+- 🧹 **All-in-one solution**: No need to chain multiple tools like cutadapt + Trimmomatic + FastQC.
+- ☁️ **Cloud ready**: Easily containerized with Docker for scalable workflows.
 - 🛠 **Frequent updates**: Actively maintained by the community.
 
 ---
@@ -99,7 +99,7 @@ This installs FastP v0.24.1 inside a lightweight container — perfect for local
 
 ### ☁️ Cloud Deployment (Google Cloud Platform)
 
-1. Build the image locally as shown above.  
+1. Build the image locally as shown above.
 2. Tag it for GCP Artifact Registry:
 
     ```bash

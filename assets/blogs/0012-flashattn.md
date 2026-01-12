@@ -22,11 +22,11 @@ Transformer models and the FlashAttention kernel have revolutionized natural-lan
 Because this is a proof-of-concept on a small, minimally featurized dataset, we skip more advanced techniques—such as learned embeddings of engineered technical indicators, multi-scale tokenization (e.g. grouping minutes into hours), or external data fusion (order-book depth, sentiment)—that could further boost forecasting accuracy. For the sake of clarity and simplicity, we’ll leave those extensions for another deep dive and focus here purely on demonstrating how FlashAttention can power an autoregressive Transformer on raw market data.
 
 We’ll cover:
-1. **Containerizing FlashAttention** with Docker  
-2. **Processing raw BTC–USD data** into z-scored, autoregressive sequences  
-3. **Defining a lightweight Transformer** using the FlashAttention MHA operator  
-4. **Training & evaluating** with PyTorch Lightning  
-5. **Inspecting performance** via loss curves, test metrics, and prediction plots  
+1. **Containerizing FlashAttention** with Docker
+2. **Processing raw BTC–USD data** into z-scored, autoregressive sequences
+3. **Defining a lightweight Transformer** using the FlashAttention MHA operator
+4. **Training & evaluating** with PyTorch Lightning
+5. **Inspecting performance** via loss curves, test metrics, and prediction plots
 6. **Conclusions & next steps** for improving the model
 
 ---

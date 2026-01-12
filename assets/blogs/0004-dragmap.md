@@ -11,7 +11,7 @@
 }
 # High-Performance Variant Calling with Dragen-GATK
 
-Accurate variant calling is fundamental to modern genomics research and clinical sequencing. With the rise of ever-larger datasets, **speed** and **precision** are no longer optional — they are mandatory.  
+Accurate variant calling is fundamental to modern genomics research and clinical sequencing. With the rise of ever-larger datasets, **speed** and **precision** are no longer optional — they are mandatory.
 **Dragen-GATK** offers an accelerated, highly-optimized pipeline for **germline variant calling**, combining Illumina's hardware acceleration and GATK’s trusted software toolkit. Let's dive into how you can set up and run **Dragen-GATK** workflows efficiently!
 
 ---
@@ -188,7 +188,7 @@ Follow example from previous section in FastP tutorial [here](TODO:Add href) to 
         -bh -o "/app/data/SRR3317165.bam"'
     ```
 
-3. **Prepare BAM for Variant Calling** 
+3. **Prepare BAM for Variant Calling**
 
     Sort the BAM file and index it:
     ```bash
@@ -238,7 +238,7 @@ Follow example from previous section in FastP tutorial [here](TODO:Add href) to 
             -I "/app/data/SRR3317165.dedup.bam" \
             -str "/app/data/GCF_000009045.1_ASM904v1_genomic.fna.strtable" \
             -O "/app/data/GCF_000009045.1_ASM904v1_genomic.model"'
-    ``` 
+    ```
 
 5. **Call Variants**
 
@@ -324,7 +324,7 @@ A typical NGS analysis workflow with Dragen-GATK would look like:
 
 # 🎯 Conclusion
 
-**Dragen-GATK** provides the best of both worlds: blazing speed and rock-solid accuracy.  
+**Dragen-GATK** provides the best of both worlds: blazing speed and rock-solid accuracy.
 If you're building high-throughput sequencing pipelines — whether for research, diagnostics, or clinical genomics — integrating Dragen-GATK will significantly boost your variant discovery pipeline’s performance.
 
 High-quality variant calling is closer (and faster) than ever!

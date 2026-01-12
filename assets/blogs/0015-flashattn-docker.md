@@ -212,7 +212,7 @@ HEALTHCHECK --interval=30s --timeout=30s --retries=3 \
 
 	# Vertex AI Configuration
 	SERVICE_KEY_PATH = os.getenv(
-		"GOOGLE_APPLICATION_CREDENTIALS", 
+		"GOOGLE_APPLICATION_CREDENTIALS",
 		"/path/to/your/service_account_key.json"
 	)
 	LOCATION = "your-gcp-region"         # e.g., "us-central1"
@@ -232,9 +232,9 @@ HEALTHCHECK --interval=30s --timeout=30s --retries=3 \
 
 	# Training Command
 	CMD = [
-		"python3", 
+		"python3",
 		"/gcs/your-gcp-training-bucket/flash-attn-example/scripts/flash_attn_train.py",
-		"--config", 
+		"--config",
 		"/gcs/your-gcp-training-bucket/flash-attn-example/config/flash_attn_crypto_model_config.yaml",
 	]
 
@@ -268,7 +268,7 @@ HEALTHCHECK --interval=30s --timeout=30s --retries=3 \
 
 	# Create and submit the training job
 	job = aiplatform.CustomJob(
-		display_name=DISPLAY_NAME, 
+		display_name=DISPLAY_NAME,
 		worker_pool_specs=worker_pool_specs,
 		staging_bucket=STAGING_BUCKET,
 	)
@@ -292,18 +292,18 @@ This pipeline—from a reproducible local Docker build to a scalable multi-GPU c
 
 ## 6. Best Practices and Common Pitfalls
 
-**Best Practices**  
-- **Pin all dependencies**, including OS packages.  
-- Use **multi-stage builds** to separate build-time from run-time artifacts.  
-- Leverage **cached layers**: group heavy installs before your frequent code changes.  
-- Maintain a **.dockerignore** to exclude logs, data, and other bloat.  
-- **Scan images** for vulnerabilities (e.g., `docker scan`).  
+**Best Practices**
+- **Pin all dependencies**, including OS packages.
+- Use **multi-stage builds** to separate build-time from run-time artifacts.
+- Leverage **cached layers**: group heavy installs before your frequent code changes.
+- Maintain a **.dockerignore** to exclude logs, data, and other bloat.
+- **Scan images** for vulnerabilities (e.g., `docker scan`).
 - Automate builds & scans in CI (GitHub Actions, GitLab CI).
 
-**Common Pitfalls**  
+**Common Pitfalls**
 - **Huge images**: piling on dev tools or data can push images to hundreds of gigabytes—slow to pull and costly to store. As a baseline measurement, most base images with CUDA and PyTorch are around 8 GB. Then add your dependencies.
-- **Driver mismatch**: CUDA version in image vs. host driver mismatch leads to “libcudart.so” errors. For the most part, as long as you use a CUDA version that is older than the driver version, you should be fine, but you are likely to run into issues if you use a newer CUDA version than the driver version. When running locally, use `nvidia-smi` to check the driver version. For cloud, ensure your service provider supports the required CUDA version. 
-- **No health checks**: silent GPU failures can derail long-running jobs without alerting you.  
+- **Driver mismatch**: CUDA version in image vs. host driver mismatch leads to “libcudart.so” errors. For the most part, as long as you use a CUDA version that is older than the driver version, you should be fine, but you are likely to run into issues if you use a newer CUDA version than the driver version. When running locally, use `nvidia-smi` to check the driver version. For cloud, ensure your service provider supports the required CUDA version.
+- **No health checks**: silent GPU failures can derail long-running jobs without alerting you.
 - **Overlooking secrets**: never bake API keys or credentials into images; use environment variables or secret managers.
 
 ---
@@ -312,10 +312,10 @@ This pipeline—from a reproducible local Docker build to a scalable multi-GPU c
 
 Docker transforms ML workflows by locking down environments from local dev through production. It tackles the reproducibility crisis head-on and scales effortlessly, whether on your workstation or a GPU cluster. By following best practices—pinning dependencies, optimizing layers, and managing GPU access—you’ll save countless hours chasing elusive bugs.
 
-**Further Reading**  
-- Docker Documentation: https://docs.docker.com  
-- NVIDIA Container Toolkit: https://github.com/NVIDIA/nvidia-docker  
-- Best Practices for Writing Dockerfiles: https://docs.docker.com/develop/develop-images/dockerfile_best-practices/  
-- flash-attn GitHub: https://github.com/Dao-AILab/flash-attention  
+**Further Reading**
+- Docker Documentation: https://docs.docker.com
+- NVIDIA Container Toolkit: https://github.com/NVIDIA/nvidia-docker
+- Best Practices for Writing Dockerfiles: https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
+- flash-attn GitHub: https://github.com/Dao-AILab/flash-attention
 
 With a solid containerization strategy, your ML projects will be as reproducible as they are performant. Happy containerizing!

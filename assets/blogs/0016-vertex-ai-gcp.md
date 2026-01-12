@@ -25,10 +25,10 @@ May 14, 2025 <br/>
 
 As your models grow in size and complexity, you’ll inevitably hit the limits of local GPUs. Google Cloud’s Vertex AI lets you offload heavy training workloads to managed clusters of GPUs—so you can scale seamlessly, track experiments in the cloud, and integrate with the rest of GCP. In this tutorial, we’ll turn our FlashAttention‐powered Transformer example into a Vertex AI Custom Job, walking through:
 
-1. **Building & pushing** a Docker image  
-2. **Uploading** configs, code, and data to Cloud Storage  
-3. **Submitting** a Custom Job via the Python SDK  
-4. **Optionally** targeting reserved GPU capacity  
+1. **Building & pushing** a Docker image
+2. **Uploading** configs, code, and data to Cloud Storage
+3. **Submitting** a Custom Job via the Python SDK
+4. **Optionally** targeting reserved GPU capacity
 
 Let’s get started!
 
@@ -38,10 +38,10 @@ Let’s get started!
 
 Before you begin, make sure you have:
 
-- A **GCP project** with the **Vertex AI API** enabled  
-- A **service account** vested with Vertex AI & Storage permissions  
-- The service account’s JSON key, and `GOOGLE_APPLICATION_CREDENTIALS` pointing to it  
-- **Docker** and the **gcloud** CLI installed  
+- A **GCP project** with the **Vertex AI API** enabled
+- A **service account** vested with Vertex AI & Storage permissions
+- The service account’s JSON key, and `GOOGLE_APPLICATION_CREDENTIALS` pointing to it
+- **Docker** and the **gcloud** CLI installed
 
 > 🔑 If you haven’t set up your GCP project or service account yet, follow [GCP Setup](https://cloud.google.com/vertex-ai/docs/general/setup) first.
 
@@ -98,7 +98,7 @@ gsutil cp ./assets/test-files/flash-attn-config.yaml \
 gsutil cp ./scripts/flash_attn_train.py \
   gs://flashattn-example/scripts/
 
-# Upload processed dataset, 
+# Upload processed dataset,
 # Please follow the instructions in MLContainerLab to generate the dataset
 # https://github.com/gabenavarro/MLContainerLab/blob/main/documentation/flash-attn.ipynb
 # (or use your own)

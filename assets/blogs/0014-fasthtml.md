@@ -15,29 +15,29 @@
 
 **FastHTML** is a next-generation Python web framework built around HTMX, letting you write ultra-light, interactive web apps with minimal boilerplate. In this tutorial, you’ll learn how to:
 
-1. Install FastHTML via **pip**  
-2. Containerize your app with **Docker**  
-3. Run a simple “Hello World” example with HTMX interactivity  
+1. Install FastHTML via **pip**
+2. Containerize your app with **Docker**
+3. Run a simple “Hello World” example with HTMX interactivity
 
 ---
 
 ## Table of Contents
 
-1. [Prerequisites](#prerequisites)  
-2. [Installing FastHTML](#installing-fasthtml)  
-3. [Writing Your First FastHTML App](#writing-your-first-fasthtml-app)  
-4. [Dockerizing Your App](#dockerizing-your-app)  
-5. [Building & Running the Container](#building--running-the-container)  
-6. [Example: Click-to-Change Text](#example-click-to-change-text)  
-7. [Next Steps & Resources](#next-steps--resources)  
+1. [Prerequisites](#prerequisites)
+2. [Installing FastHTML](#installing-fasthtml)
+3. [Writing Your First FastHTML App](#writing-your-first-fasthtml-app)
+4. [Dockerizing Your App](#dockerizing-your-app)
+5. [Building & Running the Container](#building--running-the-container)
+6. [Example: Click-to-Change Text](#example-click-to-change-text)
+7. [Next Steps & Resources](#next-steps--resources)
 
 ---
 
 ## Prerequisites
 
-- **Python 3.8+**  
-- **Docker** v20.10+ (with daemon running)  
-- Familiarity with the command line  
+- **Python 3.8+**
+- **Docker** v20.10+ (with daemon running)
+- Familiarity with the command line
 
 ---
 
@@ -154,4 +154,3 @@ Next Steps & Resources
 	•	Advanced Features: Learn about WebSocket support, database integration, and custom components in the official docs.
 
 Happy coding with FastHTML! 🚀
-

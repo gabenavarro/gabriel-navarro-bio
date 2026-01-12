@@ -1,498 +1,376 @@
-from fasthtml.common import Div, A, H2, P, Ul, Li, Section, H3
+from fasthtml.common import *
+from monsterui.all import *
 
 
-CV_CSS = """
-
-/* Main Content Styles */
-.section {
-    padding: var(--section-spacing) 0;
-    scroll-margin-top: 4rem;
-    margin-bottom: 18rem;
-}
-
-.section-title {
-    font-size: 2rem;
-    position: relative;
-    padding-bottom: 0.5rem;
-}
-
-
-/* Contact Info */
-.contact-info {
-    margin-bottom: 2rem;
-    font-size: 1.1rem;
-}
-
-.contact-info p {
-    margin-bottom: 0.5rem;
-}
-
-.contact-info a {
-    color: var(--secondary-color);
-    text-decoration: none;
-}
-
-.contact-info a:hover {
-    text-decoration: underline;
-}
-
-/* Summary */
-.summary {
-    background-color: var(--dark-newspaper-bg);
-    padding: 2rem;
-    border-radius: 10px;
-    margin-bottom: 3rem;
-    border-left: 4px solid var(--secondary-color);
-}
-
-/* Experience */
-.experience-item {
-    margin-bottom: 3rem;
-    position: relative;
-}
-
-.experience-title {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.experience-company {
-    font-size: 1.2rem;
-    color: var(--secondary-color);
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-}
-
-.experience-period {
-    font-size: 1rem;
-    color: var(--text-color-secondary);
-    margin-bottom: 1rem;
-    font-style: italic;
-}
-
-.experience-description ul {
-    list-style-position: inside;
-    margin-left: 1rem;
-}
-
-.experience-description li {
-    margin-bottom: 0.5rem;
-}
-
-/* Skills */
-.skills-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2rem;
-    margin-bottom: 3rem;
-}
-
-.skill-category {
-    background-color: var(--dark-newspaper-bg);
-    padding: 1.5rem;
-    border-radius: 10px;
-}
-
-.skill-category h3 {
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
-    color: var(--secondary-color);
-}
-
-.skill-list {
-    list-style: none;
-}
-
-.skill-list li {
-    margin-bottom: 0.5rem;
-    position: relative;
-    padding-left: 1.5rem;
-}
-
-.skill-list li::before {
-    content: '•';
-    position: absolute;
-    left: 0;
-    color: var(--secondary-color);
-    font-weight: bold;
-}
-
-/* Education */
-.education-item {
-    margin-bottom: 2rem;
-}
-
-.education-degree {
-    font-size: 1.3rem;
-    margin-bottom: 0.5rem;
-}
-
-.education-institution {
-    font-size: 1.1rem;
-    color: var(--secondary-color);
-    margin-bottom: 0.5rem;
-}
-
-.education-period {
-    font-size: 1rem;
-    color: var(--text-color-secondary);
-    font-style: italic;
-}
-
-/* Patents & Publications */
-.patent-item, .publication-item {
-    margin-bottom: 1.5rem;
-    padding-left: 1rem;
-    border-left: 2px solid var(--secondary-color);
-}
-
-.patent-title, .publication-title {
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-}
-
-.patent-authors, .publication-authors {
-    font-size: 1rem;
-    color: var(--text-color-secondary);
-    margin-bottom: 0.5rem;
-}
-
-.patent-link, .publication-link {
-    font-size: 0.9rem;
-    color: var(--secondary-color);
-    word-break: break-word;
-}
-
-.patent-year, .publication-year {
-    font-size: 0.9rem;
-    color: var(--text-color-secondary);
-    margin-top: 0.5rem;
-}
-
-/* Footer */
-footer {
-    background-color: rgba(0, 0, 0, 0.3);
-    padding: 2rem 0;
-    text-align: center;
-    margin-top: 4rem;
-}
-
-.footer-text {
-    color: var(--text-color-secondary);
-    font-size: 0.9rem;
-}
-
-/* Responsive Styles */
-@media (max-width: 768px) {
-    .section-title {
-        font-size: 2rem;
-    }
-    
-    .skills-container {
-        grid-template-columns: 1fr;
-    }
-}
-"""
-
-
-def cv_contact():
-    """ Create a contact section for the CV page. """
+def cv_section_header(title):
     return Div(
-        # Contact Information
-        Section(
-            H2("Contact Information", cls="section-title"),
-            Div(
-                P("📍 Moraga, CA"),
-                P("✉️ ", A("gchinonavarro@gmail.com", href="mailto:gchinonavarro@gmail.com")),
-                P("🌐 ", A("https://gabriel.navarro.bio", href="https://gabriel.navarro.bio", target="_blank")),
-            ),
-            cls="section",
-        )
+        Div(title.upper(), cls="factory-label"),
+        style="margin-top: 4rem; margin-bottom: 2rem;",
     )
 
-def cv_summary():
-    """ Create a summary section for the CV page. """
-    return Div(
-        # Summary
-        Section(
-            H2("Summary", cls="section-title"),
-            Div(
-                P("Computational Scientist with 10+ years' expertise in omics ML modeling. Proven track record of designing and deploying AI/ML-powered bioinformatics pipelines, assessing biological application, and developing high-throughput omics data solutions on cloud platforms. Adept at collaborating with cross-functional teams to deliver robust, efficient solutions that drive critical insights in life sciences."),
-            ),
-            cls="section",
-        ),
-        cls="section",
-    )
 
 def cv_experience():
-    """ Create an experience section for the CV page. """
-    return Section(
-        H2("Work Experience", cls="section-title"),
-        # Experience Item 1
-        Div(
-            H3("Senior Bioinformatics Scientist, Computational Scientist", cls="experience-title"),
-            P("Triplebar", cls="experience-company"),
-            P("January 2024 — Present", cls="experience-period"),
-            Div(
-                Ul(
-                    Li("Developed custom AI/ML models for synthetic biology applications, fine-tuning pLMs to analyze antibody datasets that improved prediction accuracy by 42% and reduced experimental validation, accelerating discovery timelines."),
-                    Li("Architected GCP bioinformatics infrastructure that cut processing time by 65% and increased throughput 10x, enabling 200+ weekly genomic analysis."),
-                ),
-                cls="experience-description"
-            ),
-            cls="experience-item"
-        ),
-        
-        # Experience Item 2
-        Div(
-            H3("Data Scientist III, Computational Scientist", cls="experience-title"),
-            P("Amyris", cls="experience-company"),
-            P("December 2021 — December 2023", cls="experience-period"),
-            Div(
-                Ul(
-                    Li("Deployed multi-omics platform reducing analysis time by 75%, enabling 3x higher monthly strain design evaluation."),
-                    Li("Created Python/Dash visualization dashboards that drove 75% increase in self-service analytics adoption across R&D teams."),
-                ),
-                cls="experience-description"
-            ),
-            cls="experience-item"
-        ),
-
-        # Experience Item 3
-        Div(
-            H3("Senior Scientist, Computational Metabolomics", cls="experience-title"),
-            P("Hexagon Bio", cls="experience-company"),
-            P("March 2020 — November 2021", cls="experience-period"),
-            Div(
-                Ul(
-                    Li("Built high-throughput metabolomics pipeline processing 4+ TB of LC-MS/MS data with 85% recall in compound identification and <5% false discovery rate."),
-                    Li("Designed and implemented machine learning algorithms that successfully identified 16 novel fungal compound classes with demonstrated biological activity."),
-                ),
-                cls="experience-description"
-            ),
-            cls="experience-item"
-        ),
-
-        # Experience Item 4
-        Div(
-            H3("Lead Scientist, Computational Metabolomics", cls="experience-title"),
-            P("Brightseed", cls="experience-company"),
-            P("February 2018 — February 2020", cls="experience-period"),
-            Div(
-                Ul(
-                    Li("Developed core metabolomics technology platform for Forager™, Brightseed's proprietary AI system, resulting in a 1000x increase in phytonutrient identification throughput."),
-                    Li("Created ML algorithms mapping 20,000+ plant compounds to human health benefits, establishing first-of-its-kind bioactive database."),
-                ),
-                cls="experience-description"
-            ),
-            cls="experience-item"
-        ),
-
-        # Experience Item 5
-        Div(
-            H3("Consultant", cls="experience-title"),
-            P("Mondelez", cls="experience-company"),
-            P("February 2018 — July 2019", cls="experience-period"),
-            Div(
-                Ul(
-                    Li("Provided strategic expertise to develop and optimize 12 mass spectrometry-based metabolomics protocols that improved compound detection sensitivity."),
-                ),
-                cls="experience-description"
-            ),
-            cls="experience-item"
-        ),
-
-        # Experience Item 6
-        Div(
-            H3("Senior Scientist, Mass Spectrometry", cls="experience-title"),
-            P("Mondelez", cls="experience-company"),
-            P("January 2016 — January 2018", cls="experience-period"),
-            Div(
-                Ul(
-                    Li("Pioneered machine learning-based algorithms for mass spectrometry data that reduced analysis time by 90%, enabling rapid quality control decisions for food product development across 3 global manufacturing facilities."),
-                ),
-                cls="experience-description"
-            ),
-            cls="experience-item"
-        ),
-        cls="section",
-    )
-
-
-def cv_skills():
-    """ Create a skills section for the CV page. """
+    experiences = [
+        {
+            "title": "Head of Machine Learning and Bioinformatics",
+            "company": "Triplebar",
+            "period": "January 2024 — Present",
+            "bullets": [
+                "Designed and trained 2B-parameter genome language model on 4,000 fungal genomes using multi-node distributed training (16 GPUs), achieving 15% improvement in variant effect prediction.",
+                "Fine-tuned 8B foundation models for genotype-phenotype prediction, implementing custom PyTorch workflows with gradient checkpointing and mixed-precision training.",
+                "Applied protein structure prediction (Boltz, ESM) and diffusion-based design (RFDiffusion) to develop naïve antibody screening strategies, reducing costs by 40%.",
+                "Architected cloud-native genomic analysis pipeline processing 200+ whole genomes weekly, reducing variant calling time from 72 to 2 hours using GATK and NVIDIA Parabricks on GCP Vertex AI.",
+            ],
+        },
+        {
+            "title": "Data Scientist III",
+            "company": "Amyris",
+            "period": "December 2021 — December 2023",
+            "bullets": [
+                "Built end-to-end multi-omics data platform integrating genomics, proteomics, and metabolomics for candidate gene identification.",
+                "Developed unsupervised learning pipeline for metabolite clustering using dimensionality reduction (UMAP, t-SNE) and hierarchical clustering.",
+                "Implemented automated feature extraction from mass spectrometry data using convolutional neural networks, achieving 92% accuracy in compound classification.",
+            ],
+        },
+        {
+            "title": "Senior Scientist, Computational Metabolomics",
+            "company": "Hexagon Bio",
+            "period": "March 2020 — November 2021",
+            "bullets": [
+                "Developed high-throughput metabolomics pipeline processing 4+ TB of LC-MS/MS data, reducing analysis time from weeks to days.",
+                "Built deep learning models for retention time prediction and spectral matching, improving accuracy by 35%.",
+                "Accelerated natural product discovery pipeline by 5x through integration of computational predictions with experimental validation.",
+            ],
+        },
+        {
+            "title": "Lead Scientist, Computational Metabolomics",
+            "company": "Brightseed",
+            "period": "February 2018 — February 2020",
+            "bullets": [
+                "Architected 'Forager' AI platform achieving 100x increase in phytonutrient identification throughput for 20,000+ compounds.",
+                "Developed custom molecular fingerprinting and supervised learning models to identify 50+ novel bioactive molecules.",
+                "Led initiatives connecting computational predictions to experimental design, resulting in 2 patent applications.",
+            ],
+        },
+        {
+            "title": "Senior Scientist, Mass Spectrometry Specialist",
+            "company": "Mondelez International",
+            "period": "January 2016 — January 2018",
+            "bullets": [
+                "Developed machine learning-based QC algorithms reducing mass spectrometry analysis time by 90% across 3 global manufacturing facilities.",
+                "Implemented automated decision systems for real-time quality control at industrial scale.",
+            ],
+        },
+    ]
 
     return Section(
-        H2("Skills", cls="section-title"),
-        # Skills            
-        Div(
+        cv_section_header("Work Experience"),
+        *[
             Div(
-                H3("Machine Learning & AI"),
-                Ul(
-                    Li("Genomic and protein language model training and fine-tuning"),
-                    Li("Embedding space analysis"),                    
-                ), 
-                cls="skill-category"
-            ),
-            Div(
-                H3("Computational Skills"),
-                Ul(
-                    Li("Python, Bash scripting"),
-                    Li("PyTorch, ESMFold, AlphaFold"),
-                    Li("Scikit-learn, RDKit"),
-                    Li("Dash, VertexAI, Kubeflow"),
-                    Li("Docker, WSL"),
-                ), cls="skill-category"
-            ),
-            Div(
-                H3("Computational Biology & Genomics"),
-                Ul(
-                    Li("NGS Data"),
-                    Li("Mass spectrometry-based metabolomics and proteomic"),
-                    Li("High-throughput sequencing analysis"),
-                ), cls="skill-category"
-                
-            ),
-            Div(
-                H3("Cloud & Data Infrastructure"),
-                Ul(
-                    Li("GCP (Batch Computing, Vertex AI)"),
-                    Li("Docker"),
-                    Li("Cloud-Native Systems"),
-                ), cls="skill-category"
-            ),
-            cls="skills-container",
-        ),
-        cls="section"
+                Grid(cols=12)(
+                    Div(
+                        P(
+                            exp["period"],
+                            style="font-weight: 700; color: var(--color-base-500); font-size: 0.875rem;",
+                        ),
+                        cls="col-span-12 md:col-span-3",
+                    ),
+                    Div(
+                        H3(
+                            exp["title"].upper(),
+                            style="margin-top: 0; color: var(--color-white); font-weight: 700; font-size: 1.125rem;",
+                        ),
+                        P(
+                            exp["company"].upper(),
+                            style="font-weight: 700; color: var(--color-accent-100); font-size: 0.75rem; margin-bottom: 1rem;",
+                        ),
+                        Ul(
+                            *[
+                                Li(
+                                    b,
+                                    style="color: var(--color-base-400); font-size: 0.875rem; margin-bottom: 0.5rem;",
+                                )
+                                for b in exp["bullets"]
+                            ],
+                            style="margin-top: 1rem; list-style-type: none; padding-left: 0;",
+                        ),
+                        cls="col-span-12 md:col-span-9",
+                    ),
+                ),
+                style="margin-bottom: 3rem; padding: 2rem; border: 1px solid var(--color-base-900); border-radius: var(--radius-lg); background: var(--dark-base-secondary);",
+            )
+            for exp in experiences
+        ],
     )
 
 
 def cv_education():
-    """ Create an education section for the CV page. """
+    edu = [
+        {
+            "degree": "Postdoctoral Researcher, IRACDA Fellow",
+            "school": "University of California, San Diego",
+            "period": "2014 — 2015",
+        },
+        {
+            "degree": "PhD in Chemistry, NSF GRFP Fellow",
+            "school": "University of California Santa Cruz",
+            "period": "2008 — 2013",
+        },
+        {
+            "degree": "Bachelor of Science in Chemical Biology",
+            "school": "University of California Berkeley",
+            "period": "2004 — 2008",
+        },
+    ]
     return Section(
-        H2("Education", cls="section-title"),
-        Div(
-            # Education Item 1
+        cv_section_header("Education"),
+        *[
             Div(
-                H3("Postdoctoral Researcher, IRACDA Fellow", cls="education-degree"),
-                P("University of California, San Diego", cls="education-institution"),
-                P("2014 — 2015", cls="education-period"),
-            ),
-            
-            # Education Item 2
-            Div(
-                H3("PhD in Chemistry, NSF GRFP Fellow", cls="education-degree"),
-                P("University of California Santa Cruz", cls="education-institution"),
-                P("2008 — 2013", cls="education-period"),
-            ),
-            
-            # Education Item 3
-            Div(
-                H3("Bachelor of Science in Chemical Biology", cls="education-degree"),
-                P("University of California Berkeley", cls="education-institution"),
-                P("2004 — 2008", cls="education-period"),
-            ),
+                Grid(cols=12)(
+                    Div(
+                        P(
+                            e["period"],
+                            style="font-weight: 700; color: var(--color-base-500); font-size: 0.875rem;",
+                        ),
+                        cls="col-span-12 md:col-span-3",
+                    ),
+                    Div(
+                        H3(
+                            e["degree"].upper(),
+                            style="margin-top: 0; color: var(--color-white); font-weight: 700; font-size: 1.125rem;",
+                        ),
+                        P(
+                            e["school"].upper(),
+                            style="font-weight: 700; color: var(--color-accent-100); font-size: 0.75rem;",
+                        ),
+                        cls="col-span-12 md:col-span-9",
+                    ),
+                ),
+                style="margin-bottom: 2rem; padding: 2rem; border: 1px solid var(--color-base-900); border-radius: var(--radius-lg); background: var(--dark-base-secondary);",
+            )
+            for e in edu
+        ],
+    )
+
+
+def cv_skills():
+    skills = {
+        "Foundation Models & ML": [
+            "Pre-training, fine-tuning, evaluation framework design",
+            "Genomic & Protein Language Models (Evo2, ESM, Boltz)",
+            "Diffusion Models (RFDiffusion) for antibody design",
+            "Distributed training (DDP, FSDP, Megatron-LM), Multi-GPU clusters",
+        ],
+        "Computational Biology": [
+            "Variant calling (GATK, Parabricks), Genome assembly",
+            "LC-MS/MS analysis (targeted & untargeted), Antibody design",
+            "Biological Databases: NCBI, UniProt, PDB, MassIVE",
+            "Chemistry: RDKit, molecular fingerprinting, SAR analysis",
+        ],
+        "Software & Infrastructure": [
+            "Python, R, SQL, Bash, JavaScript, Java",
+            "PyTorch, Lightning, BioNeMo, Scikit-learn",
+            "Cloud: GCP (Vertex AI), AWS, Docker, Kubernetes",
+            "DevOps: Git, CI/CD, reproducible workflows",
+        ],
+    }
+
+    return Section(
+        cv_section_header("Skills"),
+        Grid(
+            *[
+                Div(
+                    H3(
+                        cat.upper(),
+                        style="font-weight: 700; font-size: 0.875rem; color: var(--color-white); margin-bottom: 1rem; border-bottom: 1px solid var(--color-base-900); padding-bottom: 0.5rem;",
+                    ),
+                    Ul(
+                        *[
+                            Li(
+                                s,
+                                style="color: var(--color-base-400); font-size: 0.875rem; margin-bottom: 0.5rem;",
+                            )
+                            for s in items
+                        ],
+                        style="list-style-type: none; padding-left: 0;",
+                    ),
+                    style="padding: 1.5rem; border: 1px solid var(--color-base-900); border-radius: var(--radius-lg); background: var(--dark-base-secondary);",
+                )
+                for cat, items in skills.items()
+            ],
+            cols_min=1,
+            cols_md=3,
+            cls="gap-8",
         ),
-        cls="section",
     )
 
 
 def cv_patents():
-    """ Create a patents section for the CV page. """
+    patents = [
+        {
+            "title": "Extract, consumable product and method for enriching bioactive metabolite in an extract",
+            "authors": "Chae, L. H., Flatt, J., Herrmann, A. M., Navarro, G., Ochoa, J. L.",
+            "link": "https://patents.google.com/patent/US11647776B2/en",
+            "year": "2023",
+        },
+        {
+            "title": "Methods for making and using novel semi-synthetic small molecules for the treatment parasitic disease",
+            "authors": "Roger R Linington, Gabriel Navarro, Khanitha Pudhom, James McKerrow",
+            "link": "https://patents.google.com/patent/US9290474B2/en",
+            "year": "2016",
+        },
+        {
+            "title": "Semi-synthetic small molecules for the treatment parasitic disease",
+            "authors": "Roger Linington, Gabriel Navarro, Khanitha Pudhom, James McKerrow",
+            "link": "https://patents.google.com/patent/US8946455B2/en",
+            "year": "2015",
+        },
+        {
+            "title": "Novel semi-synthetic small molecules for the treatment parasitic disease",
+            "authors": "Khanitha Pudhom, Gabriel Navarro, James McKerrow, Roger Linington",
+            "link": "https://patents.google.com/patent/US20140236030A1/en",
+            "year": "2014",
+        },
+    ]
     return Section(
-        H2("Patents", cls="section-title"),
-        Div(
-            # Patent Item 1
-            Div(
-                H3("Methods for making and using novel semi-synthetic small molecules for the treatment parasitic disease", cls="patent-title"),
-                P("Roger Linington, Gabriel Navarro, Khanitha Pudhom, James McKerrow", cls="patent-authors"),
-                A("https://patents.google.com/patent/US9290474B2/en", href="https://patents.google.com/patent/US9290474B2/en", target="_blank", cls="patent-link"),
-                P("2016", cls="patent-year"),
-            ),
-            
-            # Patent Item 2
-            Div(
-                H3("Semi-Synthetic Small Molecules for the Treatment Parasitic Disease", cls="patent-title"),
-                P("Roger R Linington, Gabriel Navarro, Khanitha Pudhom, James McKerrow", cls="patent-authors"),
-                A("https://patents.google.com/patent/US8946455B2/en", href="https://patents.google.com/patent/US8946455B2/en", target="_blank", cls="patent-link"),
-                P("2015", cls="patent-year"),
-            ),
+        cv_section_header("Patents"),
+        Grid(
+            *[
+                Div(
+                    P(
+                        p["year"],
+                        style="font-weight: 700; color: var(--color-base-500); font-size: 0.875rem; margin-bottom: 0.5rem;",
+                    ),
+                    H3(
+                        p["title"].upper(),
+                        style="margin-top: 0; color: var(--color-white); font-weight: 700; font-size: 1rem; line-height: 1.4;",
+                    ),
+                    P(
+                        p["authors"],
+                        style="color: var(--color-base-400); font-size: 0.75rem; margin-bottom: 1rem;",
+                    ),
+                    A(
+                        "VIEW PATENT →",
+                        href=p["link"],
+                        style="color: var(--color-accent-100); font-weight: 700; font-size: 0.75rem; text-decoration: none; letter-spacing: 0.05em;",
+                    ),
+                    style="padding: 1.5rem; border: 1px solid var(--color-base-900); border-radius: var(--radius-lg); background: var(--dark-base-secondary);",
+                )
+                for p in patents
+            ],
+            cols_min=1,
+            cols_md=2,
+            cls="gap-8",
         ),
-        cls="section",
     )
 
 
 def cv_publications():
-    """ Create a publications section for the CV page. """
+    pubs = [
+        {
+            "title": "Tau oligomers modulate synapse fate by eliciting progressive bipartite synapse dysregulation and synapse loss",
+            "authors": "Pareja-Navarro, K. A., King, C. D., Kauwe, G., Ngwala, Y. Y., Lokitiyakul, D., Wong, I., Vira, A., Chen, J. H., Sharma, M., Navarro, G.",
+            "info": "bioRxiv (Under Review: Molecular Neurodegeneration), 2026",
+        },
+        {
+            "title": "Portobelamides A and B and caciqueamide, cytotoxic peptidic natural products from a Caldora sp. marine cyanobacterium",
+            "authors": "Demirkiran, O., Almaliti, J., Leao, T., Navarro, G., Byrum, T., Valeriote, F. A., Gerwick, L., Gerwick, W. H.",
+            "info": "Journal of Natural Products, 84(8), 2081-2093, 2021",
+        },
+        {
+            "title": "Evaluating nitrogen-containing biosynthetic products produced by saltwater culturing of several California littoral zone Gram-negative bacteria",
+            "authors": "Lorig-Roach, N., Still, P. C., Coppage, D., Compton, J. E., Crews, M. S., Navarro, G., Tenney, K., Crews, P.",
+            "info": "Journal of Natural Products, 80(8), 2304-2310, 2017",
+        },
+        {
+            "title": "Biofilm formation and detachment in Gram-negative pathogens is modulated by select bile acids",
+            "authors": "Sanchez, L. M., Cheng, A. T., Warner, C. J. A., Townsley, L., Peach, K. C., Navarro, G., Shikuma, N. J., Bray, W. M., Riener, R. M., Yildiz, F. H.",
+            "info": "PLoS One, 11(3), e0149603, 2016",
+        },
+        {
+            "title": "Kalkipyrone B, a marine cyanobacterial γ-pyrone possessing cytotoxic and anti-fungal activities",
+            "authors": "Bertin, M. J., Demirkiran, O., Navarro, G., Moss, N. A., Lee, J., Goldgof, G. M., Vigil, E., Winzeler, E. A., Valeriote, F. A., Gerwick, W. H.",
+            "info": "Phytochemistry, 122, 113-118, 2016",
+        },
+        {
+            "title": "Salinipostins A–K, long-chain bicyclic phosphotriesters as a potent and selective antimalarial chemotype",
+            "authors": "Navarro, G., Schulze, C. J., Ebert, D., DeRisi, J., Linington, R. G.",
+            "info": "The Journal of Organic Chemistry, 80(3), 1312-1320, 2015",
+        },
+        {
+            "title": "Abyssomicin 2 reactivates latent HIV-1 by a PKC- and HDAC-independent mechanism",
+            "authors": "Navarro, G., León, B., Dickey, B. J., Stepan, G., Tsai, A., Jones, G. S., Morales, M. E., Barnes, T., Ahmadyar, S., Tsiang, M.",
+            "info": "Organic Letters, 17(2), 262-265, 2015",
+        },
+        {
+            "title": "Isolation of polycavernoside D from a marine cyanobacterium",
+            "authors": "Navarro, G., Cummings, M. E., Lee, J., Moss, N., Glukhov, E., Valeriote, F. A., Gerwick, L., Gerwick, W. H.",
+            "info": "Environmental Science & Technology Letters, 2(7), 166-170, 2015",
+        },
+        {
+            "title": "Mass spectrometry tools for screening of marine cyanobacterial natural products",
+            "authors": "Knaan, T. L., Garg, N., Peng, Y., Alexandrov, T., Navarro, G., Glukhov, E., Gerwick, L., Gerwick, W. H., Dorrestein, P. C.",
+            "info": "Planta Medica, 81(11), PQ6, 2015",
+        },
+        {
+            "title": "Honaucin A, mechanism of action and role as a potential cancer prevention agent",
+            "authors": "Gerwick, L., Mascuch, S. J., Navarro, G., Boudreau, P., Carland, T. M., Gaasterland, T., Gerwick, W. H.",
+            "info": "Planta Medica, 81(11), PW2, 2015",
+        },
+        {
+            "title": "Image-based 384-well high-throughput screening method for the discovery of skyllamycins A to C as biofilm inhibitors and inducers of biofilm detachment in Pseudomonas aeruginosa",
+            "authors": "Navarro, G., Cheng, A. T., Peach, K. C., Bray, W. M., Bernan, V. S., Yildiz, F. H., Linington, R. G.",
+            "info": "Antimicrobial Agents and Chemotherapy, 58(2), 1092-1099, 2014",
+        },
+        {
+            "title": "Hit-to-lead development of the chamigrane endoperoxide merulin A for the treatment of African sleeping sickness",
+            "authors": "Navarro, G., Chokpaiboon, S., De Muylder, G., Bray, W. M., Nisam, S. C., McKerrow, J. H., Pudhom, K., Linington, R. G.",
+            "info": "PLoS Neglected Tropical Diseases (or similar), 2012",
+        },
+        {
+            "title": "An image-based 384-well high-throughput screening method for phenotypic discovery of biofilm inhibitors in Pseudomonas aeruginosa",
+            "authors": "Navarro, G., Peach, K. C., Cheng, A., Bray, W. M., Yildiz, F. H., Linington, R. G.",
+            "info": "Planta Medica, 78(11), PD145, 2012",
+        },
+        {
+            "title": "Versatile Method for the Detection of Covalently Bound Substrates on Solid Supports by DART Mass Spectrometry",
+            "authors": "Sanchez, L. M., Curtis, M. E., Bracamonte, B. E., Kurita, K. L., Navarro, G., Sparkman, O. D., Linington, R. G.",
+            "info": "Organic Letters, 2011",
+        },
+        {
+            "title": "Highlights of marine invertebrate-derived biosynthetic products: Their biomedical potential and possible production by microbial associants",
+            "authors": "Radjasa, O. K., Vaske, Y. M., Navarro, G., Vervoort, H. C., Tenney, K., Linington, R. G., Crews, P.",
+            "info": "Bioorganic & Medicinal Chemistry, 2011",
+        },
+        {
+            "title": "Biomimetic synthesis of the shimalactones",
+            "authors": "Sofiyev, V., Navarro, G., Trauner, D.",
+            "info": "Organic Letters, 10(1), 149-152, 2008",
+        },
+    ]
     return Section(
-        H2("Publications", cls="section-title"),
-        Div(
-            # Publication Item 1
-            Div(
-                H3("Biofilm Formation and Detachment in Gram-Negative Pathogens Is Modulated by Select Bile Acids", cls="publication-title"),
-                P("Laura M. Sanchez, Andrew Cheng, Christopher J.A. Warner, Loni Townsley, Kelly C. Peach, Gabriel Navarro, Nicholas J. Shikuma, Walter M. Bray, Romina M. Riener, Fitnat H. Yildiz, Roger G. Linington", cls="publication-authors"),
-                P("PLoS One, 2016, 11, e0149603", cls="publication-link"),
-            ),
-            
-            # Publication Item 2
-            Div(
-                H3("Kalkipyrone B, a Marine Cyanobacterial γ-Pyrone Possessing Cytotoxic and Anti-Fungal Activities", cls="publication-title"),
-                P("Matthew J. Bertin, Ozlem Demirkiran, Gabriel Navarro, Nathan A. Moss, John Lee, Gregory M. Goldgof, Edgar Vigil, Elizabeth A Winzeler, Fred A Valeriote, William H. Gerwick", cls="publication-authors"),
-                P("Phytochemistry, 2016, 122, 113-118", cls="publication-link"),
-            ),
-            
-            # Publication Item 3
-            Div(
-                H3("Isolation of Polycavernoside D from a Marine Cyanobacterium", cls="publication-title"),
-                P("Gabriel Navarro, Susie Cummings, John Lee, Nathan Moss, Evgenia Glukhov, Fred A. Valeriote, Lena Gerwick, William H. Gerwick", cls="publication-authors"),
-                P("Environmental Science & Technology Letters, 2015, 2, 166-170", cls="publication-link"),
-            ),
-            
-            # Publication Item 4
-            Div(
-                H3("Salinipostins A—K, Long-Chain Bicyclic Phosphotriesters as a Potent and Selective Antimalarial Chemotype", cls="publication-title"),
-                P("Christopher J. Schulze*, Gabriel Navarro*, Daniel Ebert, Joseph L. DeRisi, Roger G. Linington (* Co-ﬁrst author)", cls="publication-authors"),
-                P("The Journal of Organic Chemistry. 2015, 80, 1312", cls="publication-link"),
-                P("1320", cls="publication-link"),
-            ),
-            # Publication Item 5
-            Div(
-                H3("Abyssomicin 2 Reactivates Latent HIV-1 by a PKC-and HDAC-Independent Mechanism", cls="publication-title"),
-                P("Brian Leon*, Gabriel Navarro*, Bailey J. Dickey, George Stepan, Angela Tsai, Gregg S. Jones, Monica E. Morales, Tiffany Barnes, Shekeba Ahmadyar, Manuel Tsiang, Romas Geleziunas, Tomas Cihlar, Nikos Pagratis, Yang Tian, Helen Yu, Roger G. Linington (* Co-ﬁrst author)", cls="publication-authors"),
-                P("Organic Letters. 2015, 17, 262-265", cls="publication-link"),
-            ),
-            # Publication Item 6
-            Div(
-                H3("Image-based 384-well high-throughput screening method for the discovery of skyllamycins A to C as biofilm inhibitors and inducers of biofilm detachment in Pseudomonas aeruginosa", cls="publication-title"),
-                P("Gabriel Navarro, Andrew Cheng, Kelly C. Peach, Walter M. Bray, Valerie S. Bernan, Fitnat H. Yildiz, Roger G. Linington", cls="publication-authors"),
-                P("Antimicrobial Agents and Chemotherapy. 2014¸58, 1092-1099", cls="publication-link"),
-            ),
-            # Publication Item 7
-            Div(
-                H3("Hit-to-Lead Development of the Chamigrane Endoperoxide Merulin A for the Treatment of African Sleeping Sickness", cls="publication-title"),
-                P("Gabriel Navarro, Supchar Chokpaiboon, Geraldine DeMuylder, Walter M. Bray, Sean C. Nisam, James H. McKerrow, Khanitha Pudhom, Roger G. Linington", cls="publication-authors"),
-                P("PLoS ONE, 2012, 7, e46172", cls="publication-link"),
-            ),
-            # Publication Item 8
-            Div(
-                H3("Highlights of Marine Invertebrate-Derived Biosynthetic Products: Their Biomedical Potential and Possible Production by Microbial Associates", cls="publication-title"),
-                P("Gabriel Navarro, Roger G. Linington", cls="publication-authors"),
-                P("Marine Drugs, 2012, 10, 383-420", cls="publication-link"),
-            ),
-        
-
-            # Publication Item 9
-            Div(
-                H3("Versatile Method for the Detection of Covalently Bound Substrates on Solid Supports by DART Mass Spectrometry", cls="publication-title"),
-                P("Laura M. Sanchez, Matthew E. Curtis, Bianca E. Bracamonte, Kenji L. Kurita, Gabriel Navarro, David O. Sparkman, Roger G. Linington", cls="publication-authors"),
-                P("Organic Letters, 2011, 13, 3770-3773", cls="publication-link"),
-            ),
-            # Publication Item 10
-            Div(
-                H3("Biomimetic Synthesis of the Shimalactones", cls="publication-title"),
-                P("Vladimir Sofiyev, Gabriel Navarro, Dirk Trauner", cls="publication-authors"),
-                P("Organic Letters, 2008, 10, 149-152", cls="publication-link"),
-            ),
+        cv_section_header("Publications"),
+        Grid(
+            *[
+                Div(
+                    H3(
+                        p["title"].upper(),
+                        style="margin-top: 0; color: var(--color-white); font-weight: 700; font-size: 1rem; line-height: 1.4;",
+                    ),
+                    P(
+                        p["authors"],
+                        style="color: var(--color-base-400); font-size: 0.875rem; margin-bottom: 0.5rem;",
+                    ),
+                    P(
+                        p["info"],
+                        style="color: var(--color-accent-100); font-weight: 700; font-size: 0.75rem;",
+                    ),
+                    style="padding: 1.5rem; border-bottom: 1px solid var(--color-base-900);",
+                )
+                for p in pubs
+            ],
+            cols_min=1,
+            cols_md=1,
+            cls="gap-4",
         ),
-        cls="section",
     )

@@ -1,187 +1,71 @@
-from fasthtml.common import Style, Div, Img, H3, P, A, Span
-from src.components import simple_navigation, contact_me_modal
-from src.lib.css import ROOT_CSS, BODY_CSS
-from src.lib.javascript import MasonryJS, MarkedJS
-from typing import Optional
-from src.lib.google.bigquery import BigQueryClient
-from src.components.chips import filter_chips
-
-CATEGORY_MAP = {
-    "bioinformatics": "omics",
-    "genomics": "omics",
-    "transcriptomics": "omics",
-    "metabolomics": "omics",
-    "proteomics": "omics",
-    "protein folding": "machine-learning",
-    "machine learning": "machine-learning",
-    "deep-learning": "machine-learning",
-    "state-space-models": "machine-learning",
-    "flashattention": "machine-learning",
-    "transformers": "machine-learning",
-    "webdevelopment": "visualization",
-    "html": "visualization",
-    "css": "visualization",
-    "javascript": "visualization",
-    "docker": "infrastructure",
-    "cloud": "infrastructure",
-    "gcp": "infrastructure",
-}
-
-css = """
-.masonry-container {
-    max-width: var(--container-max-width);
-    margin: auto auto;
-    position: relative;
-    z-index: 2;
-    padding: 0 1rem;
-    padding-top: 2rem;
-    min-height: 100vh;
-    overflow-y: hidden;
-}
-
-.masonry-card {
-    background-color: var(--dark-newspaper-bg);
-    border-radius: 5px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    padding: 0.75rem;
-    margin-bottom: 1rem;
-    transition: transform 0.3s ease;
-}
-
-.masonry-card:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    cursor: pointer;
-    transition: transform 0.3s ease;
-    z-index: 3;
-    background-color: var(--dark-highlight-newspaper);
-    color: var(--white);
-    text-decoration: none;
-    filter: brightness(1.05);
-}
-
-.masonry-card-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--white);
-    margin-bottom: 0.5rem;
-    margin-top: 0.5rem;
-}
-
-/* Hidden cards when filtered out */
-.masonry-card.hidden {
-    height: 0%;
-    overflow: hidden;
-    padding: 0;
-    margin: 0;
-    visibility: hidden;
-}
-
-.masonry-sizer {
-    max-width: 250px;
-
-    /* Medium screens */
-    @media (max-width: 992px) {
-        max-width: 400px;
-    }
-
-    /* Small screens */
-    @media (max-width: 768px) {
-        max-width: 600px;
-    }
-}
-
-.rounded-img {
-    width: 100%;
-    height: auto;
-    border-radius: 5px;
-}
-
-.a-card {
-    text-decoration: none;
-}
-
-a.disabled {
-  pointer-events: none;   /* no mouse events at all */
-  cursor: default;        /* normal arrow, not the hand */
-  color: #999;            /* visually muted */
-  text-decoration: none;  /* remove underline */
-}
-
-/* Card category badges - updated for multi-category display */
-.card-category {
-    display: inline-block;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 600;
-    margin-right: 5px;
-    margin-bottom: 10px;
-}
-
-.category-machine-learning { background-color: #c70445; color: white; }
-.category-omics { background-color: #0064b6; color: white; }
-.category-infrastructure { background-color: #a48404; color: white; }
-.category-visualization { background-color: #00a405; color: white; }
-
-"""
+from fasthtml.common import *
+from monsterui.all import *
+from src.components import StandardPage
+from src.services.projects import ProjectService
 
 
-
-def generate_cards(tag:Optional[str] = None):
-    """ Create a card with an image, title, and description."""
-    client = BigQueryClient()
-    blogs = client.query(sql="SELECT * FROM `noble-office-299208.portfolio.gn-blog` LIMIT 1000")
-
-    if isinstance(blogs, dict):
-        blogs = [blogs]
-
+def render_project_card(idx, project):
+    """Renders a project as a Factory technical card."""
     return Div(
-        *[
-            A(
-                Img(
-                    src=entry["image"], 
-                    alt=f"",
-                    cls="rounded-img",
-                ),
-                H3(entry["title"], cls="masonry-card-title"),
-                *[Span(i["v"], cls=f"card-category category-{CATEGORY_MAP.get(i['v'], 'omics')}") for i in entry["tags"]],
-                P(entry["description"], cls="white"),
-                href=f"/projects/{entry['id']}",
-                data_category=",".join(
-                    sorted(list(set([CATEGORY_MAP.get(i["v"], "omics") for i in entry["tags"]])))
-                ),
-                cls="masonry-card masonry-sizer a-card" if not entry["disabled"] else "masonry-card masonry-sizer a-card disabled",
-            ) for entry in blogs
-        ],
-        cls="masonry-container",
+        A(
+            # Category Label
+            Div(
+                f"{idx + 1:02d} / {' / '.join(project.tags).upper()}",
+                cls="factory-label",
+            ),
+            # Project Image
+            Img(
+                src=project.image,
+                alt=project.title,
+                style="width: 100%; height: 200px; object-fit: cover; border: 1px solid var(--color-base-900); border-radius: var(--radius-md); margin-bottom: 1rem; filter: grayscale(100%); transition: filter 0.3s ease;",
+                onmouseover="this.style.filter='grayscale(0%)'",
+                onmouseout="this.style.filter='grayscale(100%)'",
+            )
+            if project.image
+            else None,
+            # Title and Description
+            H3(
+                project.title.upper(),
+                style="font-size: 1.25rem; font-weight: 700; color: var(--color-white); margin-top: 0; margin-bottom: 0.5rem;",
+            ),
+            P(
+                project.description,
+                style="font-size: 0.875rem; color: var(--color-base-400); line-height: 1.6;",
+            ),
+            href=f"/blogs/{project.id}",
+            style="text-decoration: none; color: inherit; display: block;",
+        ),
+        style="padding: 1.5rem; border: 1px solid var(--color-base-900); border-radius: var(--radius-lg); background: var(--dark-base-secondary); transition: border-color 0.3s ease;",
+        cls="uk-transition-target",
     )
+
 
 def create_masonry_page(tag: str | None = None):
-    chips = [
-        ("Machine Learning", "red", "machine-learning", True if tag == "machine-learning" else False), 
-        ("Omics", "blue", "omics", True if tag == "omics" else False), 
-        ("Visualization", "green", "visualization", True if tag == "visualization" else False), 
-        ("Infrastructure", "yellow", "infrastructure", True if tag == "infrastructure" else False)
+    service = ProjectService()
+    if tag:
+        projects = service.get_projects_by_tag(tag)
+    else:
+        projects = service.get_all_projects()
+
+    projects = projects[::-1]
+    num_projects = len(projects)
+
+    content = [
+        Div(style="height: 3rem;"),
+        H1("BLOGS", cls="factory-title", style="margin-bottom: 0;"),
+        H1("& MORE", cls="factory-title", style="margin-top: 0;"),
+        Div(style="margin-top: 3rem;"),
+        Grid(
+            *[
+                render_project_card(num_projects - i - 1, p)
+                for i, p in enumerate(projects)
+            ],
+            cols_min=1,
+            cols_sm=1,
+            cols_md=2,
+            cols_lg=3,
+            cls="gap-8",
+        ),
     ]
-    return Div(
-        Style(ROOT_CSS + BODY_CSS + css),
-        MasonryJS(
-            sel=".masonry-container",
-            item_selector=".masonry-card",
-            column_width=".masonry-sizer",
-            gutter=20,
-            percent_position=False,
-            horizontal_order=True,
-            origin_left=True,
-            origin_top=True,
-        ),
-        MarkedJS(),
-        simple_navigation(),
-        filter_chips(chips),
-        contact_me_modal(),
-        Div(
-            generate_cards(),
-        ),
-        cls="container",
-    )
+
+    return StandardPage("Projects", *content)

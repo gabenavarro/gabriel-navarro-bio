@@ -12,5 +12,5 @@ COPY_ICON = Svg(
     stroke="currentColor",
     stroke_width="2",
     stroke_linecap="round",
-    stroke_linejoin="round"
+    stroke_linejoin="round",
 )

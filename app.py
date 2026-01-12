@@ -1,36 +1,52 @@
-from fasthtml.common import fast_app, serve, Title, Main
-from src.pages import HERO_PAGE, create_masonry_page, CV_PAGE, create_blog_page
+from fasthtml.common import *
+from monsterui.all import *
+from src.pages import (
+    HERO_PAGE,
+    create_masonry_page,
+    CV_PAGE,
+    create_blog_page,
+    PROJECTS_PAGE,
+)
 import argparse
 
 # This is a simple FastHTML app that serves a page with a title and a main content area.
-app, rt = fast_app()
+app, rt = fast_app(
+    hdrs=(
+        Theme.slate.headers(highlightjs=True),
+        Favicon("/assets/ico/favicon.ico", "/assets/ico/favicon.ico"),
+    ),
+    title="Gabriel, PhD",
+)
+
 
 # Main page
 @rt("/")
 def get():
-    return Title("Gabriel"), Main(HERO_PAGE)
+    return HERO_PAGE
+
 
 # Projects page
 @rt("/projects")
 def projects(tag: str = None):
-    """
-    Projects page with a masonry layout and filter chips.
-    ### Args:
-        - tag (str): Optional tag to filter projects by. ?tag=machine-learning, etc.
-    ### Returns:
-        - Title: Page title.
-        - Div: Main content of the page.
-    """
-    return Title("Gabriel - Projects"), create_masonry_page(tag)
+    return PROJECTS_PAGE
 
-@rt("/projects/{blog_id}")
-def get_project(blog_id: str):
-    return Title("Gabriel - Projects"), create_blog_page(blog_id)
+
+# Blogs page
+@rt("/blogs")
+def blogs(tag: str = None):
+    return create_masonry_page(tag)
+
+
+@rt("/blogs/{blog_id}")
+def get_blog(blog_id: str):
+    return create_blog_page(blog_id)
+
 
 # CV page
 @rt("/cv")
 def cv():
-    return Title("Gabriel - CV"), CV_PAGE
+    return CV_PAGE
+
 
 # Parse command line argument for port
 parser = argparse.ArgumentParser(description="Run the FastHTML app.")

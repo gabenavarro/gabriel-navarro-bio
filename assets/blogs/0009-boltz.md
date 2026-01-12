@@ -255,7 +255,7 @@ In green, we see the predicted structure of GSK3A, while FRAT1 is shown in teal.
 
 ### Quantitative Accuracy Assessment
 
-To validate the accuracy of our prediction, we compare the Boltz-1x model against the experimentally determined structure using structural alignment techniques. The predicted structure is aligned with the experimental structure (PDB ID: 1GNG) to assess how closely they match. 
+To validate the accuracy of our prediction, we compare the Boltz-1x model against the experimentally determined structure using structural alignment techniques. The predicted structure is aligned with the experimental structure (PDB ID: 1GNG) to assess how closely they match.
 
 <p align="center">
   <img src="https://storage.googleapis.com/gn-portfolio/images/0009-boltz1x/Overlay_Boltz_1GNG.gif" max-width="170">

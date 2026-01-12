@@ -17,9 +17,9 @@ High-throughput sequencing generates massive amounts of data, but raw reads can 
 
 [FastQC-RS](https://fastqc-rs.github.io/usage.html) is a command-line utility, inspired by the original [FastQC](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/), that scans FASTQ files and generates detailed QC summaries. Written in Rust, it offers:
 
-- **Speed:** Rapid analysis even on large files  
-- **Efficiency:** Low memory footprint and minimal CPU load  
-- **Active development:** Frequent releases with new features and fixes  
+- **Speed:** Rapid analysis even on large files
+- **Efficiency:** Low memory footprint and minimal CPU load
+- **Active development:** Frequent releases with new features and fixes
 
 ## Key Features of FastQC
 ## Key Features
@@ -30,9 +30,9 @@ FastQC-RS evaluates multiple aspects of your sequencing data and produces intuit
 
 Provides an overview of each file:
 
-- **Total reads**  
-- **Average read length**  
-- **Average GC content**  
+- **Total reads**
+- **Average read length**
+- **Average GC content**
 
 <img src="https://storage.googleapis.com/gn-portfolio/images/fastqc-rc-gcdist.svg" width=100% alt="fastqc-rc-bsc"/>
 <br>
@@ -58,10 +58,10 @@ Detects unusual GC patterns that may indicate contamination or bias:
 
 ## Why Choose FastQC-RS?
 
-- **Rust-powered performance:** Faster scans with lower resource use  
-- **Clear HTML reports:** Eye-catching visuals with minimal interpretation overhead  
-- **Workflow integration:** Plug in easily to Snakemake, Nextflow, Galaxy, etc.  
-- **Frequent updates:** Active community and regular improvements  
+- **Rust-powered performance:** Faster scans with lower resource use
+- **Clear HTML reports:** Eye-catching visuals with minimal interpretation overhead
+- **Workflow integration:** Plug in easily to Snakemake, Nextflow, Galaxy, etc.
+- **Frequent updates:** Active community and regular improvements
 
 ## Installing FastQC-RS
 
@@ -128,7 +128,7 @@ mkdir data
 # Download FASTQ files for Bacillus subtilis ALBA01
 wget -nc -P ./data ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR331/005/SRR3317165/SRR3317165_1.fastq.gz
 wget -nc -P ./data ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR331/005/SRR3317165/SRR3317165_2.fastq.gz
-``` 
+```
 
 Now that we have the data, lets go through two examples. Conda and Docker installed FastQC.
 
@@ -140,7 +140,7 @@ For the conda environment, its pretty straightforwrad. Just run the following co
 fqc -q ./data/SRR3317165_1.fastq.gz > ./data/SRR3317165_1.html
 ```
 
-- `-q ./data/SRR3317165_1.fastq.gz`: 
+- `-q ./data/SRR3317165_1.fastq.gz`:
         The FASTQ file to be assessed.
 - `> ./data/SRR3317165_1.html`: Specifies the directory for output report.
 
@@ -175,12 +175,12 @@ Happy sequencing and quality checking!
 
 **References:**
 
-- [FastQC-RS](https://fastqc-rs.github.io/usage.html) 
+- [FastQC-RS](https://fastqc-rs.github.io/usage.html)
 - [FastQC Documentation](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
 - [SeqContainerLab](https://github.com/gabenavarro/SeqContainerLab)
 - [European Nucleotide Archive](https://www.ebi.ac.uk/ena/browser/home)
 - [Mamba](https://mamba.readthedocs.io/en/latest/index.html)
 - [Conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html)
 - [Anaconda](https://www.anaconda.com/docs/getting-started/anaconda/install)
-- [Docker](https://docs.docker.com/engine/install/) 
+- [Docker](https://docs.docker.com/engine/install/)
 - [WSL](https://learn.microsoft.com/en-us/windows/wsl/install)

@@ -3,13 +3,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Query for both left and right hidden elements
     const hiddenElements = document.querySelectorAll('.scroll-left-hidden, .scroll-right-hidden');
-    
+
     // Function to check if element is in viewport and handle visibility
     const checkVisibility = () => {
         hiddenElements.forEach(element => {
             const rect = element.getBoundingClientRect();
             const windowHeight = window.innerHeight || document.documentElement.clientHeight;
-            
+
             // Element is visible if any part of it is in the viewport
             // We use a small negative value to ensure elements at the very top get detected
             if (rect.top <= windowHeight && rect.bottom >= -50) {
@@ -23,10 +23,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     };
-    
+
     // Run on page load to show elements already in viewport
     checkVisibility();
-    
+
     // Add scroll event listener
     window.addEventListener('scroll', checkVisibility);
 
