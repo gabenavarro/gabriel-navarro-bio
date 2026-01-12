@@ -51,7 +51,7 @@ body {
     z-index: 2;
     padding: 0 1rem;
     padding-bottom: 2rem;
-    overflow-x: hidden; /* Add this line */
+    overflow: visible;
 }
 
 
@@ -106,13 +106,13 @@ body {
     width: 100%;
     overflow-x: hidden;
   }
-  
+
   /* Ensure content is properly sized */
   h1, h2, h3, p {
     max-width: 100%;
     word-wrap: break-word;
   }
-  
+
   /* Adjust any fixed width elements */
   img, video, iframe {
     max-width: 100%;
@@ -220,5 +220,3 @@ body {
 }
 
 """
-
-

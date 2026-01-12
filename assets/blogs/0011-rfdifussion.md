@@ -15,28 +15,28 @@
 
 **RFdiffusion** is an open‑source diffusion model for protein structure generation and design. It supports:
 
-- Unconditional monomer generation  
-- Motif scaffolding  
-- Symmetric oligomer design (Cyclic, Dihedral, Tetrahedral)  
-- Binder (PPI) design with hotspot control  
-- Partial diffusion & design diversification  
+- Unconditional monomer generation
+- Motif scaffolding
+- Symmetric oligomer design (Cyclic, Dihedral, Tetrahedral)
+- Binder (PPI) design with hotspot control
+- Partial diffusion & design diversification
 
-This guide walks through:  
-1. Prerequisites  
-2. Cloning and downloading model weights  
-3. Writing a Dockerfile  
-4. Building the Docker image  
-5. Running RFdiffusion via Docker  
-6. Example: Motif scaffolding  
-7. Tips & Best Practices  
+This guide walks through:
+1. Prerequisites
+2. Cloning and downloading model weights
+3. Writing a Dockerfile
+4. Building the Docker image
+5. Running RFdiffusion via Docker
+6. Example: Motif scaffolding
+7. Tips & Best Practices
 
 ---
 
 ## 1. Prerequisites
 
-- **Docker** (v20.10+) with GPU support (optional but recommended)  
-- **nvidia-docker2** if using NVIDIA GPUs  
-- **~10–20 GB** disk space for model weights  
+- **Docker** (v20.10+) with GPU support (optional but recommended)
+- **nvidia-docker2** if using NVIDIA GPUs
+- **~10–20 GB** disk space for model weights
 - Familiarity with the command line and basic protein files (FASTA/PDB)
 
 ---
@@ -134,8 +134,8 @@ docker run --rm --gpus all \
   inference.num_designs=10
 ```
 
-- **`contigmap.contigs=[L-L]`**: length range for chain  
-- **`inference.output_prefix`**: output directory + filename prefix  
+- **`contigmap.contigs=[L-L]`**: length range for chain
+- **`inference.output_prefix`**: output directory + filename prefix
 - **`inference.num_designs`**: how many designs to sample
 
 ---
@@ -162,14 +162,13 @@ This builds 20–30 AA on both sides of your motif, sampling varied loop length
 
 ## 7. Tips & Best Practices
 
-- **Cache IGSO3**: the first run computes geometric caches—subsequent runs are faster.  
-- **Symmetric designs**: use `--config-name symmetry` and `inference.symmetry=c4|d2|tetrahedral`.  
-- **Hotspots for binders**: set `ppi.hotspot_res=[A45,A47,A50]` for targeted PPI.  
-- **Partial diffusion**: add `diffuser.partial_T=<steps>` to explore around a seed structure.  
-- **Checkpoint overrides**: e.g. use `inference.ckpt_override_path=models/ActiveSite_ckpt.pt` for small motifs.   
+- **Cache IGSO3**: the first run computes geometric caches—subsequent runs are faster.
+- **Symmetric designs**: use `--config-name symmetry` and `inference.symmetry=c4|d2|tetrahedral`.
+- **Hotspots for binders**: set `ppi.hotspot_res=[A45,A47,A50]` for targeted PPI.
+- **Partial diffusion**: add `diffuser.partial_T=<steps>` to explore around a seed structure.
+- **Checkpoint overrides**: e.g. use `inference.ckpt_override_path=models/ActiveSite_ckpt.pt` for small motifs.
 - **Output artifacts**: look in `/traj/` for per‑step PDBs and `.trb` for metadata.
 
 ---
 
 *Happy protein designing with RFdiffusion!*
-

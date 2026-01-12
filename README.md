@@ -41,7 +41,7 @@ cd gabriel-navarro-bio
 ### Local Development
 1. Setup local envrionment and install dependencies:
 ```bash
-docker build -f ./assets/build/Dockerfile.dev -t gnbio:local . 
+docker build -f ./assets/build/Dockerfile.dev -t gnbio:local .
 ```
 
 2. Run docker environment
@@ -60,10 +60,10 @@ docker run -dt \
 
 3. Run uvicorn in IDE container
 ```bash
-uvicorn app.main:app --reload
+python /app/app.py --port 8080
 ```
 
-The site will be available at http://localhost:8000.
+The site will be available at http://localhost:8080.
 
 
 ### 🚢 Deployment to Google Cloud Run
@@ -98,7 +98,7 @@ gcloud run deploy gabriel-navarro-bio \
   --region us-central1
 ```
 
-## 📁 Code Structure 
+## 📁 Code Structure
 
 ```txt
 /src/

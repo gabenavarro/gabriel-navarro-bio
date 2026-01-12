@@ -34,7 +34,7 @@ FROM python:3.13-alpine
 COPY --from=builder /opt/venv /opt/venv
 
 WORKDIR /app
-    
+
 # Copy only necessary files from builder and dev stages
 COPY --from=builder /opt/venv /opt/venv
 COPY app.py /app/app.py

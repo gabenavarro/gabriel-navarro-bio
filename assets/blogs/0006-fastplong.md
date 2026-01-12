@@ -184,10 +184,10 @@ fastplong \
 
 ## 7. Tips & Best Practices
 
-- **Preview a subset**: use `--reads_to_process 100000` for a quick QC check.  
-- **Avoid overwriting**: add `--dont_overwrite` to protect existing outputs.  
-- **Parallelization**: combine `--threads` (via environment) with `--split` for concurrent downstream steps.  
-- **Low‑complexity filtering**: enable `-y` for simple repeats removal.  
+- **Preview a subset**: use `--reads_to_process 100000` for a quick QC check.
+- **Avoid overwriting**: add `--dont_overwrite` to protect existing outputs.
+- **Parallelization**: combine `--threads` (via environment) with `--split` for concurrent downstream steps.
+- **Low‑complexity filtering**: enable `-y` for simple repeats removal.
 - **Report customization**: change titles with `-R "My FastPLong Report"`.
 
 ---
@@ -197,4 +197,3 @@ fastplong \
 FastPLong streamlines long‑read QC and preprocessing, offering flexible filters, streaming, and detailed reports. Whether installed via Conda, binary, source, or Docker, you can integrate it seamlessly into your analysis pipeline.
 
 *Happy filtering!*
-

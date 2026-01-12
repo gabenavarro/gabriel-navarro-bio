@@ -60,7 +60,7 @@ RUN apk add --no-cache --update \
     curl \
     which \
     bash
-    
+
 # Install Google Cloud SDK for develompent authentication
 # Note: This is a workaround for the Google Cloud SDK installation
 RUN curl -sSL https://sdk.cloud.google.com | bash

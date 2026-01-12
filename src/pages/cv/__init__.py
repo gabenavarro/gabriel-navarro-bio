@@ -1,17 +1,27 @@
-from src.pages.cv.cv_body import CV_CSS, cv_contact, cv_education, cv_experience, cv_skills, cv_patents, cv_publications
-from src.lib.css import ROOT_CSS, BODY_CSS
-from src.components import simple_navigation, contact_me_modal
-from fasthtml.common import Style, Div
+from fasthtml.common import *
+from monsterui.all import *
+from src.pages.cv.cv_body import (
+    cv_experience,
+    cv_education,
+    cv_skills,
+    cv_patents,
+    cv_publications,
+)
+from src.components import StandardPage
 
-CV_PAGE = Div(
-    Style(ROOT_CSS + BODY_CSS + CV_CSS),
-    simple_navigation(),
-    Div("Curriculum Vitae", cls="highlight title banner-title-spacing"),
+CV_PAGE = StandardPage(
+    "Gabriel - CV",
+    Div(cls="underline"),
+    Div(style="height: 3rem;"),
+    H1("CURRICULUM", cls="factory-title", style="margin-bottom: 0;"),
+    H1("VITAE", cls="factory-title", style="margin-bottom: 0;"),
     cv_experience(),
+    Div(style="height: 3rem;"),
     cv_education(),
+    Div(style="height: 3rem;"),
     cv_skills(),
+    Div(style="height: 3rem;"),
     cv_patents(),
+    Div(style="height: 3rem;"),
     cv_publications(),
-    contact_me_modal(),
-    cls="container",
 )
