@@ -12,7 +12,7 @@ def simple_navigation(logo: str = "GABRIEL"):
                 Li(A("CV", href="/cv", cls="factory-nav-link")),
                 cls="uk-navbar-nav uk-visible@m",
             ),
-            style="padding-right: 2rem;",
+            # style="padding-right: 2rem;",
         ),
         brand=DivLAligned(
             A(
@@ -21,7 +21,7 @@ def simple_navigation(logo: str = "GABRIEL"):
                 cls="uk-navbar-item uk-logo",
                 style="font-family: 'Geist', sans-serif; font-weight: 900; letter-spacing: -0.05em; color: #FFFFFF;",
             ),
-            style="padding-left: 2rem;",
+            # style="padding-left: 2rem;",
         ),
         sticky=True,
         cls="factory-nav",

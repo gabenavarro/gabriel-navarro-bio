@@ -209,6 +209,11 @@ html, body {
     padding: 1.5rem 0;
 }
 
+.factory-nav {
+    padding-right: 2rem !important;
+    padding-left: 2rem !important;
+}
+
 .factory-nav-link {
     font-size: 0.75rem !important;
     font-weight: 600 !important;

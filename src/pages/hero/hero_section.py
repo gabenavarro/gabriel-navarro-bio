@@ -50,6 +50,7 @@ def hero_section():
             cols_md=2,
             cls="uk-grid-large uk-flex-middle",
         ),
+        Div(style="height: 3rem;"),
         cls="uk-section-large",
     )
 
