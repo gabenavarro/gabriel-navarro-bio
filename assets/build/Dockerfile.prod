@@ -39,6 +39,7 @@ WORKDIR /app
 COPY --from=builder /opt/venv /opt/venv
 COPY app.py /app/app.py
 COPY /src /app/src
+COPY /assets/ico/favicon.ico /app/assets/ico/favicon.ico
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
