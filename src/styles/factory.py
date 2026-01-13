@@ -249,8 +249,7 @@ html, body {
 /* Code Blocks */
 pre.shiki, .uk-codeblock {
     font-family: var(--font-geist-mono), monospace !important;
-    font-size: 0.875rem !important;
-    /* No line spacing */
+    font-size: 0.75rem !important;
     line-height: 1 !important;
     background-color: #0b0c0e !important;
     border: 1px solid var(--color-base-900) !important;
@@ -263,9 +262,13 @@ pre.shiki, .uk-codeblock {
 .uk-codespan {
     font-weight: 300 !important;
     font-family: var(--font-geist-mono), monospace !important;
-    font-size: 0.875rem !important;
+    font-size: 0.75rem !important;
     background-color: #161719 !important;
-    line-height: 1 !important;
+    line-height: 1rem !important;
+}
+
+.language-python {
+    line-height: 1.25rem !important;
 }
 
 /* Header Simulation */
