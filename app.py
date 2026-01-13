@@ -13,10 +13,7 @@ import argparse
 app, rt = fast_app(
     hdrs=(
         Theme.slate.headers(highlightjs=True),
-        Favicon(
-            "/assets/ico/favicon.ico",
-            "/assets/ico/favicon.ico"
-        ),
+        Favicon("/assets/ico/favicon.ico", "/assets/ico/favicon.ico"),
     ),
     title="Gabriel, PhD",
 )

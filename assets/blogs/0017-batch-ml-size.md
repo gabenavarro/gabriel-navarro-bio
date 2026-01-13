@@ -123,11 +123,11 @@ Understanding Exponential Moving Average Decay
 ==============================================
 
 Gradient contributions decay exponentially:
-                                                                       
+
 Optimizer Step:     0    1    2    3    4    5    6    7    8
                     ↓    ↓    ↓    ↓    ↓    ↓    ↓    ↓    ↓
 Contribution:      1.0  β    β²   β³   β⁴   β⁵   β⁶   β⁷   β⁸
-                    ██   █    ▓    ▒    ░    
+                    ██   █    ▓    ▒    ░
                     │    │    │         │
                     │    │    └─────────┴──── Half-life point
                     │    │              (contribution = 0.5)
@@ -142,7 +142,7 @@ Batch Size 512:                  Batch Size 1:
 Each step = 512 tokens           Each step = 1 token
      │                                │
      ├─ Step 1: 512 tokens           ├─ Step 1: 1 token
-     ├─ Step 2: 1024 tokens          ├─ Step 2: 2 tokens  
+     ├─ Step 2: 1024 tokens          ├─ Step 2: 2 tokens
      ├─ Step 3: 1536 tokens          ├─ Step 3: 3 tokens
      └─ ...                          └─ ...
 
@@ -189,18 +189,18 @@ def compute_beta2_from_halflife(
 ) -> float:
     """
     Compute β₂ (second moment decay) from desired token half-life.
-    
+
     The half-life represents: after seeing this many tokens,
     a gradient's contribution to the second moment decays to 50%.
-    
+
     Args:
         token_halflife: Desired half-life in tokens (e.g., 10_000_000)
         batch_size: Number of samples per optimizer step
         sequence_length: Length of each sequence in tokens
-        
+
     Returns:
         β₂ value that achieves the desired token half-life
-        
+
     Example:
         >>> # For typical LLM training with batch size 512
         >>> beta2 = compute_beta2_from_halflife(10_000_000, 512)
@@ -209,12 +209,12 @@ def compute_beta2_from_halflife(
     # Calculate number of optimizer steps to reach half-life
     tokens_per_step = batch_size * sequence_length
     steps_to_halflife = token_halflife / tokens_per_step
-    
+
     # Solve for β such that β^steps = 0.5
     # Taking log: steps * log(β) = log(0.5)
     # Therefore: β = exp(log(0.5) / steps)
     beta2 = np.exp(np.log(0.5) / steps_to_halflife)
-    
+
     return float(beta2)
 
 
@@ -225,18 +225,18 @@ def scale_beta2_for_new_batch_size(
 ) -> float:
     """
     Scale β₂ when changing batch size to maintain constant token half-life.
-    
+
     This is the key formula from the paper (Equation 2):
     β₂* = β₂^(B*/B)
-    
+
     Args:
         current_beta2: Current β₂ value
         current_batch_size: Current batch size
         new_batch_size: New batch size to scale to
-        
+
     Returns:
         New β₂ value that maintains same token half-life
-        
+
     Example:
         >>> # Scale from batch size 512 (β₂=0.95) to batch size 1
         >>> new_beta2 = scale_beta2_for_new_batch_size(0.95, 512, 1)
@@ -244,10 +244,10 @@ def scale_beta2_for_new_batch_size(
     """
     # The ratio of batch sizes determines the exponent
     batch_ratio = new_batch_size / current_batch_size
-    
+
     # Scale β₂ by raising to the power of batch ratio
     new_beta2 = current_beta2 ** batch_ratio
-    
+
     return float(new_beta2)
 
 
@@ -262,23 +262,23 @@ def setup_adam_for_batch_size(
 ) -> dict:
     """
     Configure Adam hyperparameters for a given batch size.
-    
+
     This function embodies the paper's key recommendations:
     - Keep β₁ fixed (default 0.9 works well)
     - Scale β₂ to maintain constant token half-life
     - Learning rate scales sub-linearly (not included here; requires tuning)
-    
+
     Args:
         batch_size: Target batch size
         token_halflife: Desired averaging window in tokens
         beta1: First moment decay (keep fixed)
         learning_rate: Initial learning rate (tune separately)
-        
+
     Returns:
         Dictionary of optimizer hyperparameters
     """
     beta2 = compute_beta2_from_halflife(token_halflife, batch_size)
-    
+
     config = {
         'batch_size': batch_size,
         'beta1': beta1,
@@ -286,7 +286,7 @@ def setup_adam_for_batch_size(
         'learning_rate': learning_rate,
         'epsilon': 1e-8,
     }
-    
+
     print(f"Batch Size {batch_size:4d}: β₂ = {beta2:.8f}")
     return config
 
@@ -343,12 +343,12 @@ Learning Rate Sensitivity
      │
      └──────────────────────────────────────────────→
         0.001  0.003  0.01   0.03   0.1  Learning Rate
-        
+
         Wide "bowl" = forgiving to hyperparameter choice
 
 
 Large Batch (size = 512):
-Learning Rate Sensitivity  
+Learning Rate Sensitivity
     Loss
      │      │
    3.8│      │
@@ -363,7 +363,7 @@ Learning Rate Sensitivity
      │
      └──────────────────────────────────────────────→
         0.001  0.003  0.01   0.03   0.1  Learning Rate
-        
+
         Narrow "canyon" = precise tuning required
 
 
@@ -414,7 +414,7 @@ def loss_function(x: float, y: float) -> float:
     """
     Simple loss function that's steep in y, gradual in x.
     Loss = x + 10y²
-    
+
     This mimics neural network losses that are ill-conditioned
     (much steeper in some directions than others).
     """
@@ -424,10 +424,10 @@ def loss_function(x: float, y: float) -> float:
 def gradient(x: float, y: float, noise_scale: float = 0.0) -> Tuple[float, float]:
     """
     Compute gradient with optional noise (simulating mini-batch stochasticity).
-    
+
     True gradient: (1, 20y)
     With noise: gradient * N(1, noise_scale²)
-    
+
     Args:
         x, y: Current position
         noise_scale: Standard deviation of multiplicative noise
@@ -436,38 +436,38 @@ def gradient(x: float, y: float, noise_scale: float = 0.0) -> Tuple[float, float
     # True gradient
     grad_x = 1.0
     grad_y = 20.0 * y
-    
+
     # Add stochastic noise to simulate mini-batch gradient estimation
     if noise_scale > 0:
         noise = np.random.normal(1.0, noise_scale, size=2)
         grad_x *= noise[0]
         grad_y *= noise[1]
-    
+
     return grad_x, grad_y
 
 
 def sgd_step(
-    x: float, 
-    y: float, 
+    x: float,
+    y: float,
     learning_rate: float,
     noise_scale: float
 ) -> Tuple[float, float]:
     """
     Take one SGD step.
-    
+
     This simulates batch training: high noise_scale = small batch.
     """
     gx, gy = gradient(x, y, noise_scale)
-    
+
     x_new = x - learning_rate * gx
     y_new = y - learning_rate * gy
-    
+
     return x_new, y_new
 
 
 def sgd_with_momentum_step(
-    x: float, 
-    y: float, 
+    x: float,
+    y: float,
     vx: float,
     vy: float,
     learning_rate: float,
@@ -476,19 +476,19 @@ def sgd_with_momentum_step(
 ) -> Tuple[float, float, float, float]:
     """
     Take one SGD step with momentum.
-    
+
     Momentum helps dampen oscillations in steep directions.
     """
     gx, gy = gradient(x, y, noise_scale)
-    
+
     # Update velocity (momentum)
     vx = momentum * vx + gx
     vy = momentum * vy + gy
-    
+
     # Update position
     x_new = x - learning_rate * vx
     y_new = y - learning_rate * vy
-    
+
     return x_new, y_new, vx, vy
 
 
@@ -499,13 +499,13 @@ def run_optimization_experiment(
 ) -> List[Tuple[float, float]]:
     """
     Run optimization experiment with specified configuration.
-    
+
     Large batch: Low noise, large learning rate, few steps
     Small batch: High noise, small learning rate, many steps
     """
     # Starting point
     x, y = 2.0, 2.0
-    
+
     # Configuration based on batch size
     if batch_size_type == "large":
         # Large batch size: less noisy gradients, fewer steps, larger LR
@@ -517,12 +517,12 @@ def run_optimization_experiment(
         # Small batch size: noisier gradients, more steps, smaller LR
         learning_rate = 0.01
         noise_scale = 0.3  # High noise (low signal-to-noise)
-    
+
     momentum = 0.9
     vx, vy = 0.0, 0.0
-    
+
     trajectory = [(x, y)]
-    
+
     for _ in range(n_steps):
         if use_momentum:
             x, y, vx, vy = sgd_with_momentum_step(
@@ -530,9 +530,9 @@ def run_optimization_experiment(
             )
         else:
             x, y = sgd_step(x, y, learning_rate, noise_scale)
-        
+
         trajectory.append((x, y))
-    
+
     return trajectory
 
 
@@ -613,7 +613,7 @@ Parameter: β₂ (Second Moment Decay)
 ────────────────────────────────────
 Rule: SCALE to maintain constant token half-life
 
-1.0000┐                           
+1.0000┐
       │          ╱
 0.9999├         ╱
       │        ╱
@@ -649,7 +649,7 @@ Rule: Scale SUB-LINEARLY (not square root!)
      │                     │root   │
      └────────────────────────────────────────→
        1    16   64   256  1024 4096  Batch Size
-       
+
 Note: Exact scaling requires tuning, but it's
       much slower than √batch_size
 
@@ -666,7 +666,7 @@ Scale to Batch Size 1:
        → ~0.0003
 
 Scale to Batch Size 4096:
-├─ β₁: Keep at 0.9  
+├─ β₁: Keep at 0.9
 ├─ β₂: 0.95^(4096/512) = 0.664
 └─ LR: ×3 (empirically)
        → ~0.003
@@ -690,7 +690,7 @@ class OptimizerConfig:
     beta2: float
     epsilon: float = 1e-8
     weight_decay: float = 0.1
-    
+
     def __repr__(self) -> str:
         return (
             f"OptimizerConfig(\n"
@@ -710,30 +710,30 @@ def scale_optimizer_config(
 ) -> OptimizerConfig:
     """
     Scale optimizer configuration to a new batch size.
-    
+
     This implements the paper's scaling rules:
     1. Keep β₁ fixed
     2. Scale β₂ to maintain constant token half-life
     3. Scale learning rate (optionally specify factor)
-    
+
     Args:
         base_config: Current optimizer configuration
         new_batch_size: Target batch size
         learning_rate_scale_factor: Optional manual LR scale
                                    If None, uses heuristic
-    
+
     Returns:
         New optimizer configuration for the target batch size
     """
     batch_ratio = new_batch_size / base_config.batch_size
-    
+
     # Rule 1: Keep β₁ fixed (0.9 works well universally)
     new_beta1 = base_config.beta1
-    
+
     # Rule 2: Scale β₂ to maintain constant token half-life
     # Formula from Equation 2 in paper: β₂* = β₂^(B*/B)
     new_beta2 = base_config.beta2 ** batch_ratio
-    
+
     # Rule 3: Scale learning rate
     # The paper shows this is NOT sqrt scaling; it's sub-linear
     # Empirically: ~3x change for 512x batch size change
@@ -742,14 +742,14 @@ def scale_optimizer_config(
         # Heuristic: scale proportional to batch_ratio^0.3
         # (This is a rough approximation; tune for your use case)
         learning_rate_scale_factor = batch_ratio ** 0.3
-    
+
     new_learning_rate = base_config.learning_rate * learning_rate_scale_factor
-    
+
     # For very small batch sizes, the paper recommends turning off weight decay
     new_weight_decay = base_config.weight_decay
     if new_batch_size <= 4:
         new_weight_decay = 0.0
-    
+
     return OptimizerConfig(
         batch_size=new_batch_size,
         learning_rate=new_learning_rate,
@@ -823,7 +823,7 @@ print("-" * 60)
 for bs in [1, 4, 16, 64, 256, 512, 1024, 4096]:
     config = scale_optimizer_config(gpt3_baseline, bs)
     halflife = calculate_token_halflife(config.beta2, config.batch_size)
-    
+
     print(f"BS={bs:4d}: β₂={config.beta2:.6f}, "
           f"LR={config.learning_rate:.6f}, "
           f"t₁/₂={halflife:>10,.0f} tokens")
@@ -857,7 +857,7 @@ The Return of Vanilla SGD
 =========================
 
 Traditional View (Large Batches):
-                                                            
+
   Simple Optimizers                Sophisticated Optimizers
         ▼                                   ▼
    ┌──────────┐                        ┌────────────┐
@@ -872,7 +872,7 @@ Traditional View (Large Batches):
 
 
 Paper's Finding (Small Batches):
-                                                            
+
   Simple Optimizers                Sophisticated Optimizers
         ▼                                   ▼
    ┌──────────┐                        ┌────────────┐
@@ -891,17 +891,17 @@ Performance Convergence by Batch Size
 
 Loss at    Large Batch (4096)         Small Batch (1)
 Convergence    ↓                          ↓
-           
+
    5.0 ┤   ╱ SGD (diverges)          All optimizers
        │  ╱                           achieve similar
    4.5 ┤ ╱                            final loss:
-       │╱   ╱── Adafactor             
+       │╱   ╱── Adafactor
    4.0 ├╮  ╱                              ╱── SGD
-       │╰╮╱─── Adam                       ├── Adam  
+       │╰╮╱─── Adam                       ├── Adam
    3.8 ├─╰──── Muon                       ├── Adafactor
        │                                  ╰── Muon
    3.6 ├─────────────────────────────────────────
-       
+
 
 Memory Comparison
 =================
@@ -954,11 +954,11 @@ class TrainingMetrics:
 
 class SimpleOptimizer:
     """Base class for optimizers."""
-    
+
     def step(self, params: np.ndarray, grads: np.ndarray) -> np.ndarray:
         """Update parameters given gradients."""
         raise NotImplementedError
-    
+
     def state_size_per_param(self) -> int:
         """Return number of additional floats stored per parameter."""
         raise NotImplementedError
@@ -967,30 +967,30 @@ class SimpleOptimizer:
 class VanillaSGD(SimpleOptimizer):
     """
     Vanilla SGD with no momentum.
-    
+
     Update rule: θ ← θ - η∇L(θ)
-    
+
     Key advantage: NO OPTIMIZER STATE!
     """
-    
+
     def __init__(self, learning_rate: float = 0.001):
         self.lr = learning_rate
-    
+
     def step(self, params: np.ndarray, grads: np.ndarray) -> np.ndarray:
         """
         Simple gradient descent step.
-        
+
         Args:
             params: Current parameters
             grads: Gradients
-            
+
         Returns:
             Updated parameters
         """
         # Just subtract learning_rate * gradient
         # No momentum, no adaptivity, no state to track
         return params - self.lr * grads
-    
+
     def state_size_per_param(self) -> int:
         """SGD with no momentum has zero optimizer state."""
         return 0
@@ -999,13 +999,13 @@ class VanillaSGD(SimpleOptimizer):
 class Adam(SimpleOptimizer):
     """
     Adam optimizer with exponential moving averages.
-    
+
     Update rule:
       m_t = β₁ m_{t-1} + (1-β₁) g_t
       v_t = β₂ v_{t-1} + (1-β₂) g_t²
       θ_t = θ_{t-1} - η * m_t / (√v_t + ε)
     """
-    
+
     def __init__(
         self,
         learning_rate: float = 0.001,
@@ -1017,20 +1017,20 @@ class Adam(SimpleOptimizer):
         self.beta1 = beta1
         self.beta2 = beta2
         self.epsilon = epsilon
-        
+
         # Optimizer state (will be initialized on first step)
         self.m: Optional[np.ndarray] = None  # First moment
         self.v: Optional[np.ndarray] = None  # Second moment
         self.t = 0  # Step count
-    
+
     def step(self, params: np.ndarray, grads: np.ndarray) -> np.ndarray:
         """
         Adam optimization step.
-        
+
         Args:
             params: Current parameters
             grads: Gradients
-            
+
         Returns:
             Updated parameters
         """
@@ -1038,22 +1038,22 @@ class Adam(SimpleOptimizer):
         if self.m is None:
             self.m = np.zeros_like(params)
             self.v = np.zeros_like(params)
-        
+
         self.t += 1
-        
+
         # Update biased first moment estimate
         self.m = self.beta1 * self.m + (1 - self.beta1) * grads
-        
+
         # Update biased second moment estimate
         self.v = self.beta2 * self.v + (1 - self.beta2) * (grads ** 2)
-        
+
         # Bias correction
         m_hat = self.m / (1 - self.beta1 ** self.t)
         v_hat = self.v / (1 - self.beta2 ** self.t)
-        
+
         # Parameter update
         return params - self.lr * m_hat / (np.sqrt(v_hat) + self.epsilon)
-    
+
     def state_size_per_param(self) -> int:
         """Adam stores two floats (m and v) per parameter."""
         return 2
@@ -1070,38 +1070,38 @@ def simulate_training(
 ) -> TrainingMetrics:
     """
     Simulate training a model with given optimizer.
-    
+
     This is a simplified simulation showing the behavior,
     not actual neural network training.
     """
     params = initial_params.copy()
     losses = []
-    
+
     # Simple quadratic loss for demonstration
     def compute_loss(p):
         return 0.5 * np.sum(p ** 2)
-    
+
     def compute_gradient(p, batch_size):
         """Gradient with noise (simulating small batch stochasticity)."""
         true_grad = p  # Gradient of 0.5*sum(p²) is just p
-        
+
         # Add noise inversely proportional to batch size
         noise_scale = 1.0 / np.sqrt(batch_size)
         noise = np.random.normal(0, noise_scale, size=p.shape)
-        
+
         return true_grad + noise
-    
+
     for step in range(n_steps):
         # Compute noisy gradient
         grads = compute_gradient(params, batch_size)
-        
+
         # Update parameters
         params = optimizer.step(params, grads)
-        
+
         # Track loss
         loss = compute_loss(params)
         losses.append(loss)
-    
+
     return TrainingMetrics(
         steps=list(range(n_steps)),
         losses=losses,
@@ -1224,7 +1224,7 @@ Using Adam or Adafactor:
 │      Formula: β₂ = 0.95^(512/batch_size)
 │      Examples:
 │      • batch_size=1:    β₂ ≈ 0.9999
-│      • batch_size=16:   β₂ ≈ 0.9984  
+│      • batch_size=16:   β₂ ≈ 0.9984
 │      • batch_size=256:  β₂ ≈ 0.976
 │      • batch_size=512:  β₂ ≈ 0.95
 └─ Learning rate: Tune (starts around 3e-4)
@@ -1331,7 +1331,7 @@ Mistakes to Avoid
 ❌ Using β₂=0.95 for batch size 1
    → Will fail! Scale to ~0.9999
 
-❌ Assuming √batch scaling for learning rate  
+❌ Assuming √batch scaling for learning rate
    → Too aggressive. Scale sub-linearly.
 
 ❌ Gradient accumulation on single GPU
@@ -1476,14 +1476,14 @@ class MemoryProfile:
     optimizer_state_gb: float
     gradient_buffer_gb: float
     activations_gb: float
-    
+
     @property
     def total_gb(self) -> float:
-        return (self.model_params_gb + 
-                self.optimizer_state_gb + 
-                self.gradient_buffer_gb + 
+        return (self.model_params_gb +
+                self.optimizer_state_gb +
+                self.gradient_buffer_gb +
                 self.activations_gb)
-    
+
     def __repr__(self) -> str:
         return (
             f"MemoryProfile:\n"
@@ -1499,11 +1499,11 @@ class MemoryProfile:
 class AdafactorSimulator:
     """
     Simulates Adafactor's memory-efficient second moment estimation.
-    
+
     Key idea: For an n×m weight matrix, instead of storing nm values
     for the second moment, store only n+m values (row and column sums).
     """
-    
+
     def __init__(
         self,
         learning_rate: float = 0.001,
@@ -1515,34 +1515,34 @@ class AdafactorSimulator:
         self.beta2 = beta2
         self.epsilon = epsilon
         self.use_bf16_params = use_bf16_params
-        
+
         # State (will be initialized lazily)
         self.row_sum: Optional[np.ndarray] = None
         self.col_sum: Optional[np.ndarray] = None
         self.t = 0
-    
+
     def memory_for_params(self, shape: Tuple[int, ...]) -> int:
         """
         Calculate optimizer state size in bytes.
-        
+
         For Adam: 2 × n × m × 4 bytes (first and second moments)
         For Adafactor: (n + m) × 4 bytes (row + column sums)
         """
         if len(shape) == 1:
             # For 1D parameters (like biases), store full second moment
             return shape[0] * 4
-        
+
         # For 2D parameters (weight matrices)
         n, m = shape
         adam_size = 2 * n * m * 4
         adafactor_size = (n + m) * 4
-        
+
         print(f"  Shape {shape}: Adam needs {adam_size/1e6:.2f}MB, "
               f"Adafactor needs {adafactor_size/1e6:.2f}MB "
               f"({100*adafactor_size/adam_size:.1f}% of Adam)")
-        
+
         return adafactor_size
-    
+
     def step_2d(
         self,
         params: np.ndarray,
@@ -1550,56 +1550,56 @@ class AdafactorSimulator:
     ) -> np.ndarray:
         """
         Perform Adafactor update for 2D parameter tensor (weight matrix).
-        
+
         Key innovation: Estimate per-element second moment from
         row and column statistics instead of storing all elements.
         """
         assert params.ndim == 2
         n, m = params.shape
-        
+
         # Initialize state if needed
         if self.row_sum is None:
             self.row_sum = np.zeros(n)
             self.col_sum = np.zeros(m)
-        
+
         self.t += 1
-        
+
         # Update row and column sums of squared gradients
         # Instead of: v_t = β₂ v_{t-1} + (1-β₂) g_t²
         # We maintain: v_row and v_col
         grads_sq = grads ** 2
-        
+
         self.row_sum = self.beta2 * self.row_sum + (1 - self.beta2) * grads_sq.sum(axis=1)
         self.col_sum = self.beta2 * self.col_sum + (1 - self.beta2) * grads_sq.sum(axis=0)
-        
+
         # Reconstruct approximate second moment from factorization
         # v_approx[i,j] ≈ v_row[i] * v_col[j] / mean(v)
         total_sum = grads_sq.sum()
         mean_v = total_sum / (n * m)
-        
+
         # Broadcast to create approximate second moment
         v_approx = np.outer(self.row_sum, self.col_sum) / (mean_v + self.epsilon)
-        
+
         # Bias correction
         v_hat = v_approx / (1 - self.beta2 ** self.t)
-        
+
         # Parameter update
         # Note: No first moment (Adafactor doesn't store m_t for simplicity)
         update = self.lr * grads / (np.sqrt(v_hat) + self.epsilon)
-        
+
         new_params = params - update
-        
+
         # Stochastic rounding if using bf16
         if self.use_bf16_params:
             new_params = self._stochastic_round_bf16(new_params)
-        
+
         return new_params
-    
+
     @staticmethod
     def _stochastic_round_bf16(params: np.ndarray) -> np.ndarray:
         """
         Simulate stochastic rounding to bfloat16.
-        
+
         Critical for maintaining precision with bf16 weights!
         Without this, small updates would be lost due to rounding.
         """
@@ -1618,7 +1618,7 @@ def calculate_memory_profile(
 ) -> MemoryProfile:
     """
     Calculate memory footprint for different fine-tuning approaches.
-    
+
     Args:
         num_params: Number of model parameters
         approach: One of ["lora", "full_adam", "full_adafactor"]
@@ -1627,10 +1627,10 @@ def calculate_memory_profile(
         use_bf16: Whether to use bfloat16 for model parameters
     """
     bytes_per_param = 2 if use_bf16 else 4
-    
+
     # Model parameters
     model_memory = num_params * bytes_per_param / 1e9
-    
+
     # Optimizer state
     if approach == "lora":
         # LoRA only trains tiny adapters (~1% of params)
@@ -1645,18 +1645,18 @@ def calculate_memory_profile(
         optimizer_memory = num_params * 0.02 * 4 / 1e9
     else:
         raise ValueError(f"Unknown approach: {approach}")
-    
+
     # Gradient accumulation buffer
     effective_batch = batch_size * gradient_accumulation_steps
     if gradient_accumulation_steps > 1:
         gradient_memory = num_params * 4 / 1e9  # Store accumulated grads
     else:
         gradient_memory = 0  # No accumulation buffer needed
-    
+
     # Activations (simplified: assume gradient checkpointing)
     # Real calculation would depend on model architecture
     activations_memory = 4.0  # Rough estimate
-    
+
     return MemoryProfile(
         model_params_gb=model_memory,
         optimizer_state_gb=optimizer_memory,
@@ -1705,7 +1705,7 @@ for name, config in approaches.items():
         config["use_bf16"]
     )
     results[name] = profile
-    
+
     print(f"{name}:")
     print("-" * 60)
     print(profile)
