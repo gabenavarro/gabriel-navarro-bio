@@ -85,12 +85,12 @@ Large Batch Required         Small Batch Works!
 
 The Key Difference:
 ┌────────────────────────────────────────────────┐
-│ Fix the TOKEN HALF-LIFE, not the decay rate β₂│
+│ Fix the TOKEN HALF-LIFE, not the decay rate β₂ │
 │                                                │
-│  Old Way: β₂ = 0.95 for all batch sizes       │
-│  New Way: t₁/₂ = 10M tokens for all batches   │
+│  Old Way: β₂ = 0.95 for all batch sizes        │
+│  New Way: t₁/₂ = 10M tokens for all batches    │
 │                                                │
-│  This means: β₂ = 0.9999 for batch size 1     │
+│  This means: β₂ = 0.9999 for batch size 1      │
 │              β₂ = 0.95 for batch size 512      │
 └────────────────────────────────────────────────┘
 ```
@@ -119,21 +119,32 @@ The "half-life" concept fixes this by measuring timescales in tokens instead of 
 ### Concept Diagram
 
 ```
-Understanding Exponential Moving Average Decay
-==============================================
+Understanding Exponential Decay of Gradient Contributions
+==========================================================
 
-Gradient contributions decay exponentially:
+Suppose we're using β₂ = 0.95 for our second moment in Adam.
 
-Optimizer Step:     0    1    2    3    4    5    6    7    8
-                    ↓    ↓    ↓    ↓    ↓    ↓    ↓    ↓    ↓
-Contribution:      1.0  β    β²   β³   β⁴   β⁵   β⁶   β⁷   β⁸
-                    ██   █    ▓    ▒    ░
-                    │    │    │         │
-                    │    │    └─────────┴──── Half-life point
-                    │    │              (contribution = 0.5)
-                    │    └─ β² = ~0.90
-                    └─ β¹ = 0.95
+A gradient computed at step 0 contributes to future moments like this:
 
+Optimizer Step:     0      1      2      3      4      5
+                    ↓      ↓      ↓      ↓      ↓      ↓
+Exponent:           β₂⁰    β₂¹    β₂²    β₂³    β₂⁴    β₂⁵
+
+Contribution:       1.0    0.95   0.90   0.86   0.81   0.77
+                    ████   ███    ███    ██     █▓     ▓▒
+                    │      │      │      │
+                    │      │      │      └─ After 3 steps: 0.86x
+                    │      │      └──────── After 2 steps: 0.90x
+                    │      └─────────────── After 1 step:  0.95x
+                    └────────────────────── Initial:       1.0x
+
+
+Calculating the actual values (when β₂ = 0.95):
+- β₂⁰ = 1.0         (initial)
+- β₂¹ = 0.95        (after 1 step)
+- β₂² = 0.9025      (after 2 steps)
+- β₂³ = 0.8574      (after 3 steps)
+- β₂⁴ = 0.8145      (after 4 steps)
 
 Problem: Steps ≠ Tokens!
 ========================
@@ -141,10 +152,10 @@ Problem: Steps ≠ Tokens!
 Batch Size 512:                  Batch Size 1:
 Each step = 512 tokens           Each step = 1 token
      │                                │
-     ├─ Step 1: 512 tokens           ├─ Step 1: 1 token
-     ├─ Step 2: 1024 tokens          ├─ Step 2: 2 tokens
-     ├─ Step 3: 1536 tokens          ├─ Step 3: 3 tokens
-     └─ ...                          └─ ...
+     ├─ Step 1: 512 tokens            ├─ Step 1: 1 token
+     ├─ Step 2: 1024 tokens           ├─ Step 2: 2 tokens
+     ├─ Step 3: 1536 tokens           ├─ Step 3: 3 tokens
+     └─ ...                           └─ ...
 
 
 Solution: Fix Token Half-Life!
@@ -152,26 +163,55 @@ Solution: Fix Token Half-Life!
 
 Instead of fixing β₂, we fix t₁/₂ (number of tokens for 0.5x decay)
 
-Given: β^(t₁/₂ / (B·T)) = 0.5
+Given: β₂^(t₁/₂ / (B·T)) = 0.5
 
 Where: B = batch size
        T = sequence length
        t₁/₂ = desired token half-life
 
+Example Calculation 1:
 
-Example Calculation:
-t₁/₂ = 10M tokens (our choice)
-T = 1024 (sequence length)
+Given:
+    t₁/₂ = 7M tokens (our choice for simple calculation)
+    T = 1024 (sequence length as a typical value)
+    B = 512 (batch size)
 
-For batch size 512:
-  10,000,000 / (512 × 1024) ≈ 19 steps for half-life
-  So we need: β² ≈ 0.95^19 ≈ 0.5
-  Therefore: β₂ ≈ 0.95
+What should β₂ be?
 
-For batch size 1:
-  10,000,000 / (1 × 1024) ≈ 9766 steps for half-life
-  So we need: β²^9766 ≈ 0.5
-  Therefore: β₂ ≈ 0.9999
+    β₂^(t₁/₂ / (B·T)) = 0.5
+    β₂^(7,000,000 / (512 × 1024)) = 0.5
+    β₂^13.35 = 0.5
+    log(β₂^13.35) = log(0.5)
+    13.35 * log(β₂) = log(0.5)
+    log(β₂) = log(0.5) / 13.35
+    β₂ = 10^(log(0.5) / 13.35)
+    β₂ ≈ 0.95
+
+Therefore:
+
+    β₂ ≈ 0.95 for desired token half-life of 7M tokens with batch size 512 and sequence length 1024.
+
+Example Calculation 2:
+
+Given:
+    t₁/₂ = 7M tokens (Same as above)
+    T = 1024 (Same as above)
+    B = 1 (batch size, NEW BATCH SIZE)
+
+What should β₂ be?
+
+    β₂^(t₁/₂ / (B·T)) = 0.5
+    β₂^(7,000,000 / (1 × 1024)) = 0.5
+    β₂^6,835 = 0.5
+    log(β₂^6,835) = log(0.5)
+    6,835 * log(β₂) = log(0.5)
+    log(β₂) = log(0.5) / 6,835
+    β₂ = 10^(log(0.5) / 6,835)
+    β₂ ≈ 0.9999
+
+Therefore:
+
+    β₂ ≈ 0.9999 for desired token half-life of 7M tokens with batch size 1 and sequence length 1024.
 ```
 
 ### Implementation
@@ -307,7 +347,7 @@ print("This maintains constant averaging over tokens.")
 
 - **Token half-life provides a batch-size-independent way to think about optimizer timescales**, measuring how many tokens of data we average over rather than how many optimizer steps
 - **The formula β₂* = β₂^(B*/B) allows you to scale β₂ when changing batch size** from B to B* while keeping the token half-life constant
-- **Typical values are β₂ ≈ 0.9999 for batch size 1** (very slow decay) and β₂ ≈ 0.95 for batch size 512 (faster decay), but they represent the same 10M token half-life
+- **Typical values are β₂ ≈ 0.9999 for batch size 1** (very slow decay) and β₂ ≈ 0.95 for batch size 512 (faster decay), but they represent the same 7M token half-life
 - **This insight explains why previous small-batch experiments failed**: they used β₂ values optimized for large batches, causing them to average over too little data
 
 ---
@@ -333,61 +373,61 @@ Hyperparameter Sensitivity: Small vs Large Batches
 Small Batch (size = 1):
 Learning Rate Sensitivity
     Loss
-     │                    ╭──────────╮
-   3.5│                 ╭─╯          ╰─╮
-     │               ╭─╯                ╰─╮
-   3.4├─────────────┤     Robust Region  ├──────────
-     │               ╰─╮                ╭─╯
-     │                 ╰─╮          ╭─╯
-   3.3│                  ╰──────────╯
-     │
-     └──────────────────────────────────────────────→
-        0.001  0.003  0.01   0.03   0.1  Learning Rate
+        │                 ╭──────────╮
+   3.5  │               ╭─╯          ╰─╮
+        │             ╭─╯              ╰─╮
+   3.4  ├─────────────┤   Robust Region  ├──────────
+        │             ╰─╮              ╭─╯
+        │               ╰─╮          ╭─╯
+   3.3  │                 ╰──────────╯
+        │
+        └──────────────────────────────────────────────→
+         0.001  0.003  0.01   0.03   0.1  Learning Rate
 
-        Wide "bowl" = forgiving to hyperparameter choice
+    Wide "bowl" = forgiving to hyperparameter choice
 
 
 Large Batch (size = 512):
 Learning Rate Sensitivity
     Loss
-     │      │
-   3.8│      │
-     │      ╰╮
-   3.6│       │
-     │       │← Narrow
-   3.4│      ╭╯  optimal
-     │      │    region
-   3.2│   ╭─╯
-     │  ╭╯
-   3.0├─╯
-     │
-     └──────────────────────────────────────────────→
-        0.001  0.003  0.01   0.03   0.1  Learning Rate
+        │    │
+   3.8  │    │
+        │    ╰╮
+   3.6  │     │
+        │     │← Narrow
+   3.4  │    ╭╯  optimal
+        │    │   region
+   3.2  │  ╭─╯
+        │ ╭╯
+   3.0  ├─╯
+        │
+        └──────────────────────────────────────────────→
+         0.001  0.003  0.01   0.03   0.1  Learning Rate
 
-        Narrow "canyon" = precise tuning required
+    Narrow "canyon" = precise tuning required
 
 
 Why This Happens:
 =================
 
-Large Batch Size                   Small Batch Size
-      ↓                                   ↓
-  Large Steps                         Small Steps
-      ↓                                   ↓
+  Large Batch Size                  Small Batch Size
+         ↓                                 ↓
+    Large Steps                       Small Steps
+         ↓                                 ↓
 ┌──────────────────┐              ┌──────────────────┐
 │ Must predict     │              │ Only predict     │
 │ loss surface     │              │ loss surface     │
 │ FAR from current │              │ NEAR current     │
 │ position         │              │ position         │
 └────────┬─────────┘              └────────┬─────────┘
-         │                                  │
-         ▼                                  ▼
+         │                                 │
+         ▼                                 ▼
 ┌──────────────────┐              ┌──────────────────┐
 │ Hard prediction  │              │ Easy prediction  │
 │ problem          │              │ problem          │
 └────────┬─────────┘              └────────┬─────────┘
-         │                                  │
-         ▼                                  ▼
+         │                                 │
+         ▼                                 ▼
 ┌──────────────────┐              ┌──────────────────┐
 │ Requires:        │              │ Simple methods   │
 │ - Momentum       │              │ work fine:       │
@@ -639,16 +679,16 @@ Parameter: Learning Rate
 ────────────────────────────────────
 Rule: Scale SUB-LINEARLY (not square root!)
 
-0.1  ┐
-     │                    Actual scaling
-0.01 ├───────╮            (sub-linear)
-     │       ╰─╮               │
-0.001├          ╰─╮            ↓
-     │            ╰────╮    ╭──────╮
-0.0001                ╰────╯Square │
-     │                     │root   │
-     └────────────────────────────────────────→
-       1    16   64   256  1024 4096  Batch Size
+0.1    ┐
+       │                    Actual scaling
+0.01   ├───────╮            (sub-linear)
+       │       ╰─╮              │
+0.001  ├         ╰─╮            ↓
+       │           ╰────╮    ╭──────╮
+0.0001 ├                ╰────╯Square│
+       │                     │root  │
+       └────────────────────────────────────────→
+         1    16   64   256  1024 4096  Batch Size
 
 Note: Exact scaling requires tuning, but it's
       much slower than √batch_size
@@ -796,10 +836,10 @@ print(f"Match: {np.isclose(theoretical_beta2, batch_1_config.beta2)}")
 print()
 
 # Calculate token half-life to verify it's constant
-def calculate_token_halflife(beta2: float, batch_size: int, seq_len: int = 1024) -> float:
-    """Calculate token half-life from β₂ and batch size."""
-    tokens_per_step = batch_size * seq_len
+def calculate_token_halflife(beta2: float, batch_size: int, seq_len: int = 1024):
+    """Calculate token half-life from β₂."""
     steps_to_halflife = np.log(0.5) / np.log(beta2)
+    tokens_per_step = batch_size * seq_len
     return steps_to_halflife * tokens_per_step
 
 halflife_baseline = calculate_token_halflife(
@@ -863,8 +903,8 @@ Traditional View (Large Batches):
    ┌──────────┐                        ┌────────────┐
    │   SGD    │                        │   Adam     │
    │          │                        │   Lion     │
-   │  ╳╳╳     │◁─────── Unstable      │   Muon     │
-   │  Loss    │        Training       │   SOAP     │
+   │  ╳╳╳     │←─────── Unstable       │   Muon     │
+   │  Loss    │        Training        │   SOAP     │
    │  Spikes  │                        │            │
    │          │                        │  ✓✓✓      │
    └──────────┘                        │  Stable    │
@@ -877,9 +917,9 @@ Paper's Finding (Small Batches):
         ▼                                   ▼
    ┌──────────┐                        ┌────────────┐
    │   SGD    │                        │   Adam     │
-   │          │◁─────── Both Work!    │   Lion     │
-   │  ✓✓✓     │        Comparable     │   Muon     │
-   │  Stable  │        Performance    │   SOAP     │
+   │          │←─────── Both Work!     │   Lion     │
+   │  ✓✓✓    │        Comparable      │   Muon     │
+   │  Stable  │        Performance     │   SOAP     │
    │  Good    │                        │            │
    │  Results │                        │  ✓✓✓      │
    └──────────┘                        │  Stable    │
@@ -910,10 +950,10 @@ Per-parameter memory storage:
 
 ┌───────────────────────────────────────────────┐
 │ Adam / AdamW:                                 │
-│ ┌─────────┬──────────┬──────────┬──────────┐ │
-│ │Parameter│ Gradient │1st Moment│2nd Moment│ │
-│ │ (2-4B)  │  (4B)    │  (4B)    │  (4B)    │ │
-│ └─────────┴──────────┴──────────┴──────────┘ │
+│ ┌─────────┬──────────┬──────────┬──────────┐  │
+│ │Parameter│ Gradient │1st Moment│2nd Moment│  │
+│ │ (2-4B)  │  (4B)    │  (4B)    │  (4B)    │  │
+│ └─────────┴──────────┴──────────┴──────────┘  │
 │ Total: 14-16 bytes per parameter              │
 └───────────────────────────────────────────────┘
 
@@ -1271,7 +1311,7 @@ Instead of:
 
 Try:
 ┌────────────────────────────┐
-│ Full model + Adafactor + BS 1│
+│ Full model + Ada + BS 1    │
 │ Memory: ~X GB              │
 │ Performance: Better!       │
 └────────────────────────────┘
@@ -1384,12 +1424,12 @@ Traditional LoRA:
 ┌──────────────────────────────────────┐
 │   Frozen Pretrained Model (16-bit)   │
 │   ████████████████████████████████   │
-│                                       │
+│                                      │
 │   + LoRA Adapters (32-bit, tiny)     │
-│   ██                                  │
-│                                       │
+│   ██                                 │
+│                                      │
 │   + Adam State for Adapters          │
-│   ████                                │
+│   ████                               │
 └──────────────────────────────────────┘
 Total Memory: ~2 bytes/param
 Performance: Good (but not full fine-tune)
@@ -1400,13 +1440,13 @@ Full Fine-Tune with Adam + Large Batch:
 ┌──────────────────────────────────────┐
 │   Model Parameters (32-bit)          │
 │   ████████████████████████████████   │
-│                                       │
+│                                      │
 │   + Adam State (m_t, v_t)            │
 │   ████████████████████████████████   │
 │   ████████████████████████████████   │
-│                                       │
+│                                      │
 │   + Gradient Accumulation            │
-│   ████████████████████                │
+│   ████████████████████               │
 └──────────────────────────────────────┘
 Total Memory: ~16 bytes/param
 Performance: Best (but huge memory)
@@ -1417,12 +1457,12 @@ Paper's Approach: Batch 1 + Adafactor:
 ┌──────────────────────────────────────┐
 │   Model Parameters (16-bit)          │
 │   ████████████████████████████████   │
-│                                       │
+│                                      │
 │   + Adafactor State (32-bit, small)  │
-│   ████████                            │
-│                                       │
+│   ████████                           │
+│                                      │
 │   + No Gradient Accumulation!        │
-│   (batch size 1)                      │
+│   (batch size 1)                     │
 └──────────────────────────────────────┘
 Total Memory: ~2.5 bytes/param
 Performance: Best (full fine-tune quality!)
@@ -1434,13 +1474,13 @@ Memory Breakdown for Gemma 3 (4B params):
 Component                  | LoRA  | Full+Adam | Full+Adafactor+BS1
 ───────────────────────────┼───────┼───────────┼───────────────────
 Model weights              | 8 GB  | 16 GB     | 8 GB (bfloat16)
-Optimizer state           | 0.2GB | 32 GB     | 2 GB (factored)
-Gradient accumulation     | 0     | 4 GB      | 0 (batch size 1)
-Activations (checkpointed)| 4 GB  | 4 GB      | 4 GB
+Optimizer state            | 0.2GB | 32 GB     | 2 GB (factored)
+Gradient accumulation      | 0     | 4 GB      | 0 (batch size 1)
+Activations (checkpointed) | 4 GB  | 4 GB      | 4 GB
 ───────────────────────────┼───────┼───────────┼───────────────────
-TOTAL                     | 12GB  | 56 GB     | 14 GB
+TOTAL                      | 12GB  | 56 GB     | 14 GB
 
-Performance on MATH       | 17%   | 18.5%     | 18.5%
+Performance on MATH        | 17%   | 18.5%     | 18.5%
 
 
 Key Insights:
