@@ -180,7 +180,7 @@ html, body {
 
 .cli-tab {
     font-size: 0.75rem;
-    font-weight: 600;
+    font-weight: 300;
     color: var(--color-base-500);
     cursor: pointer;
 }
@@ -248,12 +248,24 @@ html, body {
 
 /* Code Blocks */
 pre.shiki, .uk-codeblock {
+    font-family: var(--font-geist-mono), monospace !important;
+    font-size: 0.875rem !important;
+    /* No line spacing */
+    line-height: 1 !important;
     background-color: #0b0c0e !important;
     border: 1px solid var(--color-base-900) !important;
     border-radius: 1rem !important;
     margin: 2rem 0 !important;
     position: relative !important;
     padding-top: 2.5rem !important; /* Space for the simulated header */
+}
+
+.uk-codespan {
+    font-weight: 300 !important;
+    font-family: var(--font-geist-mono), monospace !important;
+    font-size: 0.875rem !important;
+    background-color: #161719 !important;
+    line-height: 1 !important;
 }
 
 /* Header Simulation */

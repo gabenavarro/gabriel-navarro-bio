@@ -1,10 +1,11 @@
 import os
 
+
 class Settings:
     # BigQuery Configuration
     GOOGLE_PROJECT_ID = os.getenv("GOOGLE_PROJECT_ID", "noble-office-299208")
     BIGQUERY_TABLE = "noble-office-299208.portfolio.gn-blog"
-    
+
     # UI Constants
     CATEGORY_MAP = {
         "bioinformatics": "omics",
@@ -26,7 +27,7 @@ class Settings:
         "cloud": "infrastructure",
         "gcp": "infrastructure",
     }
-    
+
     # Visual Theme
     COLORS = {
         "primary": "#4a9cf7",
@@ -89,40 +90,43 @@ Let's push the boundaries of research together!""",
                 "items": [
                     {
                         "subtitle": "Cross-Disciplinary Expertise",
-                        "text": "Over a decade of experience at the intersection of biology, chemistry, and machine learning—spanning **metabolomics**, **proteomics**, **genomics**, and **drug discovery**."
+                        "text": "Over a decade of experience at the intersection of biology, chemistry, and machine learning—spanning **metabolomics**, **proteomics**, **genomics**, and **drug discovery**.",
                     },
                     {
                         "subtitle": "Industry-Backed Innovation",
-                        "text": "Led high-impact projects at global companies and startups, including **Datacca**, **Triplebar**, **Brightseed**, **Amyris**, **Hexagon Bio**, and **Mondelez**, building platforms used by R&D and commercial teams."
+                        "text": "Led high-impact projects at global companies and startups, including **Datacca**, **Triplebar**, **Brightseed**, **Amyris**, **Hexagon Bio**, and **Mondelez**, building platforms used by R&D and commercial teams.",
                     },
                     {
                         "subtitle": "Scientific Rigor & Engineering Precision",
-                        "text": "Combines deep scientific knowledge with advanced software and cloud engineering to turn raw biological data into scalable, actionable systems."
-                    }
+                        "text": "Combines deep scientific knowledge with advanced software and cloud engineering to turn raw biological data into scalable, actionable systems.",
+                    },
                 ],
-                "button": {"text": "My Curriculum Vitae", "href": "/cv"}
+                "button": {"text": "My Curriculum Vitae", "href": "/cv"},
             },
             {
                 "title": "Machine Learning in Biosciences",
                 "items": [
                     {
                         "subtitle": "Genome Language Models",
-                        "text": "Trained and fine-tuned fungal genome language models to optimize **protein expression and secretion**, accelerating synthetic biology applications."
+                        "text": "Trained and fine-tuned fungal genome language models to optimize **protein expression and secretion**, accelerating synthetic biology applications.",
                     },
                     {
                         "subtitle": "Protein Language Models",
-                        "text": "Fine-tuned antibody-specific PLMs to enhance **sequence design** with demonstrably improved functional outcomes"
+                        "text": "Fine-tuned antibody-specific PLMs to enhance **sequence design** with demonstrably improved functional outcomes",
                     },
                     {
                         "subtitle": "Molecule Fingerprints from Mass Spectrometry",
-                        "text": "Developed machine learning models that mapped 20,000+ plant compounds to human health outcomes, driving a **1000x increase** in phytonutrient discovery throughput."
+                        "text": "Developed machine learning models that mapped 20,000+ plant compounds to human health outcomes, driving a **1000x increase** in phytonutrient discovery throughput.",
                     },
                     {
                         "subtitle": "Fungal Compound Discovery",
-                        "text": "Designed and deployed scalable workflows on Google Cloud Vertex AI using GATK, samtools, Dragen-OS, and other bioinformatics tools to streamline genomic analysis at scale."
-                    }
+                        "text": "Designed and deployed scalable workflows on Google Cloud Vertex AI using GATK, samtools, Dragen-OS, and other bioinformatics tools to streamline genomic analysis at scale.",
+                    },
                 ],
-                "button": {"text": "My Machine Learning Projects", "href": "/projects?tag=machine-learning"}
+                "button": {
+                    "text": "My Machine Learning Projects",
+                    "href": "/projects?tag=machine-learning",
+                },
             },
             {
                 "title": "Omics Infrastructure & Pipelines",
@@ -132,52 +136,59 @@ Let's push the boundaries of research together!""",
                         "items": [
                             {
                                 "subtitle": "Scalable DNA Processing",
-                                "text": "Designed and deployed scalable workflows on Google Cloud Vertex AI using GATK, samtools, Dragen-OS, and other bioinformatics tools to streamline genomic analysis at scale."
+                                "text": "Designed and deployed scalable workflows on Google Cloud Vertex AI using GATK, samtools, Dragen-OS, and other bioinformatics tools to streamline genomic analysis at scale.",
                             }
-                        ]
+                        ],
                     },
                     {
                         "title": "🧪 Proteomics",
                         "items": [
                             {
                                 "subtitle": "End-to-End Proteomics Platform",
-                                "text": "Built a comprehensive proteomics pipeline supporting the entire research workflow—from benchside experimentation to insights-driven decision-making by scientists."
+                                "text": "Built a comprehensive proteomics pipeline supporting the entire research workflow—from benchside experimentation to insights-driven decision-making by scientists.",
                             }
-                        ]
+                        ],
                     },
                     {
                         "title": "🧉 Metabolomics",
                         "items": [
                             {
                                 "subtitle": "Scalable DNA Processing",
-                                "text": "Developed high-throughput metabolomics pipelines capable of processing terabyte-scale LC-MS/MS datasets for accelerated discovery."
+                                "text": "Developed high-throughput metabolomics pipelines capable of processing terabyte-scale LC-MS/MS datasets for accelerated discovery.",
                             }
-                        ]
-                    }
+                        ],
+                    },
                 ],
-                "button": {"text": "My Omics Projects", "href": "/projects?tag=omics"}
+                "button": {"text": "My Omics Projects", "href": "/projects?tag=omics"},
             },
             {
                 "title": "Data Science & Visualization",
                 "items": [
                     {
                         "subtitle": "Multi-Omics Platform for R&D",
-                        "text": "Built interactive Python Dash and FastHTML dashboards to empower scientists to explore complex datasets and extract actionable insights across multi-omics domains."
+                        "text": "Built interactive Python Dash and FastHTML dashboards to empower scientists to explore complex datasets and extract actionable insights across multi-omics domains.",
                     }
                 ],
-                "button": {"text": "My Visualization Projects", "href": "/projects?tag=visualization"}
+                "button": {
+                    "text": "My Visualization Projects",
+                    "href": "/projects?tag=visualization",
+                },
             },
             {
                 "title": "Infrastructure & Scalability",
                 "items": [
                     {
                         "subtitle": "Cloud Bioinformatics",
-                        "text": "Architected and deployed scalable, production-ready infrastructure to support AI/ML-driven genome and antibody design workflows in cloud environments."
+                        "text": "Architected and deployed scalable, production-ready infrastructure to support AI/ML-driven genome and antibody design workflows in cloud environments.",
                     }
                 ],
-                "button": {"text": "My Infrastructure Projects", "href": "/projects?tag=infrastructure"}
-            }
-        ]
+                "button": {
+                    "text": "My Infrastructure Projects",
+                    "href": "/projects?tag=infrastructure",
+                },
+            },
+        ],
     }
+
 
 settings = Settings()

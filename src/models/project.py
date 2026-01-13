@@ -1,9 +1,11 @@
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List
+
 
 @dataclass
 class ProjectTag:
     v: str
+
 
 @dataclass
 class Project:
@@ -20,7 +22,7 @@ class Project:
     body: str = ""
 
     @classmethod
-    def from_dict(cls, data: dict) -> 'Project':
+    def from_dict(cls, data: dict) -> "Project":
         # Process tags if they are in the format returned by BigQuery [{'v': 'tag1'}, ...]
         raw_tags = data.get("tags", [])
         tags = []
@@ -30,7 +32,7 @@ class Project:
                     tags.append(tag["v"])
                 elif isinstance(tag, str):
                     tags.append(tag)
-        
+
         return cls(
             id=data.get("id", ""),
             blog_id=data.get("blog_id", ""),
@@ -42,5 +44,5 @@ class Project:
             views=data.get("views", 0),
             likes=data.get("likes", 0),
             date=data.get("date", ""),
-            body=data.get("body", "")
+            body=data.get("body", ""),
         )
