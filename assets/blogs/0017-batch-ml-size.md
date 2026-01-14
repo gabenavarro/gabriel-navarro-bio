@@ -342,6 +342,23 @@ print("\n" + "=" * 50)
 print("Notice how β₂ increases as batch size decreases!")
 print("This maintains constant averaging over tokens.")
 ```
+Output:
+```
+Recommended β₂ values for token half-life = 10M:
+==================================================
+Batch Size    1: β₂ = 0.99992902
+Batch Size    4: β₂ = 0.99971613
+Batch Size   16: β₂ = 0.99886499
+Batch Size   64: β₂ = 0.99546769
+Batch Size  256: β₂ = 0.98199365
+Batch Size  512: β₂ = 0.96431153
+Batch Size 1024: β₂ = 0.92989672
+Batch Size 4096: β₂ = 0.74771978
+
+==================================================
+Notice how β₂ increases as batch size decreases!
+This maintains constant averaging over tokens.
+```
 
 ### Key Takeaways
 
@@ -374,11 +391,11 @@ Small Batch (size = 1):
 Learning Rate Sensitivity
     Loss
         │                 ╭──────────╮
-   3.5  │               ╭─╯          ╰─╮
-        │             ╭─╯              ╰─╮
-   3.4  ├─────────────┤   Robust Region  ├──────────
-        │             ╰─╮              ╭─╯
-        │               ╰─╮          ╭─╯
+   3.5  │               ╭─╯░░░░░░░░░░╰─╮
+        │             ╭─╯░░░░░░░░░░░░░░╰─╮
+   3.4  ├─────────────┤░░░Robust Region░░├──────────
+        │             ╰─╮░░░░░░░░░░░░░░╭─╯
+        │               ╰─╮░░░░░░░░░░╭─╯
    3.3  │                 ╰──────────╯
         │
         └──────────────────────────────────────────────→
@@ -390,15 +407,15 @@ Learning Rate Sensitivity
 Large Batch (size = 512):
 Learning Rate Sensitivity
     Loss
-        │    │
-   3.8  │    │
-        │    ╰╮
-   3.6  │     │
-        │     │← Narrow
-   3.4  │    ╭╯  optimal
-        │    │   region
-   3.2  │  ╭─╯
-        │ ╭╯
+        │░░░░│
+   3.8  │░░░░│
+        │░░░░╰╮
+   3.6  │░░░░░│
+        │░░░░░│← Narrow
+   3.4  │░░░░░│  optimal
+        │░░░░│   region
+   3.2  │░░╭─╯
+        │░╭╯
    3.0  ├─╯
         │
         └──────────────────────────────────────────────→
@@ -457,6 +474,10 @@ def loss_function(x: float, y: float) -> float:
 
     This mimics neural network losses that are ill-conditioned
     (much steeper in some directions than others).
+
+    Note, there's no minimum in the x direction—it's like a slope 
+    that goes down infinitely. So y = 0 is the stable equilibrium 
+    in the y direction. This is what we're trying to reach.
     """
     return x + 10 * y**2
 
@@ -600,9 +621,25 @@ print("• Large batch WITHOUT momentum: oscillates wildly (high y)")
 print("• Large batch WITH momentum: converges well (damps oscillations)")
 print("• Small batch WITHOUT momentum: converges well (small steps)")
 print("• Small batch WITH momentum: converges well (but not needed)")
-print()
-print("Conclusion: Momentum is critical for large batches")
-print("            but unnecessary for small batches!")
+```
+Output:
+```
+Running optimization experiments...
+============================================================
+
+Results:
+------------------------------------------------------------
+Large Batch + SGD:      Final y = 1.1717   From valley! Oscillating wildly
+Large Batch + Momentum: Final y = -0.4916  Overshot, but momentum is bringing us back
+Small Batch + SGD:      Final y = 0.0000   Perfect! We've found the valley
+Small Batch + Momentum: Final y = -0.0040  Almost perfect! Tiny overshoot
+
+Key Insight:
+------------------------------------------------------------
+• Large batch WITHOUT momentum: oscillates wildly (high y)
+• Large batch WITH momentum: converges well (damps oscillations)
+• Small batch WITHOUT momentum: converges well (small steps)
+• Small batch WITH momentum: converges well (but not needed)
 ```
 
 ### Key Takeaways
@@ -654,16 +691,16 @@ Parameter: β₂ (Second Moment Decay)
 Rule: SCALE to maintain constant token half-life
 
 1.0000┐
-      │          ╱
-0.9999├         ╱
-      │        ╱
-0.999 ├       ╱        Token Half-Life: t₁/₂ = 10M
-      │      ╱         (constant across batch sizes)
-0.99  ├     ╱
-      │    ╱
-0.95  ├   ╱
-      │  ╱
-0.90  ├ ╱
+      │ ╲         
+0.9999├  ╲       
+      │   ╲     
+0.999 ├    ╲           Token Half-Life: t₁/₂ = 10M
+      │     ╲          (constant across batch sizes)
+0.99  ├      ╲
+      │       ╲
+0.95  ├        ╲
+      │         ╲
+0.90  ├          ╲
       └─────────────────────────────────────────→
         1    16   64   256  1024 4096  Batch Size
 
@@ -674,25 +711,43 @@ Examples:
 • B=512, β₂=0.95  →  B=1, β₂=0.9999  (increase β₂)
 • B=1,   β₂=0.9999 → B=512, β₂=0.95   (decrease β₂)
 
+Note: The asterisk (*) is mathematical notation for "new" or "target" value:
+    β₂ = current beta2 value (what you have now)
+    β₂* = new beta2 value (what you want)
+    B = current batch size (what you have now)
+    B* = new batch size (what you want)
 
 Parameter: Learning Rate
 ────────────────────────────────────
 Rule: Scale SUB-LINEARLY (not square root!)
 
-0.1    ┐
-       │                    Actual scaling
-0.01   ├───────╮            (sub-linear)
-       │       ╰─╮              │
-0.001  ├         ╰─╮            ↓
-       │           ╰────╮    ╭──────╮
-0.0001 ├                ╰────╯Square│
-       │                     │root  │
-       └────────────────────────────────────────→
-         1    16   64   256  1024 4096  Batch Size
+Old rule: Square root scaling
 
-Note: Exact scaling requires tuning, but it's
-      much slower than √batch_size
+lr* = lr X √B
 
+New rule: Sub-linear scaling
+
+lr* = lr X log(B + 1)
+
+Learning Rate Growth
+
+0.01  │                                  ... √512 scaling
+      │                           .......    (predicts 22x)
+      │                   ........              
+      │             ......               
+0.001 │        ....                    ● ● ● log(512 + 1) scaling
+      │    ...             ● ● ● ● ● ●       (predicts ~3x)  
+      │  ..      ● ● ● ● ●               
+      │ .  ● ● ●                     
+0.0003├● ●                 
+      │ Starting point          
+      │ (batch size 1)          
+      └─────────────────────────────────────→
+         1                              512  Batch Size
+
+Note: 
+    Exact scaling requires tuning, but it's
+    much slower than √batch_size
 
 Complete Recipe
 ═══════════════
