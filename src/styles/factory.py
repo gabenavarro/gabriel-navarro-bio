@@ -261,7 +261,7 @@ pre.shiki, .uk-codeblock {
 
 .uk-codespan {
     font-weight: 300 !important;
-    font-family: var(--font-geist-mono), monospace !important;
+    --font-mono: 'Cascadia Mono', monospace;
     font-size: 0.75rem !important;
     background-color: #161719 !important;
     line-height: 1rem !important;
@@ -269,6 +269,7 @@ pre.shiki, .uk-codeblock {
 
 .language-python {
     line-height: 1.25rem !important;
+    font-family: var(--font-geist-mono), monospace !important;
 }
 
 /* Header Simulation */
