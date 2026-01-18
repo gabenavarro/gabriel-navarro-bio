@@ -26,6 +26,10 @@ def StandardPage(
                 rel="stylesheet",
                 href="https://cdn.jsdelivr.net/npm/geist@1.3.0/dist/font/mono.css",
             ),
+            Link(
+                rel="stylesheet",
+                href="https://cdn.jsdelivr.net/npm/@fontsource/cascadia-mono@5.2.3/index.min.css",
+            ),
         ),
         Style(FACTORY_CSS + extra_styles),
         *scripts,
