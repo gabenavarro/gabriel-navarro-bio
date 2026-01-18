@@ -42,8 +42,6 @@ These findings could fundamentally change how we train models, offering simpler 
 3. [Why Small Batches Are More Robust](#why-small-batches-are-more-robust)
 4. [The Hyperparameter Scaling Rule](#the-hyperparameter-scaling-rule)
 5. [Vanilla SGD Makes a Comeback](#vanilla-sgd-makes-a-comeback)
-6. [Practical Recommendations](#practical-recommendations)
-7. [Memory-Efficient Fine-Tuning](#memory-efficient-fine-tuning)
 
 ---
 
@@ -731,13 +729,13 @@ lr* = lr X log(B + 1)
 
 Learning Rate Growth
 
-0.01  │                                  ... √512 scaling
-      │                           .......    (predicts 22x)
-      │                   ........              
-      │             ......               
-0.001 │        ....                    ● ● ● log(512 + 1) scaling
-      │    ...             ● ● ● ● ● ●       (predicts ~3x)  
-      │  ..      ● ● ● ● ●               
+0.006 │                            ..... √512 scaling
+      │                       .....      predicts 22x
+      │                  ....           (22 X 0.0003 = 0.0066)
+      │             ....               
+0.001 │        ....                ● ● ● log(512 + 1) scaling
+      │    ...           ● ● ● ● ●       predicts ~3x  
+      │  ..      ● ● ● ●                 (3 X 0.0003 = 0.0009)
       │ .  ● ● ●                     
 0.0003├● ●                 
       │ Starting point          
@@ -924,6 +922,58 @@ for bs in [1, 4, 16, 64, 256, 512, 1024, 4096]:
           f"t₁/₂={halflife:>10,.0f} tokens")
 ```
 
+Output:
+
+```
+GPT-3 Baseline (Brown et al.):
+OptimizerConfig(
+  batch_size=512,
+  learning_rate=0.001000,
+  beta1=0.9,
+  beta2=0.95000000,
+  weight_decay=0.1
+)
+
+============================================================
+
+Scaled to Batch Size 1:
+OptimizerConfig(
+  batch_size=1,
+  learning_rate=0.001000,
+  beta1=0.9,
+  beta2=0.99989982,
+  weight_decay=0.0
+)
+
+============================================================
+
+Verification of β₂ scaling:
+------------------------------------------------------------
+Formula: 0.95^(1/512) = 0.99989982
+Computed: 0.99989982
+Match: True
+
+Token half-life (baseline): 7,084,917 tokens
+Token half-life (batch=1):  7,084,917 tokens
+Ratio: 1.00x
+
+Success! Token half-life is preserved! ✓
+
+============================================================
+
+Complete batch size sweep:
+------------------------------------------------------------
+BS=   1: β₂=0.999900, LR=0.000154, t₁/₂= 7,084,917 tokens
+BS=   4: β₂=0.999599, LR=0.000233, t₁/₂= 7,084,917 tokens
+BS=  16: β₂=0.998398, LR=0.000354, t₁/₂= 7,084,917 tokens
+BS=  64: β₂=0.993609, LR=0.000536, t₁/₂= 7,084,917 tokens
+BS= 256: β₂=0.974679, LR=0.000812, t₁/₂= 7,084,917 tokens
+BS= 512: β₂=0.950000, LR=0.001000, t₁/₂= 7,084,917 tokens
+BS=1024: β₂=0.902500, LR=0.001231, t₁/₂= 7,084,917 tokens
+BS=4096: β₂=0.663420, LR=0.001866, t₁/₂= 7,084,917 tokens
+```
+
+
 ### Key Takeaways
 
 - **The β₁ = 0.9 default works robustly across all batch sizes** and doesn't need adjustment
@@ -958,12 +1008,12 @@ Traditional View (Large Batches):
    ┌──────────┐                        ┌────────────┐
    │   SGD    │                        │   Adam     │
    │          │                        │   Lion     │
-   │  ╳╳╳     │←─────── Unstable       │   Muon     │
-   │  Loss    │        Training        │   SOAP     │
+   │          │←─────── Unstable       │   Muon     │
+   │  Loss    │         Training       │   SOAP     │
    │  Spikes  │                        │            │
-   │          │                        │  ✓✓✓      │
-   └──────────┘                        │  Stable    │
-                                       └────────────┘
+   │  ╳╳╳     │                        │  ✓✓✓      │
+   │  Unstable│                        │  Stable    │
+   └──────────┘                        └────────────┘
 
 
 Paper's Finding (Small Batches):
@@ -984,40 +1034,40 @@ Paper's Finding (Small Batches):
 Performance Convergence by Batch Size
 ======================================
 
-Loss at    Large Batch (4096)         Small Batch (1)
-Convergence    ↓                          ↓
-
-   5.0 ┤   ╱ SGD (diverges)          All optimizers
-       │  ╱                           achieve similar
-   4.5 ┤ ╱                            final loss:
-       │╱   ╱── Adafactor
-   4.0 ├╮  ╱                              ╱── SGD
-       │╰╮╱─── Adam                       ├── Adam
-   3.8 ├─╰──── Muon                       ├── Adafactor
-       │                                  ╰── Muon
-   3.6 ├─────────────────────────────────────────
+Loss at    Large Batch (4096)   Small Batch (1) + β₂ @ t₁/₂
+Convergence    ↓                       ↓
+                                                    
+   5.0 ┤   ╱ SGD (diverges)    ┤  All optimizers
+       │  ╱                    │  achieve similar
+   4.5 ┤ ╱                     ┤  final loss:
+       │╱   ╱── Adafactor      │             
+   4.0 ├╮  ╱                   ├       ╱── SGD
+       │╰╮╱─── Adam            │       ├── Adam
+   3.8 ├─╰──── Muon            ├       ├── Adafactor
+       │                       │       ╰── Muon
+   3.6 ├───────────────────    ├────────────────
 
 
 Memory Comparison
 =================
 
-Per-parameter memory storage:
+Training per-parameter memory storage:
 
 ┌───────────────────────────────────────────────┐
 │ Adam / AdamW:                                 │
-│ ┌─────────┬──────────┬──────────┬──────────┐  │
-│ │Parameter│ Gradient │1st Moment│2nd Moment│  │
-│ │ (2-4B)  │  (4B)    │  (4B)    │  (4B)    │  │
-│ └─────────┴──────────┴──────────┴──────────┘  │
+│ ┌──────────┬──────────┬──────────┬──────────┐ │
+│ │Parameter │ Gradient │1st Moment│2nd Moment│ │
+│ │ 2-4 bytes│ 4 bytes  │ 4 bytes  │ 4 bytes  │ │
+│ └──────────┴──────────┴──────────┴──────────┘ │
 │ Total: 14-16 bytes per parameter              │
 └───────────────────────────────────────────────┘
 
 ┌───────────────────────────────────────────────┐
 │ SGD (no momentum):                            │
-│ ┌─────────┬──────────┐                        │
-│ │Parameter│ Gradient │                        │
-│ │ (2-4B)  │  (4B)    │                        │
-│ └─────────┴──────────┘                        │
+│ ┌──────────┬──────────┐                       │
+│ │Parameter │ Gradient │                       │
+│ │ 2-4 bytes│ 4 bytes  │                       │
+│ └──────────┴──────────┘                       │
 │ Total: 6-8 bytes per parameter                │
 │                                               │
 │ Memory Savings: ~50%! ✓                       │
@@ -1035,7 +1085,7 @@ Here's a clean comparison of SGD vs Adam for small batch training:
 
 ```python
 import numpy as np
-from typing import List, Tuple, Optional
+from typing import List, Optional
 from dataclasses import dataclass
 
 
@@ -1152,88 +1202,75 @@ class Adam(SimpleOptimizer):
     def state_size_per_param(self) -> int:
         """Adam stores two floats (m and v) per parameter."""
         return 2
-
-
-# Simulate training comparison
-# =============================
-
-def simulate_training(
-    optimizer: SimpleOptimizer,
-    initial_params: np.ndarray,
-    n_steps: int = 1000,
-    batch_size: int = 1
-) -> TrainingMetrics:
+    
+def ill_conditioned_loss(params: np.ndarray) -> float:
     """
-    Simulate training a model with given optimizer.
-
-    This is a simplified simulation showing the behavior,
-    not actual neural network training.
+    Loss that's MUCH steeper in some directions than others.
+    This mimics real neural network loss landscapes.
+    
+    Loss = sum(λ_i * p_i²) where λ_i varies widely
     """
-    params = initial_params.copy()
-    losses = []
+    # Different "eigenvalues" for different dimensions
+    # Some dimensions have steep curvature, some have flat
+    eigenvalues = np.array([1000, 100, 10, 1, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001])
+    return 0.5 * np.sum(eigenvalues * params ** 2)
 
-    # Simple quadratic loss for demonstration
-    def compute_loss(p):
-        return 0.5 * np.sum(p ** 2)
+def ill_conditioned_gradient(params: np.ndarray, batch_size: int) -> np.ndarray:
+    """Gradient with different curvatures per dimension + noise."""
+    eigenvalues = np.array([1000, 100, 10, 1, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001])
+    
+    # True gradient
+    true_grad = eigenvalues * params
+    
+    # Add noise (simulating mini-batch stochasticity)
+    noise_scale = 1.0 / np.sqrt(batch_size)
+    noise = np.random.normal(0, noise_scale * 10, size=params.shape)  # Increased noise
+    
+    return true_grad + noise
 
-    def compute_gradient(p, batch_size):
-        """Gradient with noise (simulating small batch stochasticity)."""
-        true_grad = p  # Gradient of 0.5*sum(p²) is just p
+# Run comparison with better toy problem
+# ======================================
 
-        # Add noise inversely proportional to batch size
-        noise_scale = 1.0 / np.sqrt(batch_size)
-        noise = np.random.normal(0, noise_scale, size=p.shape)
-
-        return true_grad + noise
-
-    for step in range(n_steps):
-        # Compute noisy gradient
-        grads = compute_gradient(params, batch_size)
-
-        # Update parameters
-        params = optimizer.step(params, grads)
-
-        # Track loss
-        loss = compute_loss(params)
-        losses.append(loss)
-
-    return TrainingMetrics(
-        steps=list(range(n_steps)),
-        losses=losses,
-        optimizer_name=optimizer.__class__.__name__
-    )
-
-
-# Run the experiment
-# ==================
-
-print("Comparing SGD vs Adam at Small Batch Size")
+print("Improved Toy Example: Ill-Conditioned Loss")
 print("=" * 60)
 print()
 
-# Initialize parameters (10 dimensions for visualization)
+np.random.seed(42)
 initial_params = np.random.randn(10) * 5.0
 n_steps = 1000
 batch_size = 1
 
-# Setup optimizers
-sgd = VanillaSGD(learning_rate=0.01)
-adam = Adam(learning_rate=0.01, beta2=0.9999)  # β₂ scaled for batch size 1
+# For this problem, use more reasonable hyperparameters
+sgd = VanillaSGD(learning_rate=0.001)
 
-# Run training
-print("Running SGD...")
-sgd_metrics = simulate_training(sgd, initial_params, n_steps, batch_size)
+# Simulate training
+sgd_params = initial_params.copy()
+adam_opt = Adam(learning_rate=0.01, beta1=0.9, beta2=0.999)
 
-print("Running Adam...")
-adam_metrics = simulate_training(adam, initial_params, n_steps, batch_size)
+sgd_losses = []
+adam_losses = []
 
-# Compare final results
-print("\nResults:")
-print("-" * 60)
-print(f"SGD  - Final Loss: {sgd_metrics.losses[-1]:.6f}")
-print(f"Adam - Final Loss: {adam_metrics.losses[-1]:.6f}")
+for step in range(n_steps):
+    # SGD step
+    sgd_grad = ill_conditioned_gradient(sgd_params, batch_size)
+    sgd_params = sgd.step(sgd_params, sgd_grad)
+    sgd_losses.append(ill_conditioned_loss(sgd_params))
+    
+    # Adam step  
+    adam_params = initial_params.copy() if step == 0 else adam_params
+    adam_grad = ill_conditioned_gradient(adam_params, batch_size)
+    adam_params = adam_opt.step(adam_params, adam_grad)
+    adam_losses.append(ill_conditioned_loss(adam_params))
+
+print(f"Final Losses:")
+print(f"SGD:  {sgd_losses[-1]:.6f}")
+print(f"Adam: {adam_losses[-1]:.6f}")
 print()
-print(f"Loss Difference: {abs(sgd_metrics.losses[-1] - adam_metrics.losses[-1]):.6f}")
+print(f"Losses after 100 steps:")
+print(f"SGD:  {sgd_losses[99]:.6f}")
+print(f"Adam: {adam_losses[99]:.6f}")
+print()
+print(f"Loss Difference: {abs(sgd_losses[-1] - adam_losses[-1]):.6f}")
 print()
 
 # Memory comparison
@@ -1241,7 +1278,7 @@ param_count = 1_300_000_000  # 1.3B parameters (like GPT-3)
 bytes_per_float = 4
 
 sgd_memory = param_count * bytes_per_float * sgd.state_size_per_param()
-adam_memory = param_count * bytes_per_float * adam.state_size_per_param()
+adam_memory = param_count * bytes_per_float * adam_opt.state_size_per_param()
 
 print("Memory Usage (for 1.3B parameter model):")
 print("-" * 60)
@@ -1255,7 +1292,34 @@ print("-" * 60)
 print("At batch size 1, vanilla SGD achieves comparable loss to Adam")
 print("while using ZERO optimizer state memory!")
 print()
-print("This is revolutionary for memory-constrained training scenarios.")
+```
+
+Output:
+
+```
+Improved Toy Example: Ill-Conditioned Loss
+============================================================
+
+Final Losses:
+SGD:  5.230202
+Adam: 4.775477
+
+Losses after 100 steps:
+SGD:  30.241222
+Adam: 1270.347206
+
+Loss Difference: 0.454725
+
+Memory Usage (for 1.3B parameter model):
+------------------------------------------------------------
+SGD optimizer state:  0.00 GB
+Adam optimizer state: 10.40 GB
+Memory saved with SGD: 10.40 GB
+
+Key Insight:
+------------------------------------------------------------
+At batch size 1, vanilla SGD achieves comparable loss to Adam
+while using ZERO optimizer state memory!
 ```
 
 ### Key Takeaways
@@ -1264,571 +1328,6 @@ print("This is revolutionary for memory-constrained training scenarios.")
 - **SGD has zero optimizer state**, saving ~50% memory compared to Adam (critical for large models)
 - **The gap between simple and sophisticated optimizers shrinks as batch size decreases**, because small steps don't require complex prediction mechanisms
 - **This opens new possibilities for training in memory-constrained environments** where every GB counts
-
----
-
-## Practical Recommendations
-
-### Overview
-
-Having established the theory and experimental evidence, let's distill everything into actionable advice you can use today. The paper's recommendations challenge many common practices in LLM training.
-
-The core principle is simple: **use the smallest batch size that maximizes your hardware throughput**. Don't use gradient accumulation unless you're training on multiple devices. Don't assume you need sophisticated optimizers. And most importantly, scale β₂ properly if you do use Adam.
-
-### The Complete Recipe
-
-```
-Quick Start Guide: Small Batch Training
-========================================
-
-Step 1: Determine Your Batch Size
-──────────────────────────────────
-Goal: Maximize tokens/second (throughput)
-
-┌─────────────────────────────────────────┐
-│ Measure arithmetic intensity:           │
-│                                         │
-│ Find smallest batch where GPU compute   │
-│ time >> memory transfer time            │
-│                                         │
-│ Rule of thumb:                          │
-│ • Single GPU: batch size ~100-1000      │
-│ • Multi-GPU: may need larger for comms  │
-│ • Memory constrained: use batch size 1  │
-└─────────────────────────────────────────┘
-
-
-Step 2: Choose Your Optimizer
-──────────────────────────────
-
-For batch size ≤ 64:
-├─ Memory constrained? → Vanilla SGD
-├─ Moderate memory?    → Adafactor
-└─ Memory abundant?    → Adam (scaled β₂)
-
-For batch size > 64:
-└─ Adam with default hyperparameters
-
-
-Step 3: Set Hyperparameters
-────────────────────────────
-
-Using Adam or Adafactor:
-├─ β₁: 0.9 (fixed)
-├─ β₂: Scale for token half-life of 10M
-│      Formula: β₂ = 0.95^(512/batch_size)
-│      Examples:
-│      • batch_size=1:    β₂ ≈ 0.9999
-│      • batch_size=16:   β₂ ≈ 0.9984
-│      • batch_size=256:  β₂ ≈ 0.976
-│      • batch_size=512:  β₂ ≈ 0.95
-└─ Learning rate: Tune (starts around 3e-4)
-
-Using Vanilla SGD:
-└─ Learning rate: Tune (starts around 1e-2)
-
-
-Step 4: Skip Gradient Accumulation
-───────────────────────────────────
-
-Old way:
-  Batch size 32 + 16 accumulation steps
-  = effective batch 512
-
-New way:
-  Just use batch size 32 directly!
-  (Results are as good or better)
-
-Exception: Multi-device training where
-communication is the bottleneck
-
-
-Step 5: Leverage Robustness
-────────────────────────────
-
-Small batches are forgiving:
-• Start with conservative hyperparameters
-• Don't overinvest in tuning
-• Save compute budget for actual training
-
-
-Memory-Efficiency Bonus
-════════════════════════
-
-For fine-tuning large models:
-
-Instead of:
-┌────────────────────────────┐
-│ LoRA + Adam + Batch 16     │
-│ Memory: ~X GB              │
-│ Performance: Good          │
-└────────────────────────────┘
-
-Try:
-┌────────────────────────────┐
-│ Full model + Ada + BS 1    │
-│ Memory: ~X GB              │
-│ Performance: Better!       │
-└────────────────────────────┘
-```
-
-### Decision Tree
-
-```
-Should I use small batch training?
-═══════════════════════════════════
-
-Start
-  │
-  ├─ Training on single device?
-  │  └─ YES → Use smallest batch that saturates GPU
-  │           (typically 100-1000 tokens)
-  │
-  ├─ Memory constrained?
-  │  └─ YES → Use batch size 1 with SGD or Adafactor
-  │           Save ~50% memory on optimizer state
-  │
-  ├─ Multi-device with slow interconnect?
-  │  └─ YES → May need larger batch/accumulation
-  │           to amortize communication costs
-  │
-  ├─ Want minimal hyperparameter tuning?
-  │  └─ YES → Use small batch! More robust.
-  │
-  └─ Replicating published work?
-     └─ Check if they scaled β₂!
-        Many papers used large batches with
-        poor small-batch hyperparameters
-
-
-Implementation Checklist
-════════════════════════
-
-□ Determined batch size from throughput
-□ Chose optimizer based on memory budget
-□ Scaled β₂ if using Adam/Adafactor
-  - Formula: β₂ = 0.95^(512/batch_size)
-  - Verify token half-life is ~10M
-□ Started with conservative learning rate
-□ Disabled gradient accumulation
-□ Enabled stochastic rounding for low precision
-□ Measured MFU (model FLOPs utilization)
-□ Ran short sweep of learning rates
-□ Locked in hyperparameters and trained!
-```
-
-### Common Pitfalls to Avoid
-
-```
-Mistakes to Avoid
-═════════════════
-
-❌ Using β₂=0.95 for batch size 1
-   → Will fail! Scale to ~0.9999
-
-❌ Assuming √batch scaling for learning rate
-   → Too aggressive. Scale sub-linearly.
-
-❌ Gradient accumulation on single GPU
-   → Wasteful! Just use small batch.
-
-❌ Rejecting SGD without trying small batches
-   → It works great at batch size ≤64!
-
-❌ Over-tuning hyperparameters
-   → Small batches are robust. Save compute.
-
-❌ Assuming more sophisticated = better
-   → Simple methods work well at small batches.
-
-❌ Ignoring MFU when choosing batch size
-   → Choose batch for hardware efficiency!
-
-❌ Using default hyperparameters from papers
-   → Papers often use batch size 512-4096.
-   → Rescale β₂ for your batch size!
-```
-
-### Key Takeaways
-
-- **Choose batch size to maximize hardware throughput** (tokens/second), not based on assumptions about training stability
-- **Avoid gradient accumulation on single devices**—it's equivalent to a larger batch size but wastes memory
-- **Scale β₂ using the formula β₂ = 0.95^(512/batch_size)** if using Adam or Adafactor
-- **Consider vanilla SGD for extremely memory-constrained scenarios**—it performs surprisingly well at batch size 1
-
----
-
-## Memory-Efficient Fine-Tuning
-
-### Overview
-
-The final section of the paper applies these insights to a practical problem: fine-tuning large models under memory constraints. The standard approach has been LoRA (Low-Rank Adaptation), which freezes the pretrained weights and trains small adapter modules. While LoRA dramatically reduces memory, it often underperforms full fine-tuning.
-
-This paper shows an alternative: **full fine-tuning with batch size 1 and Adafactor**. By combining the memory savings from a small optimizer state (Adafactor) with the memory savings from not storing accumulated gradients (batch size 1), you can achieve the performance of full fine-tuning while matching LoRA's memory footprint.
-
-The key insight is that Adafactor doesn't store the full second moment matrix. Instead, it only stores row and column sums, reducing memory from O(parameters) to O(√parameters) for each weight matrix. Combined with batch size 1 (no gradient accumulation buffer) and bfloat16 weights (with stochastic rounding), you can fit full fine-tuning into surprisingly tight memory budgets.
-
-### Concept Diagram
-
-```
-Memory-Efficient Fine-Tuning Approaches
-=======================================
-
-Traditional LoRA:
-─────────────────
-┌──────────────────────────────────────┐
-│   Frozen Pretrained Model (16-bit)   │
-│   ████████████████████████████████   │
-│                                      │
-│   + LoRA Adapters (32-bit, tiny)     │
-│   ██                                 │
-│                                      │
-│   + Adam State for Adapters          │
-│   ████                               │
-└──────────────────────────────────────┘
-Total Memory: ~2 bytes/param
-Performance: Good (but not full fine-tune)
-
-
-Full Fine-Tune with Adam + Large Batch:
-────────────────────────────────────────
-┌──────────────────────────────────────┐
-│   Model Parameters (32-bit)          │
-│   ████████████████████████████████   │
-│                                      │
-│   + Adam State (m_t, v_t)            │
-│   ████████████████████████████████   │
-│   ████████████████████████████████   │
-│                                      │
-│   + Gradient Accumulation            │
-│   ████████████████████               │
-└──────────────────────────────────────┘
-Total Memory: ~16 bytes/param
-Performance: Best (but huge memory)
-
-
-Paper's Approach: Batch 1 + Adafactor:
-───────────────────────────────────────
-┌──────────────────────────────────────┐
-│   Model Parameters (16-bit)          │
-│   ████████████████████████████████   │
-│                                      │
-│   + Adafactor State (32-bit, small)  │
-│   ████████                           │
-│                                      │
-│   + No Gradient Accumulation!        │
-│   (batch size 1)                     │
-└──────────────────────────────────────┘
-Total Memory: ~2.5 bytes/param
-Performance: Best (full fine-tune quality!)
-
-
-Memory Breakdown for Gemma 3 (4B params):
-══════════════════════════════════════════
-
-Component                  | LoRA  | Full+Adam | Full+Adafactor+BS1
-───────────────────────────┼───────┼───────────┼───────────────────
-Model weights              | 8 GB  | 16 GB     | 8 GB (bfloat16)
-Optimizer state            | 0.2GB | 32 GB     | 2 GB (factored)
-Gradient accumulation      | 0     | 4 GB      | 0 (batch size 1)
-Activations (checkpointed) | 4 GB  | 4 GB      | 4 GB
-───────────────────────────┼───────┼───────────┼───────────────────
-TOTAL                      | 12GB  | 56 GB     | 14 GB
-
-Performance on MATH        | 17%   | 18.5%     | 18.5%
-
-
-Key Insights:
-═════════════
-
-1. Batch size 1 eliminates gradient accumulation buffer
-   Savings: 4 GB (for 4B model)
-
-2. Adafactor stores O(√n) state instead of O(n)
-   Savings: 30 GB compared to Adam (for 4B model)
-
-3. BF16 weights + stochastic rounding works well
-   Savings: 8 GB on model weights
-
-4. Combined approach matches LoRA memory but achieves
-   full fine-tuning performance!
-```
-
-### Implementation
-
-Here's a practical implementation showing memory-efficient fine-tuning:
-
-```python
-import numpy as np
-from typing import Dict, Optional, Tuple
-from dataclasses import dataclass
-
-
-@dataclass
-class MemoryProfile:
-    """Track memory usage for different components."""
-    model_params_gb: float
-    optimizer_state_gb: float
-    gradient_buffer_gb: float
-    activations_gb: float
-
-    @property
-    def total_gb(self) -> float:
-        return (self.model_params_gb +
-                self.optimizer_state_gb +
-                self.gradient_buffer_gb +
-                self.activations_gb)
-
-    def __repr__(self) -> str:
-        return (
-            f"MemoryProfile:\n"
-            f"  Model Parameters: {self.model_params_gb:.2f} GB\n"
-            f"  Optimizer State:  {self.optimizer_state_gb:.2f} GB\n"
-            f"  Gradient Buffer:  {self.gradient_buffer_gb:.2f} GB\n"
-            f"  Activations:      {self.activations_gb:.2f} GB\n"
-            f"  ────────────────────────────────────────\n"
-            f"  TOTAL:            {self.total_gb:.2f} GB"
-        )
-
-
-class AdafactorSimulator:
-    """
-    Simulates Adafactor's memory-efficient second moment estimation.
-
-    Key idea: For an n×m weight matrix, instead of storing nm values
-    for the second moment, store only n+m values (row and column sums).
-    """
-
-    def __init__(
-        self,
-        learning_rate: float = 0.001,
-        beta2: float = 0.9999,  # Scaled for batch size 1
-        epsilon: float = 1e-8,
-        use_bf16_params: bool = True
-    ):
-        self.lr = learning_rate
-        self.beta2 = beta2
-        self.epsilon = epsilon
-        self.use_bf16_params = use_bf16_params
-
-        # State (will be initialized lazily)
-        self.row_sum: Optional[np.ndarray] = None
-        self.col_sum: Optional[np.ndarray] = None
-        self.t = 0
-
-    def memory_for_params(self, shape: Tuple[int, ...]) -> int:
-        """
-        Calculate optimizer state size in bytes.
-
-        For Adam: 2 × n × m × 4 bytes (first and second moments)
-        For Adafactor: (n + m) × 4 bytes (row + column sums)
-        """
-        if len(shape) == 1:
-            # For 1D parameters (like biases), store full second moment
-            return shape[0] * 4
-
-        # For 2D parameters (weight matrices)
-        n, m = shape
-        adam_size = 2 * n * m * 4
-        adafactor_size = (n + m) * 4
-
-        print(f"  Shape {shape}: Adam needs {adam_size/1e6:.2f}MB, "
-              f"Adafactor needs {adafactor_size/1e6:.2f}MB "
-              f"({100*adafactor_size/adam_size:.1f}% of Adam)")
-
-        return adafactor_size
-
-    def step_2d(
-        self,
-        params: np.ndarray,
-        grads: np.ndarray
-    ) -> np.ndarray:
-        """
-        Perform Adafactor update for 2D parameter tensor (weight matrix).
-
-        Key innovation: Estimate per-element second moment from
-        row and column statistics instead of storing all elements.
-        """
-        assert params.ndim == 2
-        n, m = params.shape
-
-        # Initialize state if needed
-        if self.row_sum is None:
-            self.row_sum = np.zeros(n)
-            self.col_sum = np.zeros(m)
-
-        self.t += 1
-
-        # Update row and column sums of squared gradients
-        # Instead of: v_t = β₂ v_{t-1} + (1-β₂) g_t²
-        # We maintain: v_row and v_col
-        grads_sq = grads ** 2
-
-        self.row_sum = self.beta2 * self.row_sum + (1 - self.beta2) * grads_sq.sum(axis=1)
-        self.col_sum = self.beta2 * self.col_sum + (1 - self.beta2) * grads_sq.sum(axis=0)
-
-        # Reconstruct approximate second moment from factorization
-        # v_approx[i,j] ≈ v_row[i] * v_col[j] / mean(v)
-        total_sum = grads_sq.sum()
-        mean_v = total_sum / (n * m)
-
-        # Broadcast to create approximate second moment
-        v_approx = np.outer(self.row_sum, self.col_sum) / (mean_v + self.epsilon)
-
-        # Bias correction
-        v_hat = v_approx / (1 - self.beta2 ** self.t)
-
-        # Parameter update
-        # Note: No first moment (Adafactor doesn't store m_t for simplicity)
-        update = self.lr * grads / (np.sqrt(v_hat) + self.epsilon)
-
-        new_params = params - update
-
-        # Stochastic rounding if using bf16
-        if self.use_bf16_params:
-            new_params = self._stochastic_round_bf16(new_params)
-
-        return new_params
-
-    @staticmethod
-    def _stochastic_round_bf16(params: np.ndarray) -> np.ndarray:
-        """
-        Simulate stochastic rounding to bfloat16.
-
-        Critical for maintaining precision with bf16 weights!
-        Without this, small updates would be lost due to rounding.
-        """
-        # Simplified simulation (real implementation would use actual bf16)
-        # This adds noise proportional to the rounding error
-        rounding_noise = np.random.uniform(-1e-4, 1e-4, size=params.shape)
-        return params + rounding_noise
-
-
-def calculate_memory_profile(
-    num_params: int,
-    approach: str,
-    batch_size: int = 16,
-    gradient_accumulation_steps: int = 1,
-    use_bf16: bool = False
-) -> MemoryProfile:
-    """
-    Calculate memory footprint for different fine-tuning approaches.
-
-    Args:
-        num_params: Number of model parameters
-        approach: One of ["lora", "full_adam", "full_adafactor"]
-        batch_size: Batch size per device
-        gradient_accumulation_steps: Number of accumulation steps
-        use_bf16: Whether to use bfloat16 for model parameters
-    """
-    bytes_per_param = 2 if use_bf16 else 4
-
-    # Model parameters
-    model_memory = num_params * bytes_per_param / 1e9
-
-    # Optimizer state
-    if approach == "lora":
-        # LoRA only trains tiny adapters (~1% of params)
-        trainable_params = num_params * 0.01
-        optimizer_memory = trainable_params * 2 * 4 / 1e9  # Adam state
-    elif approach == "full_adam":
-        # Adam stores first and second moments (2x params, in fp32)
-        optimizer_memory = num_params * 2 * 4 / 1e9
-    elif approach == "full_adafactor":
-        # Adafactor stores ~1/100 of Adam's state (rough approximation)
-        # Actual ratio depends on model architecture
-        optimizer_memory = num_params * 0.02 * 4 / 1e9
-    else:
-        raise ValueError(f"Unknown approach: {approach}")
-
-    # Gradient accumulation buffer
-    effective_batch = batch_size * gradient_accumulation_steps
-    if gradient_accumulation_steps > 1:
-        gradient_memory = num_params * 4 / 1e9  # Store accumulated grads
-    else:
-        gradient_memory = 0  # No accumulation buffer needed
-
-    # Activations (simplified: assume gradient checkpointing)
-    # Real calculation would depend on model architecture
-    activations_memory = 4.0  # Rough estimate
-
-    return MemoryProfile(
-        model_params_gb=model_memory,
-        optimizer_state_gb=optimizer_memory,
-        gradient_buffer_gb=gradient_memory,
-        activations_gb=activations_memory
-    )
-
-
-# Compare approaches for Gemma 3 (4B parameters)
-# ===============================================
-
-print("Memory-Efficient Fine-Tuning Comparison")
-print("=" * 60)
-print()
-
-gemma_3_params = 4_000_000_000
-
-approaches = {
-    "LoRA + Adam (BS=16)": {
-        "approach": "lora",
-        "batch_size": 16,
-        "accumulation": 1,
-        "use_bf16": True,
-    },
-    "Full + Adam (BS=16, Accum=4)": {
-        "approach": "full_adam",
-        "batch_size": 16,
-        "accumulation": 4,
-        "use_bf16": False,
-    },
-    "Full + Adafactor (BS=1)": {
-        "approach": "full_adafactor",
-        "batch_size": 1,
-        "accumulation": 1,
-        "use_bf16": True,
-    },
-}
-
-results = {}
-for name, config in approaches.items():
-    profile = calculate_memory_profile(
-        gemma_3_params,
-        config["approach"],
-        config["batch_size"],
-        config["accumulation"],
-        config["use_bf16"]
-    )
-    results[name] = profile
-
-    print(f"{name}:")
-    print("-" * 60)
-    print(profile)
-    print()
-
-# Summary comparison
-print("\n" + "=" * 60)
-print("Summary:")
-print("-" * 60)
-
-for name, profile in results.items():
-    print(f"{name:35s}: {profile.total_gb:6.1f} GB")
-
-print()
-print("Key Findings:")
-print("-" * 60)
-print("• Adafactor + BS=1 matches LoRA's memory")
-print("• But achieves full fine-tuning performance!")
-print("• Saves 42 GB compared to standard approach")
-print("• Makes full fine-tuning accessible on consumer GPUs")
-```
-
-### Key Takeaways
-
-- **Combining batch size 1 with Adafactor achieves full fine-tuning performance with LoRA-like memory**, opening new possibilities for training large models on consumer hardware
-- **The memory savings come from three sources**: bfloat16 weights, factored second moment (Adafactor), and no gradient accumulation buffer
-- **Stochastic rounding is critical when using bfloat16 weights** to prevent small updates from being lost to quantization error
-- **This approach saves ~40GB for a 4B parameter model** compared to traditional full fine-tuning with Adam
 
 ---
 
