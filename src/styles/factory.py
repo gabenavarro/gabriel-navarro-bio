@@ -263,6 +263,7 @@ pre.shiki, .uk-codeblock {
     font-weight: 300 !important;
     --font-mono: 'Cascadia Mono', monospace;
     font-size: 0.75rem !important;
+    white-space: pre-wrap !important;
     background-color: #161719 !important;
     line-height: 1rem !important;
 }

@@ -1,7 +1,7 @@
 from typing import List, Optional
-from src.lib.google.bigquery import BigQueryClient
+from src.services.gcp.bigquery import BigQueryClient
 from src.models.project import Project
-from src.config import settings
+from src.config.settings import settings
 
 
 class ProjectService:
