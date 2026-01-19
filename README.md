@@ -100,23 +100,24 @@ gcloud run deploy gabriel-navarro-bio \
 
 ## 📁 Code Structure
 
+The project follows a feature-based architecture optimized for FastHTML and MonsterUI, designed to be highly maintainable and LLM-friendly.
+
 ```txt
-/src/
-├── components/
-│   ├── backgrounds/
-│   ├── buttons/
-│   ├── chips/
-│   ├── modal/
-│   ├── navigation/
-│   ├── parallax/
-│   └── svg/
-├── lib/
-│   ├── css/
-│   ├── google/
-│   └── javascript/
-├── pages/
-│   ├── cv/
-│   ├── hero/
-│   └── projects/
-└── statics.py
+src/
+├── config/             # Centralized settings and constants
+├── core/               # App factory and route registration
+├── styles/             # Consolidated CSS and theme definitions
+├── components/         # Reusable UI components
+│   ├── base/           # Icons, buttons, chips
+│   ├── layout/         # High-level page structures and navigation
+│   ├── decorative/     # Backgrounds and parallax effects
+│   └── modals/         # Functional modal components
+├── features/           # Feature-specific page logic and components
+│   ├── hero/           # Landing page landing
+│   ├── projects/       # Portfolio and blog systems
+│   └── cv/             # Resume/CV page
+├── services/           # External integrations (GCP, JS interop)
+├── models/             # Shared data structures
+└── utils/              # General helper functions
 ```
+

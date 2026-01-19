@@ -63,7 +63,7 @@ But here's the key realization: β₂ controls how many optimizer steps we avera
 
 ### Concept Diagram
 
-```
+```txt
 Traditional Thinking          This Paper's Insight
 ===================          ====================
 
@@ -116,7 +116,7 @@ The "half-life" concept fixes this by measuring timescales in tokens instead of 
 
 ### Concept Diagram
 
-```
+```txt
 Understanding Exponential Decay of Gradient Contributions
 ==========================================================
 
@@ -341,7 +341,7 @@ print("Notice how β₂ increases as batch size decreases!")
 print("This maintains constant averaging over tokens.")
 ```
 Output:
-```
+```txt
 Recommended β₂ values for token half-life = 10M:
 ==================================================
 Batch Size    1: β₂ = 0.99992902
@@ -381,7 +381,7 @@ Think of it like navigating in fog. If you can only see a few feet ahead (small 
 
 ### Concept Diagram
 
-```
+```txt
 Hyperparameter Sensitivity: Small vs Large Batches
 ==================================================
 
@@ -620,8 +620,9 @@ print("• Large batch WITH momentum: converges well (damps oscillations)")
 print("• Small batch WITHOUT momentum: converges well (small steps)")
 print("• Small batch WITH momentum: converges well (but not needed)")
 ```
+
 Output:
-```
+```txt
 Running optimization experiments...
 ============================================================
 
@@ -664,7 +665,7 @@ These rules emerged from exhaustive grid searches over hyperparameters at differ
 
 ### Concept Diagram
 
-```
+```txt
 Hyperparameter Scaling Rules
 =============================
 
@@ -924,7 +925,7 @@ for bs in [1, 4, 16, 64, 256, 512, 1024, 4096]:
 
 Output:
 
-```
+```txt
 GPT-3 Baseline (Brown et al.):
 OptimizerConfig(
   batch_size=512,
@@ -997,7 +998,7 @@ The intuition connects to our earlier discussion about prediction distance. Larg
 
 ### Concept Diagram
 
-```
+```txt
 The Return of Vanilla SGD
 =========================
 
@@ -1296,7 +1297,7 @@ print()
 
 Output:
 
-```
+```txt
 Improved Toy Example: Ill-Conditioned Loss
 ============================================================
 
