@@ -1,6 +1,7 @@
 from fasthtml.common import *
 from monsterui.all import *
 
+
 def create_app():
     """
     Creates and configures the FastHTML application.

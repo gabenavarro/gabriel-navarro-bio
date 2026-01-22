@@ -1,5 +1,10 @@
 from fasthtml.common import Style, Script, Div, H2, Span, Button
-from src.components.base.icons import COPY_ICON, linkedin_icon, github_icon, bluesky_icon
+from src.components.base.icons import (
+    COPY_ICON,
+    linkedin_icon,
+    github_icon,
+    bluesky_icon,
+)
 from src.styles import CONTACT_MODAL_CSS
 
 _js = """
@@ -12,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function openModal() { if(modalOverlay) modalOverlay.style.display = 'block'; }
     function closeModal() { if(modalOverlay) modalOverlay.style.display = 'none'; }
-    
+
     function copyEmail() {
         const email = emailText.textContent;
         navigator.clipboard.writeText(email).then(() => {
@@ -37,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 """
 
+
 def ContactModal(email: str = "gchinonavarro@gmail.com"):
     """Returns a modal for contact information."""
     return Div(
@@ -52,7 +58,12 @@ def ContactModal(email: str = "gchinonavarro@gmail.com"):
                 Div(
                     Div(
                         Span(email, cls="email-text"),
-                        Button(COPY_ICON, id="copyEmailBtn", title="Copy email", cls="copy-btn"),
+                        Button(
+                            COPY_ICON,
+                            id="copyEmailBtn",
+                            title="Copy email",
+                            cls="copy-btn",
+                        ),
                         cls="email-container",
                     ),
                     Div(

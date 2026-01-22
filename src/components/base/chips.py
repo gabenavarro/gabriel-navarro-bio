@@ -2,6 +2,7 @@ from typing import List, Tuple
 from fasthtml.common import Div, Button, Style, Script
 from src.styles import CHIPS_CSS
 
+
 def get_chip_javascript(card_selector: str):
     return (
         """
@@ -60,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 """
     )
+
 
 def filter_chips(chips: List[Tuple[str, str, str, bool]]) -> Div:
     chip_list = [

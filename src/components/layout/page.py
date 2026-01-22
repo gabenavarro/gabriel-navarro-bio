@@ -3,6 +3,7 @@ from monsterui.all import *
 from .navigation import navigation
 from src.styles import FACTORY_CSS, THEME_CSS
 
+
 def StandardPage(
     title: str, *content, extra_styles: str = "", extra_scripts=None, cls=""
 ):

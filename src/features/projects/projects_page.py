@@ -4,6 +4,7 @@ from src.components.layout.page import StandardPage
 from src.services.projects import ProjectService
 from .components import render_project_card
 
+
 def create_masonry_page(tag: str | None = None):
     """Creates the masonry layout page for blogs/projects."""
     service = ProjectService()
@@ -34,6 +35,7 @@ def create_masonry_page(tag: str | None = None):
     ]
 
     return StandardPage("Projects", *content)
+
 
 def create_blog_page(uuid: str):
     """Creates a detail page for a specific blog post."""
@@ -68,6 +70,7 @@ def create_blog_page(uuid: str):
 
     return StandardPage(project.title, *content)
 
+
 def projects_landing_page():
     """Returns the projects placeholder page."""
     return StandardPage(
@@ -82,5 +85,6 @@ def projects_landing_page():
             Div(cls="mt-12")(A("BACK TO HOME", href="/", cls="factory-btn-primary")),
         ),
     )
+
 
 PROJECTS_PAGE = projects_landing_page()

@@ -19,6 +19,7 @@ SOCIAL_BTN_CSS = """
 }
 """
 
+
 def linkedin_icon(
     href: str = "https://www.linkedin.com/in/gcnavarro/",
     color: str = "#0077B5",
@@ -54,6 +55,7 @@ def linkedin_icon(
         title="LinkedIn",
     )
 
+
 def github_icon(
     href: str = "https://github.com/gabenavarro",
     color: str = "#333",
@@ -87,6 +89,7 @@ def github_icon(
         title="GitHub",
     )
 
+
 def bluesky_icon(
     href: str = "https://bsky.app/profile/gcnavarro.bsky.social", color: str = "#1DA1F2"
 ):
@@ -116,6 +119,7 @@ def bluesky_icon(
         cls="social-btn bluesky",
         title="Bluesky",
     )
+
 
 COPY_ICON = Svg(
     Rect(x="9", y="9", width="13", height="13", rx="2", ry="2"),

@@ -1,4 +1,4 @@
-from fasthtml.common import Div, Span, Style, Script
+from fasthtml.common import Div, Style, Script
 from src.styles import BALL_BACKGROUND_CSS, TRANSITION_CSS
 
 # ==============================================================================
@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 """
 
+
 def FloatingBalls(num_balls: int = 8):
     """Returns a background with floating balls that react to mouse movement."""
     balls = [Div(cls="ball") for _ in range(num_balls)]
@@ -54,8 +55,9 @@ def FloatingBalls(num_balls: int = 8):
         Style(BALL_BACKGROUND_CSS),
         Script(_floating_balls_js),
         *balls,
-        cls="ball_background"
+        cls="ball_background",
     )
+
 
 # ==============================================================================
 # Vertical Lines Background
@@ -86,6 +88,7 @@ VERTICAL_LINES_CSS = """
 @keyframes drop { 0% { top: -20%; } 100% { top: 110%; } }
 """
 
+
 def VerticalLines():
     """Returns a background with falling vertical lines."""
     return Div(
@@ -96,9 +99,11 @@ def VerticalLines():
         cls="vertical_lines_container",
     )
 
+
 # ==============================================================================
 # Gradient Transition Background
 # ==============================================================================
+
 
 def GradientTransition():
     """Returns a background with animated gradient spheres for section transitions."""
@@ -110,5 +115,5 @@ def GradientTransition():
         Div(cls="glow-1"),
         Div(cls="glow-2"),
         Div(cls="particles-container"),
-        cls="gradient-background"
+        cls="gradient-background",
     )
