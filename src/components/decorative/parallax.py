@@ -76,6 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 """
 
+
 def DotParallax():
     """Returns an interactive dot background with parallax effects."""
     return Div(
@@ -83,6 +84,7 @@ def DotParallax():
         Script(_dot_parallax_js),
         cls="parallax-background",
     )
+
 
 # ==============================================================================
 # Sunset Parallax Effect
@@ -92,7 +94,7 @@ _sunset_parallax_js = """
 document.addEventListener('mousemove', (e) => {
     const x = (e.clientX / window.innerWidth - 0.5) * 2;
     const y = (e.clientY / window.innerHeight - 0.5) * 2;
-    
+
     document.querySelectorAll('.sun').forEach(el => el.style.transform = `translate(calc(-50% + ${-x*20}px), ${-y*10}px)`);
     document.querySelectorAll('.mountains-bg').forEach(el => el.style.transform = `translate(${-x*15}px, ${-y*5}px)`);
     document.querySelectorAll('.water').forEach(el => el.style.transform = `translate(${-x*10}px, 0)`);
@@ -100,6 +102,7 @@ document.addEventListener('mousemove', (e) => {
     document.querySelectorAll('.tree').forEach(el => el.style.transform = `translate(calc(-50% + ${-x*40}px), ${-y*20}px)`);
 });
 """
+
 
 def SunsetParallax():
     """Returns a beautiful sunset landscape with parallax effects."""
@@ -109,7 +112,11 @@ def SunsetParallax():
         Div(cls="sun"),
         Div(Div(cls="mountain-bg"), Div(cls="mountain-bg-2"), cls="mountains-bg"),
         Div(Div(cls="water-reflection"), Div(cls="sun-reflection"), cls="water"),
-        Div(Div(cls="mountain-fg-left"), Div(cls="mountain-fg-right"), cls="mountains-fg"),
+        Div(
+            Div(cls="mountain-fg-left"),
+            Div(cls="mountain-fg-right"),
+            cls="mountains-fg",
+        ),
         Div(Div(cls="tree-branch-1"), Div(cls="tree-branch-2"), cls="tree"),
-        cls="parallax-landscape"
+        cls="parallax-landscape",
     )

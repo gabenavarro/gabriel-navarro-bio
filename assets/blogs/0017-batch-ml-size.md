@@ -473,8 +473,8 @@ def loss_function(x: float, y: float) -> float:
     This mimics neural network losses that are ill-conditioned
     (much steeper in some directions than others).
 
-    Note, there's no minimum in the x direction—it's like a slope 
-    that goes down infinitely. So y = 0 is the stable equilibrium 
+    Note, there's no minimum in the x direction—it's like a slope
+    that goes down infinitely. So y = 0 is the stable equilibrium
     in the y direction. This is what we're trying to reach.
     """
     return x + 10 * y**2
@@ -690,9 +690,9 @@ Parameter: β₂ (Second Moment Decay)
 Rule: SCALE to maintain constant token half-life
 
 1.0000┐
-      │ ╲         
-0.9999├  ╲       
-      │   ╲     
+      │ ╲
+0.9999├  ╲
+      │   ╲
 0.999 ├    ╲           Token Half-Life: t₁/₂ = 10M
       │     ╲          (constant across batch sizes)
 0.99  ├      ╲
@@ -733,18 +733,18 @@ Learning Rate Growth
 0.006 │                            ..... √512 scaling
       │                       .....      predicts 22x
       │                  ....           (22 X 0.0003 = 0.0066)
-      │             ....               
+      │             ....
 0.001 │        ....                ● ● ● log(512 + 1) scaling
-      │    ...           ● ● ● ● ●       predicts ~3x  
+      │    ...           ● ● ● ● ●       predicts ~3x
       │  ..      ● ● ● ●                 (3 X 0.0003 = 0.0009)
-      │ .  ● ● ●                     
-0.0003├● ●                 
-      │ Starting point          
-      │ (batch size 1)          
+      │ .  ● ● ●
+0.0003├● ●
+      │ Starting point
+      │ (batch size 1)
       └─────────────────────────────────────→
          1                              512  Batch Size
 
-Note: 
+Note:
     Exact scaling requires tuning, but it's
     much slower than √batch_size
 
@@ -1037,11 +1037,11 @@ Performance Convergence by Batch Size
 
 Loss at    Large Batch (4096)   Small Batch (1) + β₂ @ t₁/₂
 Convergence    ↓                       ↓
-                                                    
+
    5.0 ┤   ╱ SGD (diverges)    ┤  All optimizers
        │  ╱                    │  achieve similar
    4.5 ┤ ╱                     ┤  final loss:
-       │╱   ╱── Adafactor      │             
+       │╱   ╱── Adafactor      │
    4.0 ├╮  ╱                   ├       ╱── SGD
        │╰╮╱─── Adam            │       ├── Adam
    3.8 ├─╰──── Muon            ├       ├── Adafactor
@@ -1203,12 +1203,12 @@ class Adam(SimpleOptimizer):
     def state_size_per_param(self) -> int:
         """Adam stores two floats (m and v) per parameter."""
         return 2
-    
+
 def ill_conditioned_loss(params: np.ndarray) -> float:
     """
     Loss that's MUCH steeper in some directions than others.
     This mimics real neural network loss landscapes.
-    
+
     Loss = sum(λ_i * p_i²) where λ_i varies widely
     """
     # Different "eigenvalues" for different dimensions
@@ -1219,14 +1219,14 @@ def ill_conditioned_loss(params: np.ndarray) -> float:
 def ill_conditioned_gradient(params: np.ndarray, batch_size: int) -> np.ndarray:
     """Gradient with different curvatures per dimension + noise."""
     eigenvalues = np.array([1000, 100, 10, 1, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001])
-    
+
     # True gradient
     true_grad = eigenvalues * params
-    
+
     # Add noise (simulating mini-batch stochasticity)
     noise_scale = 1.0 / np.sqrt(batch_size)
     noise = np.random.normal(0, noise_scale * 10, size=params.shape)  # Increased noise
-    
+
     return true_grad + noise
 
 # Run comparison with better toy problem
@@ -1256,8 +1256,8 @@ for step in range(n_steps):
     sgd_grad = ill_conditioned_gradient(sgd_params, batch_size)
     sgd_params = sgd.step(sgd_params, sgd_grad)
     sgd_losses.append(ill_conditioned_loss(sgd_params))
-    
-    # Adam step  
+
+    # Adam step
     adam_params = initial_params.copy() if step == 0 else adam_params
     adam_grad = ill_conditioned_gradient(adam_params, batch_size)
     adam_params = adam_opt.step(adam_params, adam_grad)

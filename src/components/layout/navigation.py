@@ -1,6 +1,7 @@
 from fasthtml.common import *
 from monsterui.all import *
 
+
 def navigation(logo: str = "GABRIEL"):
     """Returns the Factory-style navigation bar."""
     return NavBar(

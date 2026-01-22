@@ -560,7 +560,7 @@ CHIPS_CSS = """
 # ... (file is getting long, I'll create it in parts)
 
 # ==============================================================================
-# BACKGROUND/VISUAL EFFECTS (from lib/css/components.py) 
+# BACKGROUND/VISUAL EFFECTS (from lib/css/components.py)
 # ==============================================================================
 
 BALL_BACKGROUND_CSS = """

@@ -1,6 +1,7 @@
 from fasthtml.common import *
 from monsterui.all import *
 
+
 def FactoryCodeBlock(code, lang="python"):
     """Renders a code block with the Factory technical aesthetic."""
     return Div(

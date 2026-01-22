@@ -1,6 +1,7 @@
 from fasthtml.common import *
 from monsterui.all import *
 
+
 def render_project_card(idx, project):
     """Renders a project as a Factory technical card."""
     return Div(

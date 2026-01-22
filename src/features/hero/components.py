@@ -2,6 +2,7 @@ from fasthtml.common import *
 from monsterui.all import *
 from src.config import settings
 
+
 def hero_section():
     """Renders the main hero section of the landing page."""
     content = settings.HERO_CONTENT
@@ -54,9 +55,11 @@ def hero_section():
         cls="uk-section-large",
     )
 
+
 def format_text(text):
     """Simple markdown-like formatter for bold text."""
     import re
+
     parts = re.split(r"(\*\*.*?\*\*)", text)
     result = []
     for part in parts:
@@ -65,6 +68,7 @@ def format_text(text):
         else:
             result.append(part)
     return result
+
 
 def render_principle(idx, data):
     """Renders a section as a Factory technical block."""
@@ -116,6 +120,7 @@ def render_principle(idx, data):
         else None,
         style="padding: 2rem; border: 1px solid var(--color-base-900); border-radius: var(--radius-lg); background: var(--dark-base-secondary);",
     )
+
 
 def about_section():
     """Renders the about section with multiple principle blocks."""

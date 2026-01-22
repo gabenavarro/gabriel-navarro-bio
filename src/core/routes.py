@@ -3,11 +3,12 @@ from src.features.hero import HERO_PAGE
 from src.features.projects import PROJECTS_PAGE, create_masonry_page, create_blog_page
 from src.features.cv import CV_PAGE
 
+
 def register_routes(app, rt):
     """
     Registers all application routes.
     """
-    
+
     @rt("/")
     def get():
         return HERO_PAGE
