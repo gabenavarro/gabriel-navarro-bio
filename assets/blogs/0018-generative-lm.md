@@ -170,7 +170,7 @@ from typing import Callable, Any
 
 class SimpleRLM:
     """A simplified RLM that processes long documents recursively."""
-    
+
     def __init__(self, llm_call: Callable[[str], str], chunk_size: int = 5000):
         """
         Args:
@@ -179,35 +179,35 @@ class SimpleRLM:
         """
         self.llm_call = llm_call
         self.chunk_size = chunk_size
-    
+
     def process(self, prompt: str, context: str) -> str:
         """
         Process a long context recursively.
-        
+
         Args:
             prompt: The question to answer
             context: The (potentially huge) document
-        
+
         Returns:
             The final answer
         """
         # If context is small enough, process directly
         if len(context) < self.chunk_size:
             return self.llm_call(f"{prompt}\n\nContext: {context}")
-        
+
         # Otherwise, chunk and recursively process
         chunks = self._smart_chunk(context, self.chunk_size)
         sub_answers = []
-        
+
         for i, chunk in enumerate(chunks):
             # Recursive sub-query on each chunk
             sub_prompt = f"""Extract information relevant to: {prompt}
-            
+
 This is chunk {i+1} of {len(chunks)}. Only extract relevant info."""
-            
+
             sub_answer = self.llm_call(f"{sub_prompt}\n\n{chunk}")
             sub_answers.append(sub_answer)
-        
+
         # Aggregate results
         aggregation_prompt = f"""Original question: {prompt}
 
@@ -216,16 +216,16 @@ I've processed {len(chunks)} chunks. Here are the findings:
 {chr(10).join(f"Chunk {i+1}: {ans}" for i, ans in enumerate(sub_answers))}
 
 Synthesize these to answer the original question."""
-        
+
         return self.llm_call(aggregation_prompt)
-    
+
     def _smart_chunk(self, text: str, max_size: int) -> list[str]:
         """Split text at paragraph boundaries when possible."""
         paragraphs = text.split('\n\n')
         chunks = []
         current_chunk = []
         current_size = 0
-        
+
         for para in paragraphs:
             para_size = len(para)
             if current_size + para_size > max_size and current_chunk:
@@ -235,10 +235,10 @@ Synthesize these to answer the original question."""
             else:
                 current_chunk.append(para)
                 current_size += para_size
-        
+
         if current_chunk:
             chunks.append('\n\n'.join(current_chunk))
-        
+
         return chunks
 
 
@@ -277,16 +277,16 @@ The MIT team tested RLMs on four challenging benchmarks with dramatically differ
 Score (%)
      │                  S-NIAH (RLM ~95-100%)
 100% ├ ●━━●━━●━━●━━●━━●━━●━━●━━●━━●━━●━━●━━●━━●━━●━━
-     │ 
+     │
  90% ├ ○···○
      │      ╲           S-NIAH (GPT-5 ~80-90%)
- 80% │       ○···○···○···○···○···○···○···○···○···○··  
+ 80% │       ○···○···○···○···○···○···○···○···○···○··
      │
  70% │
      │                  OOLONG-Pairs (RLM ~58%)
- 60% ├ ■━━■━━■━━■━━■━━■━━■━━■━━■━━■━━■━━■━━■━━■━━■━━  
+ 60% ├ ■━━■━━■━━■━━■━━■━━■━━■━━■━━■━━■━━■━━■━━■━━■━━
      │                  OOLONG (RLM ~56.5%)
- 50% │ ▲━━▲━━▲━━▲━━▲━━▲━━▲━━▲━━▲━━▲━━▲━━▲━━▲━━▲━━▲━━     
+ 50% │ ▲━━▲━━▲━━▲━━▲━━▲━━▲━━▲━━▲━━▲━━▲━━▲━━▲━━▲━━▲━━
      │     △            OOLONG (GPT-5 ~44%)
  40% │        △···△···△···△···△···△···△···△···△
      │
@@ -296,7 +296,7 @@ Score (%)
      │
  10% │
      │                  OOLONG-Pairs (GPT-5 ~0.04%)
-  0% ├ □···□···□···□···□···□···□···□···□···□···□···□  
+  0% ├ □···□···□···□···□···□···□···□···□···□···□···□
      │
      └─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────
           8K   16K  33K  66K  131K 262K 524K  1M
@@ -304,13 +304,13 @@ Score (%)
 
 
 LEGEND:
-━━━  Solid lines = RLM 
+━━━  Solid lines = RLM
 ···  Dotted lines = Base GPT-5
 
 ● / ○  S-NIAH (Simple task)
-▲ / △  OOLONG (Medium complexity)  
+▲ / △  OOLONG (Medium complexity)
 ■ / □  OOLONG-Pairs (Highest complexity)
-  
+
 Key Insight: RLM performance stays strong as complexity increases
              while base models catastrophically degrade
 ```
@@ -450,7 +450,7 @@ For semantically complex tasks, RLMs chunk intelligently:
 
 Instead of:
   ❌ Read all 1000 → Process in one giant prompt
-  
+
 RLM does:
   ✅ Chunk into 100 groups of 10
      ↓
@@ -459,7 +459,7 @@ RLM does:
      Store results in buffer
      ↓
   Aggregate all buffers → Final answer
-  
+
   ┌──────┐  ┌──────┐  ┌──────┐     ┌──────┐
   │Chunk1│  │Chunk2│  │Chunk3│ ... │Chunk │
   │ 10Qs │  │ 10Qs │  │ 10Qs │     │100 Qs│
@@ -516,11 +516,11 @@ Task: Generate pairs of matching items from 1000 entries
 
 RLM Strategy:
   results = []  # Store in Python variable, not token space
-  
+
   for chunk in chunks:
       pairs = llm_query(f"Find matching pairs in {chunk}")
       results.extend(pairs)  # Accumulate programmatically
-  
+
   # Output can be arbitrarily long!
   return FINAL_VAR(results)  # Return the variable itself
 
@@ -540,16 +540,16 @@ This bypasses the model's output token limit entirely!
 
 ### Perfect Use Cases
 
-✅ **Multi-document research**: Synthesizing info from 100+ papers  
-✅ **Code repository analysis**: Understanding large codebases  
-✅ **Dense aggregation**: Tasks requiring processing most/all of the input  
+✅ **Multi-document research**: Synthesizing info from 100+ papers
+✅ **Code repository analysis**: Understanding large codebases
+✅ **Dense aggregation**: Tasks requiring processing most/all of the input
 ✅ **Long-horizon reasoning**: Multi-step problems needing deep context
 
 ### When to Stick with Base Models
 
-❌ **Short prompts** (<10K tokens): Base models perform slightly better  
-❌ **Simple retrieval**: Single needle-in-haystack problems  
-❌ **Speed-critical**: RLMs trade latency for capability  
+❌ **Short prompts** (<10K tokens): Base models perform slightly better
+❌ **Simple retrieval**: Single needle-in-haystack problems
+❌ **Speed-critical**: RLMs trade latency for capability
 ❌ **Fixed budgets**: High variance in cost due to trajectory length
 
 ### Cost-Benefit Trade-off
@@ -563,14 +563,14 @@ Performance
     ▲
 100%│
     │ ●━━━━━━━━━━━●━━━━━━━━━●━━━━━━━━━●  RLM (stable)
- 80%│ ○╲                                
-    │   ○╲                               
+ 80%│ ○╲
+    │   ○╲
  60%│     ○╲━━━━━━━━━━━━━━━━━━━━━━━━━━━  Base Model (degrades)
-    │       ○╲                           
- 40%│         ○╲                         
-    │           ○╲                       
- 20%│             ○╲                     
-    │               ○                    
+    │       ○╲
+ 40%│         ○╲
+    │           ○╲
+ 20%│             ○╲
+    │               ○
   0%│                X  (Base model fails - exceeds 272K limit)
     └────┬──────┬──────┬──────┬──────┬──────┬──────────►
         10K   50K   100K  272K  500K   1M    10M+  Context Size
@@ -626,7 +626,7 @@ The MIT research opens exciting directions:
 
 Current models weren't trained for this workflow. Imagine models explicitly trained to:
 - Make efficient chunking decisions
-- Minimize redundant sub-calls  
+- Minimize redundant sub-calls
 - Predict when recursion is needed
 
 ### 2. Deeper Recursion Trees
@@ -653,7 +653,7 @@ Current implementation is sequential. Parallel sub-calls could:
 
 Specialized strategies for:
 - **Legal**: Case law analysis across thousands of precedents
-- **Medical**: Literature review over entire research corpus  
+- **Medical**: Literature review over entire research corpus
 - **Code**: Repository-wide refactoring and bug detection
 
 ---
@@ -683,19 +683,19 @@ client = anthropic.Anthropic(api_key="your-key")
 
 def rlm_process(question: str, long_document: str) -> str:
     """Simple RLM-style processing."""
-    
+
     # 1. Set up the REPL environment context
     system_prompt = f"""You have access to a document with {len(long_document)} characters.
 The document is stored in a variable called 'context'.
 
 You can:
 - Write Python code to examine parts of it
-- Chunk it strategically  
+- Chunk it strategically
 - Make sub-queries on specific sections
 - Build up your answer incrementally
 
 Think step-by-step and use code to explore the document before answering."""
-    
+
     # 2. Let the model iterate with code execution
     response = client.messages.create(
         model="claude-sonnet-4-20250514",
@@ -709,7 +709,7 @@ The document is available as the 'context' variable.
 Use code to explore it and build your answer."""
         }]
     )
-    
+
     return response.content
 
 # Example:
