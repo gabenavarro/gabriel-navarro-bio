@@ -11,17 +11,20 @@ RUN apk add --no-cache --virtual .build-deps \
 
 WORKDIR /app
 
-# 2) copy & install Python reqs into a venv
-COPY assets/build/requirements.prod.txt .
+# 2) copy project metadata + source so editable install can resolve packages
+COPY pyproject.toml README.md /app/
+COPY src /app/src
+
+# 3) install Python deps into a venv via editable install
 RUN python -m venv /opt/venv \
     && /opt/venv/bin/pip install --no-cache-dir --upgrade pip \
-    && /opt/venv/bin/pip install --no-cache-dir -r requirements.prod.txt \
+    && /opt/venv/bin/pip install --no-cache-dir -e . \
     \
-    # 3) purge build deps and clean pip cache
+    # 4) purge build deps and clean pip cache
     && apk del .build-deps \
     && /opt/venv/bin/pip cache purge \
     \
-    # 4) strip out bytecode & __pycache__ dirs
+    # 5) strip out bytecode & __pycache__ dirs
     && find /opt/venv -type d -name "__pycache__" -exec rm -rf {} + \
     && find /opt/venv -name "*.py[co]" -delete
 

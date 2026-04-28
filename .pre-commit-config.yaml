@@ -23,3 +23,12 @@ repos:
       - id: detect-secrets
         name: detect-secrets (notebooks only)
         args: ['--baseline', '.secrets-nb.baseline', '--exclude-files', '^.(?!.*\.ipynb)', '--exclude-lines', '"(hash|id|image/\w+)":.*|<.*at 0x[0-9a-f]+>|object at 0x[0-9a-f]+', ]
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: pytest
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+        types: [python]

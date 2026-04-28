@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gabriel-navarro-bio"
+version = "0.1.0"
+description = "Gabriel Navarro bio webpage built with FastHTML and MonsterUI."
+requires-python = ">=3.13"
+readme = "README.md"
+authors = [
+    { name = "Gabriel Navarro" },
+]
+dependencies = [
+    # python-fasthtml < 0.13 passes on_startup/on_shutdown to Starlette, which Starlette 1.0
+    # removed (TypeError at fast_app boot). 0.13.4 routes through lifespan and works with
+    # starlette 1.0; pin the lower bound so fresh installs can't pick up the broken combo.
+    "python-fasthtml>=0.13.4",
+    "monsterui>=1.0.45",
+    "google-cloud-bigquery",
+    "google-auth",
+    "pyyaml",
+    # Reserved for upcoming Epic B/C work (form validation, slug routing, multipart uploads, async file IO).
+    "pydantic>=2",
+    "python-slugify",
+    "python-multipart",
+    "aiofiles",
+    "uvicorn",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "httpx",
+    "ruff",
+    "mypy",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+# FastHTML and MonsterUI are designed for star imports (`from fasthtml.common import *`
+# and `from monsterui.all import *`); F403/F405 would flag every component file.
+ignore = ["F403", "F405"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra -q"

@@ -22,10 +22,7 @@ def create_masonry_page(tag: str | None = None):
         H1("& MORE", cls="factory-title", style="margin-top: 0;"),
         Div(style="margin-top: 3rem;"),
         Grid(
-            *[
-                render_project_card(num_projects - i - 1, p)
-                for i, p in enumerate(projects)
-            ],
+            *[render_project_card(num_projects - i - 1, p) for i, p in enumerate(projects)],
             cols_min=1,
             cols_sm=1,
             cols_md=2,

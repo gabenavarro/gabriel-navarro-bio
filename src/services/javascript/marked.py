@@ -6,9 +6,7 @@ https://marked.js.org/
 from fasthtml.common import Link
 
 
-highlight_css = (
-    "https://cdn.jsdelivr.net/gh/PrismJS/prism@1.30.0/themes/prism-tomorrow.min.css"
-)
+highlight_css = "https://cdn.jsdelivr.net/gh/PrismJS/prism@1.30.0/themes/prism-tomorrow.min.css"
 highlight_link = Link(rel="stylesheet", href=highlight_css)
 
 

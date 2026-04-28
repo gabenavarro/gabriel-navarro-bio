@@ -7,9 +7,7 @@ def FactoryCodeBlock(code, lang="python"):
     return Div(
         # Header bar
         Div(
-            Div(
-                cls="factory-code-header-dash"
-            ),  # Simulating the dash via CSS or content
+            Div(cls="factory-code-header-dash"),  # Simulating the dash via CSS or content
             UkIcon("copy", cls="factory-code-copy", uk_tooltip="Copy to clipboard"),
             cls="factory-code-header",
         ),

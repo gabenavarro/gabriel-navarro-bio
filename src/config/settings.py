@@ -5,17 +5,31 @@ This module contains all application settings including BigQuery config,
 UI constants, color schemes, and content for the hero page.
 """
 
+import logging
 import os
+
+logger = logging.getLogger(__name__)
 
 
 class Settings:
-    """Application settings and configuration."""
+    """Application settings and configuration.
 
-    # ============================================================================
-    # Google Cloud Platform Configuration
-    # ============================================================================
-    GOOGLE_PROJECT_ID = os.getenv("GOOGLE_PROJECT_ID", "noble-office-299208")
-    BIGQUERY_TABLE = "noble-office-299208.portfolio.gn-blog"
+    Convention: env-derived settings live as instance attributes set in
+    `__init__` so they re-read the environment on each construction (useful
+    for tests). UI/content constants stay as class attributes.
+    """
+
+    def __init__(self) -> None:
+        # ============================================================================
+        # Google Cloud Platform Configuration
+        # ============================================================================
+        self.GOOGLE_PROJECT_ID = os.getenv("GOOGLE_PROJECT_ID", "noble-office-299208")
+        self.BIGQUERY_TABLE = os.getenv("BIGQUERY_TABLE", "noble-office-299208.portfolio.gn-blog")
+        logger.info(
+            "GCP project: %s, BigQuery table: %s",
+            self.GOOGLE_PROJECT_ID,
+            self.BIGQUERY_TABLE,
+        )
 
     # ============================================================================
     # Category Mapping
