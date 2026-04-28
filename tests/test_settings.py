@@ -1,18 +1,15 @@
 """Tests for src.config.settings."""
 
-import importlib
-import sys
+from src.config.settings import Settings
 
 
 def test_google_project_id_overridden_by_env_var(monkeypatch):
-    """GOOGLE_PROJECT_ID should be read from the environment when set."""
-    monkeypatch.setenv("GOOGLE_PROJECT_ID", "test-proj")
+    """Settings() reads GOOGLE_PROJECT_ID from the environment when set."""
+    monkeypatch.setenv("GOOGLE_PROJECT_ID", "test-proj-google")
+    assert Settings().GOOGLE_PROJECT_ID == "test-proj-google"
 
-    # The package __init__ shadows the submodule attribute with the singleton,
-    # so grab the module directly out of sys.modules to reload it.
-    import src.config.settings  # noqa: F401  (ensure it's in sys.modules)
-    settings_module = sys.modules["src.config.settings"]
 
-    reloaded = importlib.reload(settings_module)
-
-    assert reloaded.settings.GOOGLE_PROJECT_ID == "test-proj"
+def test_bigquery_table_overridden_by_env_var(monkeypatch):
+    """Settings() reads BIGQUERY_TABLE from the environment when set."""
+    monkeypatch.setenv("BIGQUERY_TABLE", "alt-project.alt-dataset.alt-table")
+    assert Settings().BIGQUERY_TABLE == "alt-project.alt-dataset.alt-table"

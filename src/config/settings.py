@@ -12,9 +12,14 @@ logger = logging.getLogger(__name__)
 
 
 class Settings:
-    """Application settings and configuration."""
+    """Application settings and configuration.
 
-    def __init__(self):
+    Convention: env-derived settings live as instance attributes set in
+    `__init__` so they re-read the environment on each construction (useful
+    for tests). UI/content constants stay as class attributes.
+    """
+
+    def __init__(self) -> None:
         # ============================================================================
         # Google Cloud Platform Configuration
         # ============================================================================
@@ -25,8 +30,9 @@ class Settings:
             "BIGQUERY_TABLE", "noble-office-299208.portfolio.gn-blog"
         )
         logger.info(
-            f"GCP project: {self.GOOGLE_PROJECT_ID}, "
-            f"BigQuery table: {self.BIGQUERY_TABLE}"
+            "GCP project: %s, BigQuery table: %s",
+            self.GOOGLE_PROJECT_ID,
+            self.BIGQUERY_TABLE,
         )
 
     # ============================================================================
