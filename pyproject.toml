@@ -17,6 +17,7 @@ dependencies = [
     "google-cloud-bigquery",
     "google-auth",
     "pyyaml",
+    # Reserved for upcoming Epic B/C work (form validation, slug routing, multipart uploads, async file IO).
     "pydantic>=2",
     "python-slugify",
     "python-multipart",
