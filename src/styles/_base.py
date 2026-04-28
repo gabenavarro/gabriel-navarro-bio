@@ -105,6 +105,15 @@ BASE_CSS = """
     --neutral-800: #3d3a39;
     --neutral-900: #2e2c2b;
     --neutral-1000: #1f1d1c;
+    --primary-color: #4a9cf7;
+    --secondary-color: #c70445;
+    --white: #ffffff;
+    --black: #000000;
+    --cat-omics: #0064b6;
+    --cat-ml: #c70445;
+    --cat-infra: #a48404;
+    --cat-viz: #00a405;
+    --cat-neutral: var(--color-base-700);
     color-scheme: light dark;
 }
 

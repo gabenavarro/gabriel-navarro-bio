@@ -146,6 +146,29 @@ COMPONENTS_CSS = """
     border-top: 1px solid var(--color-base-900);
 }
 
+/* Category Tags (single source of truth: --cat-* in _base.py) */
+.card-category {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.category-omics { background-color: var(--cat-omics); color: white; }
+.category-machine-learning { background-color: var(--cat-ml); color: white; }
+.category-ml { background-color: var(--cat-ml); color: white; }
+.category-infrastructure { background-color: var(--cat-infra); color: white; }
+.category-infra { background-color: var(--cat-infra); color: white; }
+.category-visualization { background-color: var(--cat-viz); color: white; }
+.category-viz { background-color: var(--cat-viz); color: white; }
+.category-neutral { background-color: var(--cat-neutral); color: white; }
+.cat-omics { background-color: var(--cat-omics); color: white; }
+.cat-ml { background-color: var(--cat-ml); color: white; }
+.cat-infra { background-color: var(--cat-infra); color: white; }
+.cat-viz { background-color: var(--cat-viz); color: white; }
+.cat-neutral { background-color: var(--cat-neutral); color: white; }
+
 /* Code Blocks */
 pre.shiki, .uk-codeblock {
     font-family: var(--font-geist-mono), monospace !important;
