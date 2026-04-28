@@ -12,8 +12,11 @@ authors = [
     { name = "Gabriel Navarro" },
 ]
 dependencies = [
-    "python-fasthtml",
-    "monsterui",
+    # python-fasthtml < 0.13 passes on_startup/on_shutdown to Starlette, which Starlette 1.0
+    # removed (TypeError at fast_app boot). 0.13.4 routes through lifespan and works with
+    # starlette 1.0; pin the lower bound so fresh installs can't pick up the broken combo.
+    "python-fasthtml>=0.13.4",
+    "monsterui>=1.0.45",
     "google-cloud-bigquery",
     "google-auth",
     "pyyaml",
