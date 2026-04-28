@@ -20,21 +20,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     grep \
     coreutils
 
-# Copy requirements first to leverage Docker cache
-COPY /assets/build/requirements.prod.txt .
+# Copy project metadata + source so editable install can resolve packages
+COPY pyproject.toml README.md /app/
+COPY src /app/src
 
-# Install dependencies into a virtual environment to isolate them
+# Install dependencies (with dev extras) into a virtual environment to isolate them
 RUN python -m venv /opt/venv && \
     /opt/venv/bin/pip install --no-cache-dir --upgrade pip && \
-    /opt/venv/bin/pip install --no-cache-dir -r requirements.prod.txt && \
-    rm requirements.prod.txt
-
-# Copy dev requirements
-COPY /assets/build/requirements.dev.txt /app/
-
-# Install dev dependencies
-RUN /opt/venv/bin/pip install --no-cache-dir -r requirements.dev.txt && \
-    rm requirements.dev.txt
+    /opt/venv/bin/pip install --no-cache-dir -e ".[dev]"
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
