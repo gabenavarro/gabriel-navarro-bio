@@ -98,6 +98,32 @@ gcloud run deploy gabriel-navarro-bio \
   --region us-central1
 ```
 
+## CLI
+
+The `src.cli` module provides operations for managing blog posts.
+
+```bash
+# Validate a markdown file's frontmatter
+python -m src.cli blog validate assets/blogs/0001-fastp.md
+
+# Submit a new post to BigQuery (dry-run prints the payload)
+python -m src.cli blog submit assets/blogs/0001-fastp.md --dry-run
+python -m src.cli blog submit assets/blogs/0001-fastp.md
+
+# Upsert an existing post (delete-then-insert by id)
+python -m src.cli blog update assets/blogs/0001-fastp.md --dry-run
+
+# Mark a post as disabled (hides from /blogs)
+python -m src.cli blog disable <uuid>
+
+# List posts
+python -m src.cli blog list           # active only
+python -m src.cli blog list --all     # include disabled
+```
+
+Requires `GOOGLE_APPLICATION_CREDENTIALS` env var pointing at a service-account JSON
+for any command that touches BigQuery (submit, update, disable, list).
+
 ## 📁 Code Structure
 
 The project follows a feature-based architecture optimized for FastHTML and MonsterUI, designed to be highly maintainable and LLM-friendly.
