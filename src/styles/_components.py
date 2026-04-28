@@ -1,0 +1,232 @@
+"""Component styles: factory utilities, buttons, labels, cards, code blocks.
+
+Visual primitives that compose into UI: titles, labels, CLI box, buttons,
+cards, and the styled code-block treatment. Card classes here back the
+`Card` primitive in `src/components/base/card.py`.
+"""
+
+COMPONENTS_CSS = """
+/* Factory Specific Utilities */
+.factory-title {
+    font-size: 4.5rem;
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.05em;
+    color: var(--color-white);
+    margin-bottom: 2rem;
+}
+
+.factory-sub {
+    font-size: 1.25rem;
+    color: var(--color-base-300);
+    max-width: 600px;
+    line-height: 1.6;
+}
+
+.factory-accent {
+    color: var(--color-accent-100);
+}
+
+.factory-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-accent-100);
+    margin-bottom: 1rem;
+}
+
+.factory-label::before {
+    content: "";
+    display: block;
+    width: 6px;
+    height: 6px;
+    background-color: var(--color-accent-100);
+    border-radius: 50%;
+}
+
+/* CLI Box */
+.cli-container {
+    background-color: var(--dark-base-secondary);
+    border: 1px solid var(--color-base-900);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    margin-top: 3rem;
+    max-width: 500px;
+}
+
+.cli-header {
+    background-color: var(--dark-base-primary);
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid var(--color-base-900);
+    display: flex;
+    gap: 1rem;
+}
+
+.cli-tab {
+    font-size: 0.75rem;
+    font-weight: 300;
+    color: var(--color-base-500);
+    cursor: pointer;
+}
+
+.cli-tab.active {
+    color: var(--color-white);
+}
+
+.cli-body {
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 0.875rem;
+}
+
+.cli-prompt {
+    color: var(--color-accent-100);
+    margin-right: 0.5rem;
+}
+
+/* Buttons */
+.factory-btn-primary {
+    background-color: var(--color-white) !important;
+    color: var(--dark-base-primary) !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: var(--radius-sm) !important;
+    text-transform: uppercase !important;
+}
+
+.factory-btn-secondary {
+    background-color: var(--color-base-900) !important;
+    color: var(--color-white) !important;
+    font-size: 0.75rem !important;
+    font-weight: 700 !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: var(--radius-sm) !important;
+    text-transform: uppercase !important;
+}
+
+/* Cards (back `src/components/base/card.py`) */
+.factory-card {
+    border: 1px solid var(--color-base-900);
+    border-radius: var(--radius-lg);
+    background: var(--dark-base-secondary);
+    transition: border-color 0.3s ease;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.factory-card-padding-sm { padding: 0.75rem; }
+.factory-card-padding-md { padding: 1.5rem; }
+.factory-card-padding-lg { padding: 2rem; }
+
+.factory-card-interactive:hover {
+    border-color: var(--color-accent-100);
+    cursor: pointer;
+}
+
+.factory-card-header {
+    margin-bottom: 1rem;
+}
+
+.factory-card-body {
+    /* default flow */
+}
+
+.factory-card-footer {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-base-900);
+}
+
+/* Code Blocks */
+pre.shiki, .uk-codeblock {
+    font-family: var(--font-geist-mono), monospace !important;
+    font-size: 0.75rem !important;
+    line-height: 1 !important;
+    background-color: #0b0c0e !important;
+    border: 1px solid var(--color-base-900) !important;
+    border-radius: 1rem !important;
+    margin: 2rem 0 !important;
+    position: relative !important;
+    padding-top: 2.5rem !important; /* Space for the simulated header */
+}
+
+.uk-codespan {
+    font-weight: 300 !important;
+    --font-mono: 'Cascadia Mono', monospace;
+    font-size: 0.75rem !important;
+    white-space: pre-wrap !important;
+    background-color: #161719 !important;
+    line-height: 1rem !important;
+}
+
+.language-python {
+    line-height: 1.25rem !important;
+    font-family: var(--font-geist-mono), monospace !important;
+}
+
+/* Header Simulation */
+pre.shiki::before, .uk-codeblock::before {
+    content: "—";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2.5rem;
+    background-color: #161719;
+    border-bottom: 1px solid var(--color-base-900);
+    padding: 0 1rem;
+    display: flex;
+    align-items: center;
+    color: var(--color-base-500);
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+    z-index: 1;
+}
+
+/* Copy Icon Simulation (Visual only if we can't inject JS easily into markdown) */
+pre.shiki::after, .uk-codeblock::after {
+    content: "❑"; /* Simple icon-like character or we can use a small image/svg if needed */
+    position: absolute;
+    top: 0.75rem;
+    right: 1rem;
+    color: var(--color-base-500);
+    font-size: 0.875rem;
+    z-index: 2;
+}
+
+.shiki code, .uk-codeblock code {
+    background-color: transparent !important;
+    padding: 1.5rem !important;
+    display: block !important;
+    font-family: var(--font-geist-mono), monospace !important;
+    font-size: 0.875rem !important;
+    line-height: 1.7 !important;
+    color: #D4D4D4 !important;
+}
+
+/* Syntax Highlighting Tweaks */
+.shiki .line {
+    display: block;
+}
+
+/* Overriding default shiki style if present in HTML */
+.shiki {
+    padding: 0 !important;
+}
+
+/* Codeblock padding background color */
+.bg-base-200 {
+    background-color: var(--background-color) !important;
+}
+"""
