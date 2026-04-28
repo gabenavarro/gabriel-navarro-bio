@@ -8,9 +8,20 @@ class ProjectService:
     def __init__(self):
         self.client = BigQueryClient(project_id=settings.GOOGLE_PROJECT_ID)
 
-    def get_all_projects(self, limit: int = 1000) -> List[Project]:
-        """Fetches all projects from BigQuery."""
-        query = f"SELECT * FROM `{settings.BIGQUERY_TABLE}` LIMIT {limit}"
+    def get_all_projects(self, limit: int = 1000, include_disabled: bool = False) -> List[Project]:
+        """Fetches all projects from BigQuery.
+
+        By default, rows where `disabled = true` are filtered out at the SQL
+        layer. Pass `include_disabled=True` for admin/preview use cases that
+        need to see hidden posts as well.
+        """
+        if include_disabled:
+            query = f"SELECT * FROM `{settings.BIGQUERY_TABLE}` LIMIT {int(limit)}"
+        else:
+            query = (
+                f"SELECT * FROM `{settings.BIGQUERY_TABLE}` "
+                f"WHERE disabled = false LIMIT {int(limit)}"
+            )
         results = self.client.query(sql=query)
 
         if isinstance(results, dict):
@@ -32,10 +43,17 @@ class ProjectService:
 
         return None
 
-    def get_projects_by_tag(self, tag: str) -> List[Project]:
-        """Fetches projects filtered by tag."""
+    def get_projects_by_tag(self, tag: str, include_disabled: bool = False) -> List[Project]:
+        """Fetches projects filtered by tag.
+
+        By default, rows where `disabled = true` are filtered out at the SQL
+        layer. Pass `include_disabled=True` to bypass the filter.
+        """
         # BigQuery array filtering
-        query = f"SELECT * FROM `{settings.BIGQUERY_TABLE}` WHERE @tag IN UNNEST(tags)"
+        where_disabled = "" if include_disabled else " AND disabled = false"
+        query = (
+            f"SELECT * FROM `{settings.BIGQUERY_TABLE}` WHERE @tag IN UNNEST(tags){where_disabled}"
+        )
         params = {"tag": tag}
         results = self.client.query(sql=query, params=params)
 

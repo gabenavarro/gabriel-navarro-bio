@@ -1,7 +1,5 @@
 """Tests for `ProjectService` (BigQuery is mocked via the `mock_bq` fixture)."""
 
-import pytest
-
 from src.models.project import Project
 from src.services.projects import ProjectService
 
@@ -34,14 +32,25 @@ def test_get_all_projects_wraps_single_row_dict_in_list(mock_bq):
     assert result[0].id == "solo"
 
 
-@pytest.mark.xfail(reason="D4 implements disabled-filter; currently expected to fail")
 def test_get_all_projects_filters_disabled_posts(mock_bq):
-    """`disabled=True` rows should be filtered out (D4 will implement)."""
-    mock_bq.query.return_value = [
+    """`disabled=True` rows should be filtered out via SQL `WHERE disabled = false`.
+
+    The mock inspects the emitted SQL and applies the same filter the real
+    BigQuery engine would, so this is an end-to-end behavioral check that the
+    service produces the right query.
+    """
+    all_rows = [
         {"id": "1", "title": "Live A", "disabled": False},
         {"id": "2", "title": "Hidden", "disabled": True},
         {"id": "3", "title": "Live B", "disabled": False},
     ]
+
+    def fake_query(sql, params=None):
+        if "disabled = false" in sql:
+            return [r for r in all_rows if not r.get("disabled", False)]
+        return all_rows
+
+    mock_bq.query.side_effect = fake_query
 
     service = ProjectService()
     result = service.get_all_projects()
@@ -50,6 +59,29 @@ def test_get_all_projects_filters_disabled_posts(mock_bq):
     assert all(not p.disabled for p in result)
     titles = {p.title for p in result}
     assert titles == {"Live A", "Live B"}
+
+
+def test_get_all_projects_with_include_disabled_returns_all(mock_bq):
+    """`include_disabled=True` should bypass the SQL filter and return everything."""
+    all_rows = [
+        {"id": "1", "title": "Live A", "disabled": False},
+        {"id": "2", "title": "Hidden", "disabled": True},
+        {"id": "3", "title": "Live B", "disabled": False},
+    ]
+
+    def fake_query(sql, params=None):
+        if "disabled = false" in sql:
+            return [r for r in all_rows if not r.get("disabled", False)]
+        return all_rows
+
+    mock_bq.query.side_effect = fake_query
+
+    service = ProjectService()
+    result = service.get_all_projects(include_disabled=True)
+
+    assert len(result) == 3
+    titles = {p.title for p in result}
+    assert titles == {"Live A", "Hidden", "Live B"}
 
 
 def test_get_project_by_id_returns_none_for_unknown_id(mock_bq):
