@@ -23,12 +23,8 @@ class Settings:
         # ============================================================================
         # Google Cloud Platform Configuration
         # ============================================================================
-        self.GOOGLE_PROJECT_ID = os.getenv(
-            "GOOGLE_PROJECT_ID", "noble-office-299208"
-        )
-        self.BIGQUERY_TABLE = os.getenv(
-            "BIGQUERY_TABLE", "noble-office-299208.portfolio.gn-blog"
-        )
+        self.GOOGLE_PROJECT_ID = os.getenv("GOOGLE_PROJECT_ID", "noble-office-299208")
+        self.BIGQUERY_TABLE = os.getenv("BIGQUERY_TABLE", "noble-office-299208.portfolio.gn-blog")
         logger.info(
             "GCP project: %s, BigQuery table: %s",
             self.GOOGLE_PROJECT_ID,

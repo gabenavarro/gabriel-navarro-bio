@@ -13,7 +13,5 @@ def mock_bq(monkeypatch):
     per-test to control what `ProjectService` sees from "BigQuery".
     """
     mock = MagicMock()
-    monkeypatch.setattr(
-        "src.services.projects.BigQueryClient", lambda *args, **kwargs: mock
-    )
+    monkeypatch.setattr("src.services.projects.BigQueryClient", lambda *args, **kwargs: mock)
     return mock

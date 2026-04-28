@@ -4,9 +4,7 @@ from .navigation import navigation
 from src.styles import FACTORY_CSS, THEME_CSS
 
 
-def StandardPage(
-    title: str, *content, extra_styles: str = "", extra_scripts=None, cls=""
-):
+def StandardPage(title: str, *content, extra_styles: str = "", extra_scripts=None, cls=""):
     """
     Standard page wrapper with navigation and Factory theme.
     """

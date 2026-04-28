@@ -20,9 +20,7 @@ def update_bq_row(data: List[Dict[str, Any]], full_table_id: str) -> None:
     Update existing BigQuery rows in `full_table_id` by matching on 'id'.
     All other fields in each dict will be overwritten where id == dict['id'].
     """
-    client = bigquery.Client.from_service_account_json(
-        os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-    )
+    client = bigquery.Client.from_service_account_json(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
 
     # sanity check
     if not all("id" in row for row in data):
@@ -70,9 +68,7 @@ def update_bq_row(data: List[Dict[str, Any]], full_table_id: str) -> None:
                 bigquery.ScalarQueryParameter("views", "INT64", row["views"]),
                 bigquery.ScalarQueryParameter("likes", "INT64", row["likes"]),
                 bigquery.ScalarQueryParameter("image", "STRING", row["image"]),
-                bigquery.ScalarQueryParameter(
-                    "description", "STRING", row["description"]
-                ),
+                bigquery.ScalarQueryParameter("description", "STRING", row["description"]),
                 bigquery.ScalarQueryParameter("type", "STRING", row["type"]),
                 bigquery.ScalarQueryParameter("id", "STRING", row["id"]),
                 bigquery.ScalarQueryParameter("disabled", "BOOL", row["disabled"]),
@@ -223,9 +219,7 @@ def main(
 
 
 parser = argparse.ArgumentParser(description="Submit a BigQuery job.")
-parser.add_argument(
-    "--markdown_file", type=str, required=True, help="Path to the Markdown file."
-)
+parser.add_argument("--markdown_file", type=str, required=True, help="Path to the Markdown file.")
 parser.add_argument(
     "--table",
     type=str,

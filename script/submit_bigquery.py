@@ -21,9 +21,7 @@ def upload_to_bq(data: Sequence[Mapping[str, Any]], full_table_id: str) -> None:
     """
     rows = [dict(row) for row in data]
 
-    client = bigquery.Client.from_service_account_json(
-        os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-    )
+    client = bigquery.Client.from_service_account_json(os.getenv("GOOGLE_APPLICATION_CREDENTIALS"))
     # Check bigquery if `id` is already present
     query = f"""
     SELECT id FROM `{full_table_id}` WHERE id IN ({",".join([f"'{row['id']}'" for row in rows])})
@@ -182,9 +180,7 @@ def main(
 
 
 parser = argparse.ArgumentParser(description="Submit a BigQuery job.")
-parser.add_argument(
-    "--markdown_file", type=str, required=True, help="Path to the Markdown file."
-)
+parser.add_argument("--markdown_file", type=str, required=True, help="Path to the Markdown file.")
 parser.add_argument(
     "--table",
     type=str,
