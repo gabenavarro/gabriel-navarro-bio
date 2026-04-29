@@ -91,25 +91,49 @@ COMPONENTS_CSS = """
     margin-right: 0.5rem;
 }
 
-/* Buttons */
+/* Buttons (back `src/components/base/buttons.py`) */
+.factory-btn {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid transparent;
+    background: transparent;
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
 .factory-btn-primary {
     background-color: var(--color-white) !important;
     color: var(--dark-base-primary) !important;
-    font-size: 0.75rem !important;
-    font-weight: 700 !important;
     padding: 0.5rem 1rem !important;
-    border-radius: var(--radius-sm) !important;
     text-transform: uppercase !important;
 }
 
-.factory-btn-secondary {
-    background-color: var(--color-base-900) !important;
-    color: var(--color-white) !important;
-    font-size: 0.75rem !important;
-    font-weight: 700 !important;
+.factory-btn-outline {
+    background-color: transparent !important;
+    color: var(--color-accent-100) !important;
+    border: 1px solid var(--color-accent-100) !important;
     padding: 0.5rem 1rem !important;
-    border-radius: var(--radius-sm) !important;
     text-transform: uppercase !important;
+}
+
+.factory-btn-outline:hover {
+    background-color: var(--color-accent-100) !important;
+    color: var(--dark-base-primary) !important;
+}
+
+.factory-btn-ghost {
+    color: var(--color-accent-100) !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+}
+
+.factory-btn-ghost:hover {
+    color: var(--color-accent-200) !important;
 }
 
 /* Cards (back `src/components/base/card.py`) */

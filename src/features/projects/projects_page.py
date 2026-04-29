@@ -1,5 +1,6 @@
 from fasthtml.common import *
 from monsterui.all import *
+from src.components.base import button_ghost, button_primary
 from src.components.layout.page import StandardPage
 from src.services.projects import ProjectService
 from .components import render_project_card
@@ -55,12 +56,7 @@ def create_blog_page(uuid: str):
             style="font-size: 1rem; color: var(--color-base-300); line-height: 1.8;",
         ),
         Div(
-            A(
-                "← RETURN TO SYSTEMS",
-                href="/projects",
-                cls="factory-accent",
-                style="font-weight: 700; font-size: 0.75rem; text-decoration: none; letter-spacing: 0.05em;",
-            ),
+            button_ghost("← RETURN TO SYSTEMS", href="/projects"),
             cls="uk-margin-large-top",
         ),
     ]
@@ -79,7 +75,7 @@ def projects_landing_page():
                 "I'm currently building something great. Check back soon for my latest work and case studies.",
                 cls="factory-sub",
             ),
-            Div(cls="mt-12")(A("BACK TO HOME", href="/", cls="factory-btn-primary")),
+            Div(cls="mt-12")(button_primary("BACK TO HOME", href="/")),
         ),
     )
 

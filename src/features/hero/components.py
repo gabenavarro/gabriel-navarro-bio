@@ -1,5 +1,6 @@
 from fasthtml.common import *
 from monsterui.all import *
+from src.components.base import button_ghost
 from src.config import settings
 
 
@@ -108,11 +109,9 @@ def render_principle(idx, data):
         ],
         # Action
         Div(
-            A(
+            button_ghost(
                 data["button"]["text"].upper() + " ↗",
                 href=data["button"]["href"],
-                cls="factory-accent",
-                style="font-weight: 700; font-size: 0.75rem; text-decoration: none; letter-spacing: 0.05em;",
             ),
             cls="uk-margin-top",
         )
