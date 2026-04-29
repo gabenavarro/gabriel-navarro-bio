@@ -173,7 +173,7 @@ COMPONENTS_CSS = """
 /* Project / blog card image + typography (used inside Card) */
 .factory-card-image {
     width: 100%;
-    height: 200px;
+    aspect-ratio: 16 / 10;
     object-fit: cover;
     border: 1px solid var(--color-base-900);
     border-radius: var(--radius-md);
