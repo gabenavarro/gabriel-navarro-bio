@@ -1,15 +1,18 @@
 from fasthtml.common import *
 from monsterui.all import *
 
+from src.config.settings import settings
+
 
 def navigation(logo: str = "GABRIEL"):
     """Returns the Factory-style navigation bar."""
     return NavBar(
         DivRAligned(
             Ul(
-                Li(A("Projects", href="/projects", cls="factory-nav-link")),
-                Li(A("Blogs", href="/blogs", cls="factory-nav-link")),
-                Li(A("CV", href="/cv", cls="factory-nav-link")),
+                *[
+                    Li(A(link["label"], href=link["href"], cls="factory-nav-link"))
+                    for link in settings.NAV_LINKS
+                ],
                 cls="uk-navbar-nav uk-visible@m",
             ),
         ),

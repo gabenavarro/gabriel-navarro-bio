@@ -32,6 +32,21 @@ class Settings:
         )
 
     # ============================================================================
+    # Navigation & Social Links
+    # ============================================================================
+    NAV_LINKS = [
+        {"label": "Projects", "href": "/projects"},
+        {"label": "Blogs", "href": "/blogs"},
+        {"label": "CV", "href": "/cv"},
+    ]
+
+    SOCIAL_LINKS = [
+        {"label": "LinkedIn", "href": "https://www.linkedin.com/in/gcnavarro/"},
+        {"label": "GitHub", "href": "https://github.com/gabenavarro"},
+        {"label": "Email", "href": "mailto:gchinonavarro@gmail.com"},
+    ]
+
+    # ============================================================================
     # Category Mapping
     # ============================================================================
     CATEGORY_MAP = {
