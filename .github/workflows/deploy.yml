@@ -1,0 +1,93 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Required for Workload Identity Federation
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  GCP_PROJECT_ID: noble-office-299208
+  GCP_REGION: us-central1
+  AR_HOST: us-central1-docker.pkg.dev
+  AR_REPO: us-central1-docker.pkg.dev/noble-office-299208/mercy-of-toren
+  IMAGE_NAME: gnbio
+  CLOUD_RUN_SERVICE: gnbio
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+          cache-dependency-path: pyproject.toml
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Ruff check
+        run: ruff check .
+
+      - name: Ruff format check
+        run: ruff format --check .
+
+      - name: Pytest
+        run: pytest -v
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute short SHA
+        id: sha
+        run: echo "short=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Authenticate to GCP via Workload Identity Federation
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.AR_HOST }} --quiet
+
+      - name: Build image
+        run: |
+          docker build \
+            -f assets/build/Dockerfile.prod \
+            -t "${AR_REPO}/${IMAGE_NAME}:prod" \
+            -t "${AR_REPO}/${IMAGE_NAME}:sha-${{ steps.sha.outputs.short }}" \
+            .
+
+      - name: Push image (both tags)
+        run: |
+          docker push "${AR_REPO}/${IMAGE_NAME}:prod"
+          docker push "${AR_REPO}/${IMAGE_NAME}:sha-${{ steps.sha.outputs.short }}"
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy "${CLOUD_RUN_SERVICE}" \
+            --image "${AR_REPO}/${IMAGE_NAME}:sha-${{ steps.sha.outputs.short }}" \
+            --region "${GCP_REGION}" \
+            --platform managed \
+            --quiet
+
+      - name: Print deployed revision URL
+        run: |
+          gcloud run services describe "${CLOUD_RUN_SERVICE}" \
+            --region "${GCP_REGION}" \
+            --format='value(status.url)'

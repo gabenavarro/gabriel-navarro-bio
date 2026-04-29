@@ -67,34 +67,42 @@ The site will be available at http://localhost:8080.
 
 
 ### 🚢 Deployment to Google Cloud Run
-Authenticate with Google Cloud:
+
+**Pushes to `main` automatically deploy to Cloud Run** via the [`Deploy to Cloud Run`](.github/workflows/deploy.yml) workflow:
+1. Run lint + tests (must pass)
+2. Build Docker image from `assets/build/Dockerfile.prod`
+3. Push to Artifact Registry tagged both `:prod` and `:sha-<short-sha>`
+4. Deploy to the `gnbio` Cloud Run service in `us-central1`
+
+The workflow authenticates to GCP via Workload Identity Federation (no long-lived JSON keys).
+
+#### Manual deploy (rollback or local testing)
+
 ```bash
+# Authenticate and configure Docker
 gcloud auth login
-```
-Configure Docker to use Google Cloud:
-```bash
-gcloud auth configure-docker
-```
+gcloud auth configure-docker us-central1-docker.pkg.dev
 
-Build and tag the image:
-```bash
-# Build the Docker image for production
-docker build -f ./assets/build/Dockerfile.prod -t gnbio:prod .
-# Tag the image for Google Container Registry
-docker tag gnbio:prod us-central1-docker.pkg.dev/noble-office-299208/mercy-of-toren/gnbio:prod
-```
+# Build and tag
+docker build -f ./assets/build/Dockerfile.prod \
+  -t us-central1-docker.pkg.dev/noble-office-299208/mercy-of-toren/gnbio:prod .
 
-Push the image to Google Container Registry:
-```bash
+# Push and deploy
 docker push us-central1-docker.pkg.dev/noble-office-299208/mercy-of-toren/gnbio:prod
+gcloud run deploy gnbio \
+  --image us-central1-docker.pkg.dev/noble-office-299208/mercy-of-toren/gnbio:prod \
+  --platform managed \
+  --region us-central1
 ```
 
-Deploy to Cloud Run:
+#### Rolling back
+
+Each automated deploy tags the image with the commit SHA. To roll back:
+
 ```bash
-gcloud run deploy gabriel-navarro-bio \
-  --image gcr.io/YOUR_PROJECT_ID/gabriel-navarro-bio \
-  --platform managed \
-  --allow-unauthenticated \
+# Pick a known-good <short-sha> from `git log` or the GH Actions run history
+gcloud run deploy gnbio \
+  --image us-central1-docker.pkg.dev/noble-office-299208/mercy-of-toren/gnbio:sha-<short-sha> \
   --region us-central1
 ```
 
