@@ -304,4 +304,52 @@ pre.shiki::after, .uk-codeblock::after {
 .bg-base-200 {
     background-color: var(--background-color) !important;
 }
+
+/* CV experience date column with SVG background + circular date pill */
+.cv-date-col {
+    position: relative;
+    min-height: 12rem;
+    overflow: hidden;
+}
+.cv-date-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.35;
+    pointer-events: none;
+    color: var(--color-accent-100);
+}
+.cv-date-bg svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+.cv-date-pill-wrap {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 12rem;
+}
+.cv-date-pill {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 999px;
+    background: var(--dark-base-primary);
+    border: 1px solid var(--color-base-700);
+    color: var(--color-white);
+    font-weight: 700;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    backdrop-filter: blur(4px);
+}
+/* Mobile: SVG becomes a fixed-height top banner; pill stays centered. */
+@media (max-width: 768px) {
+    .cv-date-col {
+        min-height: 8rem;
+        max-height: 8rem;
+    }
+    .cv-date-pill-wrap { min-height: 8rem; }
+}
 """
