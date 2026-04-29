@@ -1,5 +1,5 @@
 """Configuration package."""
 
-from .settings import settings
+from .settings import category_class, settings
 
-__all__ = ["settings"]
+__all__ = ["category_class", "settings"]

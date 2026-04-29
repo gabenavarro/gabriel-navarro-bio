@@ -32,6 +32,21 @@ class Settings:
         )
 
     # ============================================================================
+    # Navigation & Social Links
+    # ============================================================================
+    NAV_LINKS = [
+        {"label": "Projects", "href": "/projects"},
+        {"label": "Blogs", "href": "/blogs"},
+        {"label": "CV", "href": "/cv"},
+    ]
+
+    SOCIAL_LINKS = [
+        {"label": "LinkedIn", "href": "https://www.linkedin.com/in/gcnavarro/"},
+        {"label": "GitHub", "href": "https://github.com/gabenavarro"},
+        {"label": "Email", "href": "mailto:gchinonavarro@gmail.com"},
+    ]
+
+    # ============================================================================
     # Category Mapping
     # ============================================================================
     CATEGORY_MAP = {
@@ -53,20 +68,6 @@ class Settings:
         "docker": "infrastructure",
         "cloud": "infrastructure",
         "gcp": "infrastructure",
-    }
-
-    # ============================================================================
-    # Visual Theme & Colors
-    # ============================================================================
-    COLORS = {
-        "primary": "#4a9cf7",
-        "secondary": "#c70445",
-        "omics": "#0064b6",
-        "machine-learning": "#c70445",
-        "infrastructure": "#a48404",
-        "visualization": "#00a405",
-        "white": "#ffffff",
-        "black": "#000000",
     }
 
     # ============================================================================
@@ -226,3 +227,32 @@ Let's push the boundaries of research together!""",
 
 # Singleton instance
 settings = Settings()
+
+
+# ============================================================================
+# Category -> CSS class mapping
+# ============================================================================
+# Single source of truth for the actual color values lives in CSS:
+# `--cat-omics`, `--cat-ml`, `--cat-infra`, `--cat-viz`, `--cat-neutral`
+# (defined in `src/styles/_base.py`). This mapping only chooses which class
+# to apply to a given tag string.
+_CATEGORY_TAG_TO_CLASS = {
+    "omics": "cat-omics",
+    "genomics": "cat-omics",
+    "bioinformatics": "cat-omics",
+    "ml": "cat-ml",
+    "machine-learning": "cat-ml",
+    "ai": "cat-ml",
+    "infrastructure": "cat-infra",
+    "infra": "cat-infra",
+    "docker": "cat-infra",
+    "devops": "cat-infra",
+    "visualization": "cat-viz",
+    "viz": "cat-viz",
+    "ui": "cat-viz",
+}
+
+
+def category_class(tag: str) -> str:
+    """Map a tag to its CSS category class. Falls back to 'cat-neutral' for unknowns."""
+    return _CATEGORY_TAG_TO_CLASS.get(tag.lower().strip(), "cat-neutral")

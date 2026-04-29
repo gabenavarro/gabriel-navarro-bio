@@ -1,5 +1,6 @@
 from fasthtml.common import *
 from monsterui.all import *
+from src.components.base import button_ghost, button_primary
 from src.components.layout.page import StandardPage
 from src.services.projects import ProjectService
 from .components import render_project_card
@@ -17,10 +18,10 @@ def create_masonry_page(tag: str | None = None):
     num_projects = len(projects)
 
     content = [
-        Div(style="height: 3rem;"),
-        H1("BLOGS", cls="factory-title", style="margin-bottom: 0;"),
-        H1("& MORE", cls="factory-title", style="margin-top: 0;"),
-        Div(style="margin-top: 3rem;"),
+        Div(cls="page-spacer-md"),
+        H1("BLOGS", cls="factory-title factory-title-tight-bottom"),
+        H1("& MORE", cls="factory-title factory-title-tight-top"),
+        Div(cls="projects-grid-spacer"),
         Grid(
             *[render_project_card(num_projects - i - 1, p) for i, p in enumerate(projects)],
             cols_min=1,
@@ -47,20 +48,14 @@ def create_blog_page(uuid: str):
         H1(project.title.upper(), cls="factory-title"),
         P(
             f"SYSTEM / {' / '.join(project.tags).upper()}",
-            style="font-weight: 700; color: var(--color-accent-100); font-size: 0.75rem; border-bottom: 1px solid var(--color-base-900); padding-bottom: 1rem; margin-bottom: 2.5rem; letter-spacing: 0.05em;",
+            cls="blog-detail-meta",
         ),
         Div(
             render_md(project.body),
-            cls="factory-markdown-content",
-            style="font-size: 1rem; color: var(--color-base-300); line-height: 1.8;",
+            cls="factory-markdown-content blog-detail-body",
         ),
         Div(
-            A(
-                "← RETURN TO SYSTEMS",
-                href="/projects",
-                cls="factory-accent",
-                style="font-weight: 700; font-size: 0.75rem; text-decoration: none; letter-spacing: 0.05em;",
-            ),
+            button_ghost("← RETURN TO SYSTEMS", href="/projects"),
             cls="uk-margin-large-top",
         ),
     ]
@@ -79,7 +74,7 @@ def projects_landing_page():
                 "I'm currently building something great. Check back soon for my latest work and case studies.",
                 cls="factory-sub",
             ),
-            Div(cls="mt-12")(A("BACK TO HOME", href="/", cls="factory-btn-primary")),
+            Div(cls="mt-12")(button_primary("BACK TO HOME", href="/")),
         ),
     )
 

@@ -1,5 +1,6 @@
 from fasthtml.common import *
 from monsterui.all import *
+from .footer import Footer
 from .navigation import navigation
 from src.styles import FACTORY_CSS, THEME_CSS
 
@@ -36,4 +37,5 @@ def StandardPage(title: str, *content, extra_styles: str = "", extra_scripts=Non
             Section(*content, cls=cls),
             cls="uk-container-large",
         ),
+        Footer(),
     )
