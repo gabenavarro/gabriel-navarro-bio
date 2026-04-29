@@ -122,6 +122,7 @@ html, body {
     border: 0 solid;
     margin: 0;
     padding: 0;
+    width: 100%;
     border-color: var(--color-base-800);
     outline-color: var(--color-base-800);
     background-color: #000000 !important;
@@ -132,6 +133,24 @@ html, body {
     text-rendering: optimizeLegibility;
     --font-geist-sans: "Geist","Geist Fallback";
     --font-geist-mono: "Geist Mono","Geist Mono Fallback";
+}
+
+/* Lock the page to vertical-only scrolling. Without this, any element that
+ * for any reason renders even one pixel wider than the viewport (timing of
+ * scrollbar appearance, sticky-navbar measurement, BFCache restore in Edge,
+ * a stray 100vw that leaks in) makes the page horizontally scrollable, and
+ * Edge's BFCache will sometimes restore a non-zero scrollX after a
+ * trackpad-back gesture — leaving the whole layout shifted horizontally
+ * with the navbar links cut off the right edge until a hard refresh.
+ *
+ * `overflow-x: clip` is the modern equivalent of `hidden` that does NOT
+ * create a new containing block for `position: fixed/sticky` descendants —
+ * important so the sticky navbar keeps sticking. Fall back to `hidden` for
+ * the small slice of browsers without `clip` support.
+ */
+html {
+    overflow-x: hidden;
+    overflow-x: clip;
 }
 
 /* Keyboard focus rings (visible only on keyboard nav, not on click) */

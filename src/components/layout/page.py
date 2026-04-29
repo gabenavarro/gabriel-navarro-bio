@@ -2,6 +2,7 @@ from fasthtml.common import *
 from monsterui.all import *
 from .footer import Footer
 from .navigation import navigation
+from src.services.javascript.bfcache_scroll import BFCACHE_SCROLL_RESET_JS
 from src.styles import FACTORY_CSS, THEME_CSS
 
 
@@ -64,6 +65,7 @@ def StandardPage(
             ),
         ),
         Style(THEME_CSS + FACTORY_CSS + extra_styles),
+        BFCACHE_SCROLL_RESET_JS,
         *scripts,
         navigation(),
         Container(
