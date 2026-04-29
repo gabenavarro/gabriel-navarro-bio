@@ -186,4 +186,22 @@ PAGES_CSS = """
     font-weight: 700;
     font-size: 0.75rem;
 }
+
+/* Blog masonry layout (CSS column-count for true variable-height tiling) */
+.masonry-columns {
+    column-count: 3;
+    column-gap: 1.5rem;
+}
+.masonry-columns > * {
+    break-inside: avoid;
+    margin-bottom: 1.5rem;
+    display: inline-block;
+    width: 100%;
+}
+@media (max-width: 992px) {
+    .masonry-columns { column-count: 2; }
+}
+@media (max-width: 640px) {
+    .masonry-columns { column-count: 1; }
+}
 """

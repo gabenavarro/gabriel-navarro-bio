@@ -21,13 +21,9 @@ def create_masonry_page(tag: str | None = None):
         H1("BLOGS", cls="factory-title factory-title-tight-bottom"),
         H1("& MORE", cls="factory-title factory-title-tight-top"),
         Div(cls="projects-grid-spacer"),
-        Grid(
+        Div(
             *[render_project_card(num_projects - i - 1, p) for i, p in enumerate(projects)],
-            cols_min=1,
-            cols_sm=1,
-            cols_md=2,
-            cols_lg=3,
-            cls="gap-8",
+            cls="masonry-columns",
         ),
     ]
 
