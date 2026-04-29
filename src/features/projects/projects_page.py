@@ -32,6 +32,17 @@ def create_masonry_page(tag: str | None = None):
 
 def _render_blog_detail(project):
     """Render the shared blog detail body for a Project (UUID or slug lookup)."""
+    canonical_url = (
+        f"https://gabriel.navarro.bio/blogs/slug/{project.slug}"
+        if project.slug
+        else f"https://gabriel.navarro.bio/blogs/{project.id}"
+    )
+    meta = {
+        "description": project.description,
+        "image": project.image,
+        "url": canonical_url,
+        "type": "article",
+    }
     content = [
         Div("TECHNICAL OVERVIEW", cls="factory-label"),
         H1(project.title.upper(), cls="factory-title"),
@@ -49,7 +60,7 @@ def _render_blog_detail(project):
         ),
     ]
 
-    return StandardPage(project.title, *content)
+    return StandardPage(project.title, *content, meta=meta)
 
 
 def create_blog_page(uuid: str):
