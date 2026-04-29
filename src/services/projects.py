@@ -16,11 +16,13 @@ class ProjectService:
         need to see hidden posts as well.
         """
         if include_disabled:
-            query = f"SELECT * FROM `{settings.BIGQUERY_TABLE}` LIMIT {int(limit)}"
+            query = (
+                f"SELECT * FROM `{settings.BIGQUERY_TABLE}` ORDER BY date DESC LIMIT {int(limit)}"
+            )
         else:
             query = (
                 f"SELECT * FROM `{settings.BIGQUERY_TABLE}` "
-                f"WHERE disabled = false LIMIT {int(limit)}"
+                f"WHERE disabled = false ORDER BY date DESC LIMIT {int(limit)}"
             )
         results = self.client.query(sql=query)
 
@@ -52,7 +54,8 @@ class ProjectService:
         # BigQuery array filtering
         where_disabled = "" if include_disabled else " AND disabled = false"
         query = (
-            f"SELECT * FROM `{settings.BIGQUERY_TABLE}` WHERE @tag IN UNNEST(tags){where_disabled}"
+            f"SELECT * FROM `{settings.BIGQUERY_TABLE}` "
+            f"WHERE @tag IN UNNEST(tags){where_disabled} ORDER BY date DESC"
         )
         params = {"tag": tag}
         results = self.client.query(sql=query, params=params)

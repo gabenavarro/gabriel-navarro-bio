@@ -14,7 +14,6 @@ def create_masonry_page(tag: str | None = None):
     else:
         projects = service.get_all_projects()
 
-    projects = projects[::-1]
     num_projects = len(projects)
 
     content = [
