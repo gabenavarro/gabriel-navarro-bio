@@ -26,4 +26,5 @@ def navigation(logo: str = "GABRIEL"):
         ),
         sticky=True,
         cls="factory-nav",
+        aria_label="Primary navigation",
     )
