@@ -173,7 +173,7 @@ COMPONENTS_CSS = """
 /* Project / blog card image + typography (used inside Card) */
 .factory-card-image {
     width: 100%;
-    height: 200px;
+    aspect-ratio: 16 / 10;
     object-fit: cover;
     border: 1px solid var(--color-base-900);
     border-radius: var(--radius-md);
@@ -191,6 +191,7 @@ COMPONENTS_CSS = """
     margin-bottom: 0.5rem;
 }
 
+/* Full-text description; intentionally NO line-clamp/truncation so masonry can vary card heights. */
 .factory-card-description {
     font-size: 0.875rem;
     color: var(--color-base-400);

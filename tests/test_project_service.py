@@ -92,3 +92,22 @@ def test_get_project_by_id_returns_none_for_unknown_id(mock_bq):
     result = service.get_project_by_id("does-not-exist")
 
     assert result is None
+
+
+def test_get_all_projects_orders_by_date_desc_in_sql(mock_bq):
+    """SQL emitted by get_all_projects includes ORDER BY date DESC."""
+    mock_bq.query.return_value = []
+    ProjectService().get_all_projects()
+    # Inspect what was passed to mock_bq.query
+    call = mock_bq.query.call_args
+    sql = call.kwargs.get("sql") or call.args[0]
+    assert "order by date desc" in sql.lower()
+
+
+def test_get_projects_by_tag_orders_by_date_desc_in_sql(mock_bq):
+    """get_projects_by_tag also emits ORDER BY date DESC."""
+    mock_bq.query.return_value = []
+    ProjectService().get_projects_by_tag("genomics")
+    call = mock_bq.query.call_args
+    sql = call.kwargs.get("sql") or call.args[0]
+    assert "order by date desc" in sql.lower()
