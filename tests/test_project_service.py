@@ -111,3 +111,59 @@ def test_get_projects_by_tag_orders_by_date_desc_in_sql(mock_bq):
     call = mock_bq.query.call_args
     sql = call.kwargs.get("sql") or call.args[0]
     assert "order by date desc" in sql.lower()
+
+
+def test_from_dict_computes_slug_from_title_when_missing(mock_bq):
+    """Project.from_dict computes slug from title if BQ row lacks slug."""
+    p = Project.from_dict(
+        {
+            "id": "x",
+            "title": "Speeding Up FASTQ Preprocessing with FastP",
+            "description": "",
+            "image": "",
+            "tags": [],
+            "disabled": False,
+            "views": 0,
+            "likes": 0,
+            "date": "2025-01-01T00:00:00Z",
+            "body": "",
+        }
+    )
+    assert p.slug == "speeding-up-fastq-preprocessing-with-fastp"
+
+
+def test_get_project_by_slug_returns_matching_project(mock_bq):
+    """get_project_by_slug scans all projects and returns the match (or None)."""
+    mock_bq.query.return_value = [
+        {
+            "id": "1",
+            "title": "Hello World",
+            "description": "",
+            "image": "",
+            "tags": [],
+            "disabled": False,
+            "views": 0,
+            "likes": 0,
+            "date": "2025-01-01T00:00:00Z",
+            "body": "",
+            "slug": "",
+        },
+        {
+            "id": "2",
+            "title": "Another Post",
+            "description": "",
+            "image": "",
+            "tags": [],
+            "disabled": False,
+            "views": 0,
+            "likes": 0,
+            "date": "2025-01-01T00:00:00Z",
+            "body": "",
+            "slug": "",
+        },
+    ]
+    service = ProjectService()
+    found = service.get_project_by_slug("hello-world")
+    assert found is not None
+    assert found.id == "1"
+    assert service.get_project_by_slug("does-not-exist") is None

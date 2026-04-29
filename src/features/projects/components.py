@@ -22,9 +22,11 @@ def render_project_card(idx, project):
     body.append(H3(project.title.upper(), cls="factory-card-title"))
     body.append(P(project.description, cls="factory-card-description"))
 
+    href = f"/blogs/slug/{project.slug}" if project.slug else f"/blogs/{project.id}"
+
     return Card(
         *body,
-        href=f"/blogs/{project.id}",
+        href=href,
         interactive=True,
         padding="md",
     )

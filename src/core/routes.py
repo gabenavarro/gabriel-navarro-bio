@@ -1,6 +1,11 @@
 from fasthtml.common import *
 from src.features.hero import HERO_PAGE
-from src.features.projects import PROJECTS_PAGE, create_masonry_page, create_blog_page
+from src.features.projects import (
+    PROJECTS_PAGE,
+    create_blog_page,
+    create_blog_page_by_slug,
+    create_masonry_page,
+)
 from src.features.cv import CV_PAGE
 
 
@@ -20,6 +25,10 @@ def register_routes(app, rt):
     @rt("/blogs")
     def blogs(tag: str = None):
         return create_masonry_page(tag)
+
+    @rt("/blogs/slug/{slug}")
+    def get_blog_by_slug(slug: str):
+        return create_blog_page_by_slug(slug)
 
     @rt("/blogs/{blog_id}")
     def get_blog(blog_id: str):

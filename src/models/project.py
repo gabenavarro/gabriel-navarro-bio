@@ -1,6 +1,8 @@
 from dataclasses import dataclass, field
 from typing import List
 
+from slugify import slugify
+
 
 @dataclass
 class ProjectTag:
@@ -20,6 +22,7 @@ class Project:
     likes: int = 0
     date: str = ""
     body: str = ""
+    slug: str = ""
 
     @classmethod
     def from_dict(cls, data: dict) -> "Project":
@@ -33,10 +36,19 @@ class Project:
                 elif isinstance(tag, str):
                     tags.append(tag)
 
+        title = data.get("title", "")
+
+        # Slug always exists Python-side. BigQuery's gn-blog table doesn't have a
+        # slug column yet — until the one-time ALTER TABLE + backfill runs, this
+        # fallback derives a slug from the title so URL routing works either way.
+        slug = data.get("slug") or ""
+        if not slug and title:
+            slug = slugify(title)
+
         return cls(
             id=data.get("id", ""),
             blog_id=data.get("blog_id", ""),
-            title=data.get("title", ""),
+            title=title,
             description=data.get("description", ""),
             image=data.get("image", ""),
             tags=tags,
@@ -45,4 +57,5 @@ class Project:
             likes=data.get("likes", 0),
             date=data.get("date", ""),
             body=data.get("body", ""),
+            slug=slug,
         )
