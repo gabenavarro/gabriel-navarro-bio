@@ -36,7 +36,12 @@ def Footer():
                     )
                     for link in settings.SOCIAL_LINKS
                 ],
-                cls="factory-footer-col factory-footer-row",
+                # NOTE: was `factory-footer-col factory-footer-row` — both classes
+                # set `display: flex` but col forces `flex-direction: column`,
+                # which won the cascade and stacked the social links vertically.
+                # Drop the col class so the row's default horizontal layout wins.
+                cls="factory-footer-row",
+                aria_label="Social links",
             ),
             cls="factory-footer-row",
         ),

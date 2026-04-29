@@ -27,3 +27,17 @@ def test_footer_contains_current_year_copyright():
     """Footer shows the current year in the copyright line."""
     html = to_xml(Footer())
     assert f"© {datetime.now().year}" in html
+
+
+def test_social_links_container_does_not_combine_col_and_row_classes():
+    """The social-links container must not carry both factory-footer-col and
+    factory-footer-row.
+
+    Both classes set `display: flex`, but col forces `flex-direction: column`
+    which won the cascade and stacked the social links into a vertical
+    column at the right edge of the footer. The row class alone (with its
+    default horizontal direction) is what we want.
+    """
+    html = to_xml(Footer())
+    assert 'cls="factory-footer-col factory-footer-row"' not in html
+    assert "factory-footer-col factory-footer-row" not in html

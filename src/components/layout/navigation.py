@@ -5,23 +5,25 @@ from src.config.settings import settings
 
 
 def navigation(logo: str = "GABRIEL"):
-    """Returns the Factory-style navigation bar."""
+    """Returns the Factory-style navigation bar.
+
+    Passes nav links as positional `A(...)` items per MonsterUI's documented
+    `NavBar(*c, brand=...)` API. The previous `Ul(Li(A(...)), cls="uk-navbar-nav")`
+    pattern was an old UIkit-3 idiom that FrankenUI 2 (MonsterUI's underlying
+    CSS framework) dropped: the `.uk-navbar-nav` class is a no-op there, so
+    Tailwind's preflight reset left the UL as `display: block`, stacking the
+    links into a 61px-wide vertical column at the right edge of the viewport.
+    """
     return NavBar(
-        DivRAligned(
-            Ul(
-                *[
-                    Li(A(link["label"], href=link["href"], cls="factory-nav-link"))
-                    for link in settings.NAV_LINKS
-                ],
-                cls="uk-navbar-nav uk-visible@m",
-            ),
-        ),
+        *[
+            A(link["label"], href=link["href"], cls="factory-nav-link")
+            for link in settings.NAV_LINKS
+        ],
         brand=DivLAligned(
             A(
                 logo,
                 href="/",
-                cls="uk-navbar-item uk-logo",
-                style="font-family: 'Geist', sans-serif; font-weight: 900; letter-spacing: -0.05em; color: #FFFFFF;",
+                cls="uk-navbar-item uk-logo factory-brand",
             ),
         ),
         sticky=True,
