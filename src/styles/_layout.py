@@ -8,12 +8,14 @@ LAYOUT_CSS = """
 /* Navigation */
 .factory-nav {
     background-color: transparent !important;
-    padding: 1.5rem 0;
+    padding: 1.5rem 2rem !important;
 }
 
-.factory-nav {
-    padding-right: 2rem !important;
-    padding-left: 2rem !important;
+.factory-brand {
+    font-family: 'Geist', sans-serif;
+    font-weight: 900;
+    letter-spacing: -0.05em;
+    color: var(--color-white) !important;
 }
 
 .factory-nav-link {
