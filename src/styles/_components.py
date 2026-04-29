@@ -327,10 +327,11 @@ pre.shiki::after, .uk-codeblock::after {
     position: relative;
     z-index: 1;
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     height: 100%;
     min-height: 12rem;
+    padding-top: 0.25rem;
 }
 .cv-date-pill {
     display: inline-block;
@@ -350,6 +351,10 @@ pre.shiki::after, .uk-codeblock::after {
         min-height: 8rem;
         max-height: 8rem;
     }
-    .cv-date-pill-wrap { min-height: 8rem; }
+    .cv-date-pill-wrap {
+        min-height: 8rem;
+        align-items: center;
+        padding-top: 0;
+    }
 }
 """

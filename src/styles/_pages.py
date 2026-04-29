@@ -162,6 +162,19 @@ PAGES_CSS = """
     font-size: 0.75rem;
     text-decoration: none;
     letter-spacing: 0.05em;
+    margin-top: auto;
+}
+/* Patent cards stretch to equal grid-row height and use a flex column so */
+/* the VIEW PATENT link can be pushed to the bottom (margin-top: auto). */
+.cv-patent-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+.cv-patent-card .factory-card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 /* CV publication entry (borderless; uses bottom border separator). */

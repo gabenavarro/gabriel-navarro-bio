@@ -217,6 +217,7 @@ def cv_patents():
                     P(p["authors"], cls="cv-patent-authors"),
                     A("VIEW PATENT →", href=p["link"], cls="cv-patent-link"),
                     padding="md",
+                    cls="cv-patent-card",
                 )
                 for p in patents
             ],
