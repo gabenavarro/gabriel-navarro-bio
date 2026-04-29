@@ -1,6 +1,6 @@
 from fasthtml.common import *
 from monsterui.all import *
-from src.components.base import button_ghost
+from src.components.base import Card, button_ghost
 from src.config import settings
 
 
@@ -9,7 +9,7 @@ def hero_section():
     content = settings.HERO_CONTENT
 
     return Section(
-        Div(style="height: 3rem;"),
+        Div(cls="page-spacer-md"),
         Grid(
             # Typography
             Div(
@@ -28,19 +28,7 @@ def hero_section():
                     Img(
                         src=content["portrait_url"],
                         alt="Gabriel Navarro",
-                        cls="factory-portrait",
-                        style="""
-                        width: 100%;
-                        max-width: 400px;
-                        height: auto;
-                        filter: grayscale(100%);
-                        transition: all 0.5s ease;
-                        display: block;
-                        margin: 0 auto;
-                        object-fit: contain;
-                    """,
-                        onmouseover="this.style.filter='grayscale(0%)'; this.style.borderColor='var(--color-accent-100)'",
-                        onmouseout="this.style.filter='grayscale(100%)'; this.style.borderColor='var(--color-base-900)'",
+                        cls="factory-portrait hero-portrait-img",
                     ),
                     cls="uk-flex uk-flex-center uk-flex-middle",
                 ),
@@ -52,7 +40,7 @@ def hero_section():
             cols_md=2,
             cls="uk-grid-large uk-flex-middle",
         ),
-        Div(style="height: 3rem;"),
+        Div(cls="page-spacer-md"),
         cls="uk-section-large",
     )
 
@@ -73,52 +61,41 @@ def format_text(text):
 
 def render_principle(idx, data):
     """Renders a section as a Factory technical block."""
-    return Div(
-        # Label with number
+    children = [
         Div(f"{idx + 1:02d} / {data['title'].upper()}", cls="factory-label"),
-        # Items/Content
-        *[
+    ]
+
+    for item in data.get("items", []):
+        children.append(
             Div(
-                P(
-                    item["subtitle"].upper(),
-                    style="font-weight: 700; font-size: 0.875rem; color: var(--color-white); margin-bottom: 0.5rem;",
-                ),
-                P(
-                    *format_text(item["text"]),
-                    style="font-size: 0.875rem; color: var(--color-base-400); margin-top: 0; margin-bottom: 1.5rem; line-height: 1.6;",
-                ),
+                P(item["subtitle"].upper(), cls="principle-item-title"),
+                P(*format_text(item["text"]), cls="principle-item-body"),
             )
-            for item in data.get("items", [])
-        ],
-        # Subsections (nested)
-        *[
+        )
+
+    for sub in data.get("subsections", []):
+        children.append(
             Div(
-                P(
-                    sub["title"].upper(),
-                    style="font-weight: 700; font-size: 0.75rem; color: var(--color-base-500); border-bottom: 1px solid var(--color-base-900); padding-bottom: 0.5rem; margin-bottom: 1rem; letter-spacing: 0.05em;",
-                ),
+                P(sub["title"].upper(), cls="principle-subsection-title"),
                 *[
-                    P(
-                        *format_text(item["text"]),
-                        style="font-size: 0.875rem; color: var(--color-base-400); margin-bottom: 1rem; line-height: 1.6;",
-                    )
+                    P(*format_text(item["text"]), cls="principle-subsection-body")
                     for item in sub.get("items", [])
                 ],
             )
-            for sub in data.get("subsections", [])
-        ],
-        # Action
-        Div(
-            button_ghost(
-                data["button"]["text"].upper() + " ↗",
-                href=data["button"]["href"],
-            ),
-            cls="uk-margin-top",
         )
-        if "button" in data
-        else None,
-        style="padding: 2rem; border: 1px solid var(--color-base-900); border-radius: var(--radius-lg); background: var(--dark-base-secondary);",
-    )
+
+    if "button" in data:
+        children.append(
+            Div(
+                button_ghost(
+                    data["button"]["text"].upper() + " ↗",
+                    href=data["button"]["href"],
+                ),
+                cls="uk-margin-top",
+            )
+        )
+
+    return Card(*children, padding="lg")
 
 
 def about_section():

@@ -170,6 +170,33 @@ COMPONENTS_CSS = """
     border-top: 1px solid var(--color-base-900);
 }
 
+/* Project / blog card image + typography (used inside Card) */
+.factory-card-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border: 1px solid var(--color-base-900);
+    border-radius: var(--radius-md);
+    margin-bottom: 1rem;
+    filter: grayscale(100%);
+    transition: filter 0.3s ease;
+}
+.factory-card-image:hover { filter: grayscale(0%); }
+
+.factory-card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-white);
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+}
+
+.factory-card-description {
+    font-size: 0.875rem;
+    color: var(--color-base-400);
+    line-height: 1.6;
+}
+
 /* Category Tags (single source of truth: --cat-* in _base.py) */
 .card-category {
     display: inline-block;

@@ -1,11 +1,12 @@
 from fasthtml.common import *
 from monsterui.all import *
+from src.components.base import Card
 
 
 def cv_section_header(title):
     return Div(
         Div(title.upper(), cls="factory-label"),
-        style="margin-top: 4rem; margin-bottom: 2rem;",
+        cls="cv-section-header",
     )
 
 
@@ -66,38 +67,24 @@ def cv_experience():
     return Section(
         cv_section_header("Work Experience"),
         *[
-            Div(
+            Card(
                 Grid(cols=12)(
                     Div(
-                        P(
-                            exp["period"],
-                            style="font-weight: 700; color: var(--color-base-500); font-size: 0.875rem;",
-                        ),
+                        P(exp["period"], cls="cv-period"),
                         cls="col-span-12 md:col-span-3",
                     ),
                     Div(
-                        H3(
-                            exp["title"].upper(),
-                            style="margin-top: 0; color: var(--color-white); font-weight: 700; font-size: 1.125rem;",
-                        ),
-                        P(
-                            exp["company"].upper(),
-                            style="font-weight: 700; color: var(--color-accent-100); font-size: 0.75rem; margin-bottom: 1rem;",
-                        ),
+                        H3(exp["title"].upper(), cls="cv-role-title"),
+                        P(exp["company"].upper(), cls="cv-company"),
                         Ul(
-                            *[
-                                Li(
-                                    b,
-                                    style="color: var(--color-base-400); font-size: 0.875rem; margin-bottom: 0.5rem;",
-                                )
-                                for b in exp["bullets"]
-                            ],
-                            style="margin-top: 1rem; list-style-type: none; padding-left: 0;",
+                            *[Li(b, cls="cv-bullet") for b in exp["bullets"]],
+                            cls="cv-bullets",
                         ),
                         cls="col-span-12 md:col-span-9",
                     ),
                 ),
-                style="margin-bottom: 3rem; padding: 2rem; border: 1px solid var(--color-base-900); border-radius: var(--radius-lg); background: var(--dark-base-secondary);",
+                padding="lg",
+                cls="cv-experience-card",
             )
             for exp in experiences
         ],
@@ -125,28 +112,20 @@ def cv_education():
     return Section(
         cv_section_header("Education"),
         *[
-            Div(
+            Card(
                 Grid(cols=12)(
                     Div(
-                        P(
-                            e["period"],
-                            style="font-weight: 700; color: var(--color-base-500); font-size: 0.875rem;",
-                        ),
+                        P(e["period"], cls="cv-period"),
                         cls="col-span-12 md:col-span-3",
                     ),
                     Div(
-                        H3(
-                            e["degree"].upper(),
-                            style="margin-top: 0; color: var(--color-white); font-weight: 700; font-size: 1.125rem;",
-                        ),
-                        P(
-                            e["school"].upper(),
-                            style="font-weight: 700; color: var(--color-accent-100); font-size: 0.75rem;",
-                        ),
+                        H3(e["degree"].upper(), cls="cv-role-title"),
+                        P(e["school"].upper(), cls="cv-company-tight"),
                         cls="col-span-12 md:col-span-9",
                     ),
                 ),
-                style="margin-bottom: 2rem; padding: 2rem; border: 1px solid var(--color-base-900); border-radius: var(--radius-lg); background: var(--dark-base-secondary);",
+                padding="lg",
+                cls="cv-education-card",
             )
             for e in edu
         ],
@@ -179,22 +158,13 @@ def cv_skills():
         cv_section_header("Skills"),
         Grid(
             *[
-                Div(
-                    H3(
-                        cat.upper(),
-                        style="font-weight: 700; font-size: 0.875rem; color: var(--color-white); margin-bottom: 1rem; border-bottom: 1px solid var(--color-base-900); padding-bottom: 0.5rem;",
-                    ),
+                Card(
+                    H3(cat.upper(), cls="cv-skill-category-title"),
                     Ul(
-                        *[
-                            Li(
-                                s,
-                                style="color: var(--color-base-400); font-size: 0.875rem; margin-bottom: 0.5rem;",
-                            )
-                            for s in items
-                        ],
-                        style="list-style-type: none; padding-left: 0;",
+                        *[Li(s, cls="cv-skill-item") for s in items],
+                        cls="cv-skill-list",
                     ),
-                    style="padding: 1.5rem; border: 1px solid var(--color-base-900); border-radius: var(--radius-lg); background: var(--dark-base-secondary);",
+                    padding="md",
                 )
                 for cat, items in skills.items()
             ],
@@ -236,25 +206,12 @@ def cv_patents():
         cv_section_header("Patents"),
         Grid(
             *[
-                Div(
-                    P(
-                        p["year"],
-                        style="font-weight: 700; color: var(--color-base-500); font-size: 0.875rem; margin-bottom: 0.5rem;",
-                    ),
-                    H3(
-                        p["title"].upper(),
-                        style="margin-top: 0; color: var(--color-white); font-weight: 700; font-size: 1rem; line-height: 1.4;",
-                    ),
-                    P(
-                        p["authors"],
-                        style="color: var(--color-base-400); font-size: 0.75rem; margin-bottom: 1rem;",
-                    ),
-                    A(
-                        "VIEW PATENT →",
-                        href=p["link"],
-                        style="color: var(--color-accent-100); font-weight: 700; font-size: 0.75rem; text-decoration: none; letter-spacing: 0.05em;",
-                    ),
-                    style="padding: 1.5rem; border: 1px solid var(--color-base-900); border-radius: var(--radius-lg); background: var(--dark-base-secondary);",
+                Card(
+                    P(p["year"], cls="cv-period-tight"),
+                    H3(p["title"].upper(), cls="cv-patent-title"),
+                    P(p["authors"], cls="cv-patent-authors"),
+                    A("VIEW PATENT →", href=p["link"], cls="cv-patent-link"),
+                    padding="md",
                 )
                 for p in patents
             ],
@@ -353,19 +310,10 @@ def cv_publications():
         Grid(
             *[
                 Div(
-                    H3(
-                        p["title"].upper(),
-                        style="margin-top: 0; color: var(--color-white); font-weight: 700; font-size: 1rem; line-height: 1.4;",
-                    ),
-                    P(
-                        p["authors"],
-                        style="color: var(--color-base-400); font-size: 0.875rem; margin-bottom: 0.5rem;",
-                    ),
-                    P(
-                        p["info"],
-                        style="color: var(--color-accent-100); font-weight: 700; font-size: 0.75rem;",
-                    ),
-                    style="padding: 1.5rem; border-bottom: 1px solid var(--color-base-900);",
+                    H3(p["title"].upper(), cls="cv-publication-title"),
+                    P(p["authors"], cls="cv-publication-authors"),
+                    P(p["info"], cls="cv-publication-info"),
+                    cls="cv-publication-entry",
                 )
                 for p in pubs
             ],
