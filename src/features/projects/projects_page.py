@@ -30,14 +30,19 @@ def create_masonry_page(tag: str | None = None):
     return StandardPage("Projects", *content)
 
 
-def create_blog_page(uuid: str):
-    """Creates a detail page for a specific blog post."""
-    service = ProjectService()
-    project = service.get_project_by_id(uuid)
-
-    if not project:
-        return StandardPage("Not Found", H1("PROJECT NOT FOUND", cls="factory-title"))
-
+def _render_blog_detail(project):
+    """Render the shared blog detail body for a Project (UUID or slug lookup)."""
+    canonical_url = (
+        f"https://gabriel.navarro.bio/blogs/slug/{project.slug}"
+        if project.slug
+        else f"https://gabriel.navarro.bio/blogs/{project.id}"
+    )
+    meta = {
+        "description": project.description,
+        "image": project.image,
+        "url": canonical_url,
+        "type": "article",
+    }
     content = [
         Div("TECHNICAL OVERVIEW", cls="factory-label"),
         H1(project.title.upper(), cls="factory-title"),
@@ -55,7 +60,29 @@ def create_blog_page(uuid: str):
         ),
     ]
 
-    return StandardPage(project.title, *content)
+    return StandardPage(project.title, *content, meta=meta)
+
+
+def create_blog_page(uuid: str):
+    """Creates a detail page for a specific blog post (looked up by UUID)."""
+    service = ProjectService()
+    project = service.get_project_by_id(uuid)
+
+    if not project:
+        return StandardPage("Not Found", H1("PROJECT NOT FOUND", cls="factory-title"))
+
+    return _render_blog_detail(project)
+
+
+def create_blog_page_by_slug(slug: str):
+    """Render a blog detail page looked up by slug."""
+    service = ProjectService()
+    project = service.get_project_by_slug(slug)
+
+    if not project:
+        return StandardPage("Not Found", H1("PROJECT NOT FOUND", cls="factory-title"))
+
+    return _render_blog_detail(project)
 
 
 def projects_landing_page():

@@ -1,6 +1,7 @@
 from fasthtml.common import *
 from monsterui.all import *
 from src.components.base import Card
+from .diagrams import diagram_for
 
 
 def cv_section_header(title):
@@ -70,8 +71,12 @@ def cv_experience():
             Card(
                 Grid(cols=12)(
                     Div(
-                        P(exp["period"], cls="cv-period"),
-                        cls="col-span-12 md:col-span-3",
+                        Div(diagram_for(exp["company"]), cls="cv-date-bg"),
+                        Div(
+                            P(exp["period"], cls="cv-date-pill"),
+                            cls="cv-date-pill-wrap",
+                        ),
+                        cls="col-span-12 md:col-span-3 cv-date-col",
                     ),
                     Div(
                         H3(exp["title"].upper(), cls="cv-role-title"),

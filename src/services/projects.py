@@ -45,6 +45,19 @@ class ProjectService:
 
         return None
 
+    def get_project_by_slug(self, slug: str) -> Optional[Project]:
+        """Look up a project by its slug. Client-side scan over all projects.
+
+        BigQuery's gn-blog table does not yet have a slug column. Until the one-time
+        ALTER TABLE + backfill runs, slugs only exist Python-side via from_dict's
+        fallback to slugify(title). For ~20 posts a client-side scan is trivially
+        fast; for >100 we'd want a SQL WHERE slug = @slug instead.
+        """
+        for project in self.get_all_projects(limit=1000, include_disabled=False):
+            if project.slug == slug:
+                return project
+        return None
+
     def get_projects_by_tag(self, tag: str, include_disabled: bool = False) -> List[Project]:
         """Fetches projects filtered by tag.
 

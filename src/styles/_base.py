@@ -133,4 +133,12 @@ html, body {
     --font-geist-sans: "Geist","Geist Fallback";
     --font-geist-mono: "Geist Mono","Geist Mono Fallback";
 }
+
+/* Keyboard focus rings (visible only on keyboard nav, not on click) */
+*:focus { outline: none; }
+*:focus-visible {
+    outline: 2px solid var(--color-accent-100);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+}
 """

@@ -49,6 +49,7 @@ def Footer():
                     for link in settings.NAV_LINKS
                 ],
                 cls="factory-footer-row",
+                aria_label="Footer navigation",
             ),
             cls="factory-footer-row",
         ),
