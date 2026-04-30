@@ -172,3 +172,62 @@ def test_lint_does_not_mangle_fenced_code_blocks():
     real_block_end = fixed.index("</svg>", real_block_start)
     real_block = fixed[real_block_start:real_block_end]
     assert "\n\n" not in real_block
+
+
+def test_lint_is_idempotent():
+    """Running lint twice on the same input produces the same output as once."""
+    src = (
+        '<svg viewBox="0 0 100 100"\n'
+        '     xmlns="..."\n'
+        '     role="img">\n'
+        '  <title>t &mdash; subtitle</title>\n'
+        '\n'
+        '  <text>x &times; y</text>\n'
+        '</svg>'
+    )
+    once, _ = lint_body(src)
+    twice, fixes_second = lint_body(once)
+    assert once == twice
+    assert fixes_second == []  # second pass is a no-op
+
+
+def test_lint_does_not_mangle_indented_widget_svg():
+    """SVG indented as a child of <div class="ptb-state"> is left alone by the
+    blank-line rule; the surrounding <div> already prevents mistletoe from
+    breaking the SVG, so the lint shouldn't touch the indentation.
+
+    The strip_blank_lines_in_svg rule operates inside <svg>...</svg> regardless
+    of indentation, which is fine because indented SVGs typically don't have
+    blank lines inside in the first place. This test guards against any future
+    rule that might be too aggressive about indentation.
+    """
+    src = (
+        '<div class="ptb-state" id="s1">\n'
+        '    <svg viewBox="0 0 100 100" xmlns="..." role="img">\n'
+        '      <title>indented</title>\n'
+        '      <text>x</text>\n'
+        '    </svg>\n'
+        '</div>'
+    )
+    fixed, fixes = lint_body(src)
+    # No changes expected — this SVG is already lint-clean.
+    assert fixed == src
+    assert fixes == []
+
+
+def test_lint_canary_against_real_post_0022():
+    """Regression guard: lint reduces 0022 to a state with no internal SVG blanks.
+
+    This is the post that originally exhibited all three bug classes. We don't
+    assert byte-equality (that would be brittle if the post is edited); we
+    assert that after lint, the body has no <svg> block with a blank line in it.
+    """
+    from pathlib import Path
+    src = Path("assets/blogs/0022-spike-sparse-sink-anatomy-massive.md").read_text(encoding="utf-8")
+    fixed, _ = lint_body(src)
+    # Find every <svg>...</svg> and check no blank line inside.
+    import re
+    for m in re.finditer(r"<svg\b[^>]*>.*?</svg>", fixed, re.DOTALL):
+        block = m.group(0)
+        for line in block.split("\n"):
+            assert line.strip() != "", f"Blank line found inside SVG block: {block[:120]!r}..."
