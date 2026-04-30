@@ -84,3 +84,51 @@ def test_lint_collapses_only_svg_tag_not_other_multi_line_tags():
     fixed, _ = lint_body(src)
     # The multi-line <text> should be unchanged; the <svg> open is already on one line.
     assert "<text x=\"10\" y=\"20\"\n        font-size=\"13\">" in fixed
+
+
+def test_lint_strips_blank_lines_inside_svg():
+    src = (
+        '<svg>\n'
+        '  <title>t</title>\n'
+        '\n'
+        '  <text>line a</text>\n'
+        '\n'
+        '  <text>line b</text>\n'
+        '</svg>'
+    )
+    fixed, fixes = lint_body(src)
+    inside = fixed[fixed.index("<svg>"):fixed.index("</svg>")]
+    assert "\n\n" not in inside
+    assert "<text>line a</text>" in fixed and "<text>line b</text>" in fixed
+    assert any(f.kind == "blank-line-in-svg" for f in fixes)
+
+
+def test_lint_preserves_blank_lines_outside_svg():
+    src = (
+        "Paragraph one.\n"
+        "\n"
+        "Paragraph two.\n"
+        "\n"
+        '<svg>\n'
+        '  <title>t</title>\n'
+        '\n'
+        '  <text>x</text>\n'
+        '</svg>\n'
+        "\n"
+        "Paragraph three.\n"
+    )
+    fixed, _ = lint_body(src)
+    assert "Paragraph one.\n\nParagraph two." in fixed
+    assert "</svg>\n\nParagraph three." in fixed
+
+
+def test_lint_preserves_indentation_in_svg():
+    src = (
+        '<svg>\n'
+        '  <title>t</title>\n'
+        '\n'
+        '  <text>indented body</text>\n'
+        '</svg>'
+    )
+    fixed, _ = lint_body(src)
+    assert "  <text>indented body</text>" in fixed

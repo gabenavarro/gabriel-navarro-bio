@@ -112,6 +112,34 @@ def _collapse_svg_open_tags(body: str) -> tuple[str, int]:
     return _SVG_OPEN_PATTERN.sub(_sub, body), count
 
 
+_SVG_BLOCK_PATTERN = re.compile(r"<svg\b[^>]*>.*?</svg>", re.DOTALL)
+
+
+def _strip_blank_lines_in_svg(body: str) -> tuple[str, int]:
+    """Strip blank lines inside `<svg>...</svg>` blocks.
+
+    Mistletoe terminates HTML blocks at blank lines, which fragments inline
+    SVG content. This strips internal blank lines (lines whose only content
+    is whitespace) without touching prose blank lines outside SVGs.
+
+    Returns (transformed_body, count_of_blank_lines_stripped).
+    """
+    total_stripped = 0
+
+    def _sub(match: re.Match[str]) -> str:
+        nonlocal total_stripped
+        block = match.group(0)
+        kept = []
+        for line in block.split("\n"):
+            if line.strip() == "":
+                total_stripped += 1
+                continue
+            kept.append(line)
+        return "\n".join(kept)
+
+    return _SVG_BLOCK_PATTERN.sub(_sub, body), total_stripped
+
+
 def lint_body(body: str) -> tuple[str, list[LintFix]]:
     """Apply all three lint rules to `body`, returning the fixed text + list of fixes.
 
@@ -132,5 +160,12 @@ def lint_body(body: str) -> tuple[str, list[LintFix]]:
             kind="multi-line-svg-open",
             count=n,
             detail=f"collapsed {n} multi-line <svg ...> opening tag(s) to single line",
+        ))
+    body, n = _strip_blank_lines_in_svg(body)
+    if n:
+        fixes.append(LintFix(
+            kind="blank-line-in-svg",
+            count=n,
+            detail=f"stripped {n} blank line(s) inside <svg>...</svg> blocks",
         ))
     return body, fixes
