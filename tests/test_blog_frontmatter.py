@@ -109,3 +109,61 @@ def test_empty_body_raises(tmp_path):
     )
     with pytest.raises(ValidationError):
         parse_blog(md)
+
+
+def test_blog_row_validates_minimal_payload():
+    """BlogRow accepts a complete payload (markdown + html) with no errors."""
+    from datetime import datetime, timezone
+    from src.services.blog_frontmatter import BlogRow
+    row = BlogRow(
+        id="00000000-0000-0000-0000-000000000000",
+        title="Test",
+        date=datetime(2026, 1, 1, tzinfo=timezone.utc),
+        tags=["test"],
+        description="d",
+        image="https://example.com/img.svg",
+        type="note",
+        disabled=False,
+        views=0,
+        likes=0,
+        body="# md",
+        body_html="<h1>md</h1>",
+    )
+    assert row.body_html == "<h1>md</h1>"
+
+
+def test_blog_row_rejects_empty_body_html():
+    from datetime import datetime, timezone
+    from pydantic import ValidationError
+    from src.services.blog_frontmatter import BlogRow
+    with pytest.raises(ValidationError, match="body_html"):
+        BlogRow(
+            id="x",
+            title="t",
+            date=datetime(2026, 1, 1, tzinfo=timezone.utc),
+            tags=[],
+            description="d",
+            image="https://e.com/i.svg",
+            type="note",
+            disabled=False,
+            views=0,
+            likes=0,
+            body="md",
+            body_html="   ",  # whitespace only — invalid
+        )
+
+
+def test_blog_row_extra_fields_forbidden():
+    from datetime import datetime, timezone
+    from pydantic import ValidationError
+    from src.services.blog_frontmatter import BlogRow
+    with pytest.raises(ValidationError):
+        BlogRow(
+            id="x", title="t",
+            date=datetime(2026, 1, 1, tzinfo=timezone.utc),
+            tags=[], description="d",
+            image="https://e.com/i.svg",
+            type="note", disabled=False, views=0, likes=0,
+            body="md", body_html="<h1/>",
+            unexpected="boom",
+        )
