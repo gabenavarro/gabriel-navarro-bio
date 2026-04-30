@@ -1,6 +1,6 @@
 """Tests for src.services.blog_render."""
 from src.services.blog_render import render_to_html
-from src.services.blog_render import ValidationIssue, validate_html  # noqa: F401
+from src.services.blog_render import ValidationIssue, validate_html
 
 
 def test_render_passes_simple_markdown_to_html():
@@ -43,6 +43,7 @@ def test_validate_catches_p_wrapping_svg():
     bad = '<p><svg></svg></p>'
     issues = validate_html(bad)
     assert any(i.kind == "p-wraps-svg" for i in issues)
+    assert all(isinstance(i, ValidationIssue) for i in issues)
 
 
 def test_validate_catches_p_wrapping_text():
