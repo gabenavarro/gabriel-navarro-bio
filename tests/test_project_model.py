@@ -42,3 +42,29 @@ def test_from_dict_falls_back_to_defaults_for_missing_fields():
     assert project.likes == 0
     assert project.date == ""
     assert project.body == ""
+
+
+def test_project_from_dict_reads_body_html():
+    data = {
+        "id": "x",
+        "title": "T",
+        "description": "d",
+        "image": "https://e.com/i.svg",
+        "tags": ["t"],
+        "disabled": False,
+        "views": 0,
+        "likes": 0,
+        "date": "2026-01-01T00:00:00Z",
+        "body": "# md",
+        "body_html": "<h1>md</h1>",
+    }
+    p = Project.from_dict(data)
+    assert p.body_html == "<h1>md</h1>"
+    assert p.body == "# md"  # transitional: both fields populated
+
+
+def test_project_from_dict_defaults_body_html_to_empty_string():
+    """A row that doesn't have body_html (legacy/transitional) yields an empty string."""
+    data = {"id": "x", "title": "T", "description": "d", "image": "i", "body": "md"}
+    p = Project.from_dict(data)
+    assert p.body_html == ""

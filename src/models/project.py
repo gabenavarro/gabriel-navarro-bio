@@ -22,6 +22,7 @@ class Project:
     likes: int = 0
     date: str = ""
     body: str = ""
+    body_html: str = ""
     slug: str = ""
 
     @classmethod
@@ -57,5 +58,6 @@ class Project:
             likes=data.get("likes", 0),
             date=data.get("date", ""),
             body=data.get("body", ""),
+            body_html=data.get("body_html", ""),
             slug=slug,
         )
