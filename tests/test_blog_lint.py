@@ -132,3 +132,43 @@ def test_lint_preserves_indentation_in_svg():
     )
     fixed, _ = lint_body(src)
     assert "  <text>indented body</text>" in fixed
+
+
+def test_lint_does_not_mangle_fenced_code_blocks():
+    src = (
+        "Here's the template:\n"
+        "\n"
+        "```svg\n"
+        '<svg viewBox="0 0 100 100"\n'
+        '     xmlns="..."\n'
+        '     role="img">\n'
+        "\n"
+        "  <text>example</text>\n"
+        "</svg>\n"
+        "```\n"
+        "\n"
+        "And here's a real one:\n"
+        "\n"
+        '<svg viewBox="0 0 200 200" xmlns="..." role="img">\n'
+        '  <title>real</title>\n'
+        "\n"
+        "  <text>real text</text>\n"
+        "</svg>\n"
+    )
+    fixed, fixes = lint_body(src)
+    # The CODE BLOCK content must be preserved verbatim — multi-line open and blanks stay.
+    assert (
+        '```svg\n'
+        '<svg viewBox="0 0 100 100"\n'
+        '     xmlns="..."\n'
+        '     role="img">\n'
+        "\n"
+        "  <text>example</text>\n"
+        "</svg>\n"
+        "```"
+    ) in fixed
+    # The REAL <svg> outside the code block IS linted (no internal blank line).
+    real_block_start = fixed.index('<svg viewBox="0 0 200 200"')
+    real_block_end = fixed.index("</svg>", real_block_start)
+    real_block = fixed[real_block_start:real_block_end]
+    assert "\n\n" not in real_block

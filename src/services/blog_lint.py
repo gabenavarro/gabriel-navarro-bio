@@ -140,12 +140,43 @@ def _strip_blank_lines_in_svg(body: str) -> tuple[str, int]:
     return _SVG_BLOCK_PATTERN.sub(_sub, body), total_stripped
 
 
+_FENCED_CODE_PATTERN = re.compile(r"(^|\n)(```[^\n]*\n.*?\n```)(?=\n|$)", re.DOTALL)
+
+
+def _stash_fenced_code(body: str) -> tuple[str, list[str]]:
+    """Replace each fenced code block with a unique placeholder; return placeholder list.
+
+    The placeholder is a sentinel that won't match any lint regex, so the rest
+    of the pipeline ignores code-block content. Caller restores via _restore_fenced_code.
+    """
+    stash: list[str] = []
+
+    def _sub(match: re.Match[str]) -> str:
+        prefix, block = match.group(1), match.group(2)
+        idx = len(stash)
+        stash.append(block)
+        return f"{prefix}__BLOG_LINT_STASH_{idx}__"
+
+    return _FENCED_CODE_PATTERN.sub(_sub, body), stash
+
+
+def _restore_fenced_code(body: str, stash: list[str]) -> str:
+    for idx, block in enumerate(stash):
+        body = body.replace(f"__BLOG_LINT_STASH_{idx}__", block)
+    return body
+
+
 def lint_body(body: str) -> tuple[str, list[LintFix]]:
     """Apply all three lint rules to `body`, returning the fixed text + list of fixes.
 
     The transforms are idempotent: running `lint_body` twice on the same input
     produces the same output as running it once.
+
+    Fenced code blocks (``` ... ```) are stashed before the transforms run and
+    restored afterward, so example SVG inside code fences is not mangled by
+    the lint rules.
     """
+    body, stash = _stash_fenced_code(body)
     fixes: list[LintFix] = []
     body, n = _replace_named_entities(body)
     if n:
@@ -168,4 +199,5 @@ def lint_body(body: str) -> tuple[str, list[LintFix]]:
             count=n,
             detail=f"stripped {n} blank line(s) inside <svg>...</svg> blocks",
         ))
+    body = _restore_fenced_code(body, stash)
     return body, fixes
