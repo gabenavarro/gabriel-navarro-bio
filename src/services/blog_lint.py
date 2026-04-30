@@ -15,6 +15,7 @@ full reasoning.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from typing import Literal
 
@@ -34,10 +35,71 @@ class LintFix:
     detail: str
 
 
+# Map of HTML named entities to their Unicode literals. The five XML-predefined
+# entities (amp/lt/gt/apos/quot) are intentionally absent — they're valid in
+# both XML and HTML and do not need substitution.
+ENTITY_MAP: dict[str, str] = {
+    "mdash": "—", "ndash": "–",
+    "middot": "·", "bull": "•",
+    "times": "×", "divide": "÷",
+    "plusmn": "±", "minus": "−",
+    "rarr": "→", "larr": "←",
+    "uarr": "↑", "darr": "↓", "harr": "↔",
+    "hellip": "…",
+    "asymp": "≈", "ne": "≠",
+    "ge": "≥", "le": "≤",
+    "deg": "°",
+    "radic": "√", "infin": "∞",
+    "alpha": "α", "beta": "β", "gamma": "γ", "delta": "δ",
+    "epsilon": "ε", "theta": "θ", "lambda": "λ", "mu": "μ",
+    "pi": "π", "sigma": "σ", "phi": "φ", "omega": "ω",
+    "Sigma": "Σ", "Delta": "Δ", "Omega": "Ω",
+    "sum": "∑", "prod": "∏",
+    "nbsp": " ",
+    "copy": "©", "reg": "®", "trade": "™",
+}
+
+_XML_SAFE_ENTITIES = frozenset({"amp", "lt", "gt", "apos", "quot"})
+_ENTITY_PATTERN = re.compile(r"&([a-zA-Z][a-zA-Z0-9]*);")
+
+
+def _replace_named_entities(body: str) -> tuple[str, int]:
+    """Replace every HTML named entity with its Unicode literal.
+
+    Returns (transformed_body, count_of_replacements). Raises LintError if
+    an entity is encountered that has no mapping in ENTITY_MAP and is not
+    one of the five XML-safe entities.
+    """
+    count = 0
+
+    def _sub(match: re.Match[str]) -> str:
+        nonlocal count
+        name = match.group(1)
+        if name in _XML_SAFE_ENTITIES:
+            return match.group(0)
+        if name in ENTITY_MAP:
+            count += 1
+            return ENTITY_MAP[name]
+        raise LintError(
+            f"Unmapped named entity '&{name};'. "
+            f"Add a mapping to ENTITY_MAP in src/services/blog_lint.py and re-run."
+        )
+
+    return _ENTITY_PATTERN.sub(_sub, body), count
+
+
 def lint_body(body: str) -> tuple[str, list[LintFix]]:
     """Apply all three lint rules to `body`, returning the fixed text + list of fixes.
 
     The transforms are idempotent: running `lint_body` twice on the same input
     produces the same output as running it once.
     """
-    return body, []
+    fixes: list[LintFix] = []
+    body, n = _replace_named_entities(body)
+    if n:
+        fixes.append(LintFix(
+            kind="named-entity",
+            count=n,
+            detail=f"replaced {n} HTML named entit{'y' if n == 1 else 'ies'} with Unicode literals",
+        ))
+    return body, fixes

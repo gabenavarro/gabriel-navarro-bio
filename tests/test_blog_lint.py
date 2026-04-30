@@ -21,3 +21,32 @@ def test_lint_body_returns_tuple_of_text_and_fixes():
     fixed, fixes = lint_body(text)
     assert fixed == text
     assert fixes == []
+
+
+def test_lint_replaces_mdash_with_unicode():
+    src = "<svg><text>A &mdash; B</text></svg>"
+    fixed, fixes = lint_body(src)
+    assert "&mdash;" not in fixed
+    assert "—" in fixed
+    assert any(f.kind == "named-entity" and f.count == 1 for f in fixes)
+
+
+def test_lint_replaces_multiple_named_entities():
+    src = "<svg><text>x &times; y &rarr; z</text></svg>"
+    fixed, _ = lint_body(src)
+    assert "&times;" not in fixed
+    assert "&rarr;" not in fixed
+    assert "×" in fixed and "→" in fixed
+
+
+def test_lint_preserves_xml_safe_entities():
+    src = "<svg><text>x &lt; y &amp; z &gt; w</text></svg>"
+    fixed, fixes = lint_body(src)
+    assert fixed == src
+    assert fixes == []
+
+
+def test_lint_raises_on_unmapped_entity():
+    src = "<svg><text>nonsense &zzznotreal;</text></svg>"
+    with pytest.raises(LintError, match="zzznotreal"):
+        lint_body(src)
