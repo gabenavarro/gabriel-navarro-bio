@@ -154,11 +154,40 @@ def _bq_client():  # pragma: no cover - thin wrapper around external SDK
 
 
 def _cmd_validate(args: argparse.Namespace) -> int:
+    """Read-only check: parse, run lint preview, render, validate.
+
+    Does NOT write to disk and does NOT submit to BigQuery. Use this from
+    pre-commit or CI to catch issues before `submit`.
+    """
     try:
         blog = parse_blog(args.path)
-    except Exception as exc:  # noqa: BLE001 - CLI surface, want any failure to be reported.
+    except Exception as exc:  # noqa: BLE001
         print(f"INVALID: {exc}", file=sys.stderr)
         return 1
+
+    # Lint preview — report what `submit` would auto-fix, but don't write.
+    try:
+        _, fixes = lint_body(blog.body)
+    except LintError as exc:
+        print(f"INVALID (lint): {exc}", file=sys.stderr)
+        return 1
+    for f in fixes:
+        print(f"[lint preview] would {f.kind}: {f.detail}")
+
+    # Render + validate against the LINTED body, since that's what submit would push.
+    fixed_body, _ = lint_body(blog.body)
+    try:
+        html = render_to_html(fixed_body)
+    except RenderError as exc:
+        print(f"INVALID (render): {exc}", file=sys.stderr)
+        return 1
+
+    issues = validate_html(html)
+    if issues:
+        for i in issues:
+            print(f"[error] {i.kind} (line {i.line}): {i.snippet[:120]}", file=sys.stderr)
+        return 1
+
     print(f"OK: {blog.title}")
     return 0
 

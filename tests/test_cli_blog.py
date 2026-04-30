@@ -113,3 +113,58 @@ def test_payload_from_blog_raises_on_validation_failure(tmp_path):
     )
     with pytest.raises(ValueError, match="validate_html"):
         _payload_from_blog(md)
+
+
+def test_validate_reports_lint_issues_without_writing(tmp_path, capsys):
+    """`blog validate` reports lint issues but does NOT write the file."""
+    from src.cli.__main__ import main
+    md = tmp_path / "post.md"
+    raw = (
+        "@{id = \"00000000-0000-0000-0000-000000000000\"\n"
+        "  title = \"T\"\n"
+        "  date = \"2026-01-01T00:00:00Z\"\n"
+        "  tags = [\"x\"]\n"
+        "  views = 0\n"
+        "  likes = 0\n"
+        "  image = \"https://e.com/i.svg\"\n"
+        "  description = \"d\"\n"
+        "  type = \"note\"\n"
+        "  disabled = false\n"
+        "}\n"
+        "# B\n"
+        '<svg viewBox="0 0 1 1" xmlns="..." role="img">\n'
+        "  <title>x &mdash; y</title>\n"
+        "</svg>\n"
+    )
+    md.write_text(raw, encoding="utf-8")
+    rc = main(["blog", "validate", str(md)])
+    assert rc == 0
+    after = md.read_text(encoding="utf-8")
+    # File must be unchanged.
+    assert after == raw
+    captured = capsys.readouterr()
+    # Validate should report what lint WOULD do.
+    assert "lint" in captured.out.lower() or "would" in captured.out.lower()
+
+
+def test_validate_exits_nonzero_on_validation_issue(tmp_path):
+    """`blog validate` exits nonzero when validate_html finds an issue."""
+    from src.cli.__main__ import main
+    md = tmp_path / "post.md"
+    md.write_text(
+        "@{id = \"00000000-0000-0000-0000-000000000000\"\n"
+        "  title = \"T\"\n"
+        "  date = \"2026-01-01T00:00:00Z\"\n"
+        "  tags = [\"x\"]\n"
+        "  views = 0\n"
+        "  likes = 0\n"
+        "  image = \"https://e.com/i.svg\"\n"
+        "  description = \"d\"\n"
+        "  type = \"note\"\n"
+        "  disabled = false\n"
+        "}\n"
+        "# B\n<svg viewBox=\"0 0 1 1\"><text>missing title and role</text></svg>\n",
+        encoding="utf-8",
+    )
+    rc = main(["blog", "validate", str(md)])
+    assert rc == 1
