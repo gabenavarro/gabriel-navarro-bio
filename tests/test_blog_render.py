@@ -1,5 +1,6 @@
 """Tests for src.services.blog_render."""
 from src.services.blog_render import render_to_html
+from src.services.blog_render import ValidationIssue, validate_html  # noqa: F401
 
 
 def test_render_passes_simple_markdown_to_html():
@@ -31,3 +32,53 @@ def test_render_preserves_inline_svg_when_clean():
     # The diagnostic for the bug we're fixing — must NOT appear:
     assert "<p><svg" not in html
     assert "<p><text" not in html
+
+
+def test_validate_returns_empty_for_clean_html():
+    html = '<svg viewBox="0 0 1 1" role="img"><title>t</title></svg>'
+    assert validate_html(html) == []
+
+
+def test_validate_catches_p_wrapping_svg():
+    bad = '<p><svg></svg></p>'
+    issues = validate_html(bad)
+    assert any(i.kind == "p-wraps-svg" for i in issues)
+
+
+def test_validate_catches_p_wrapping_text():
+    bad = '<svg role="img"><title>t</title></svg>\n<p><text x="0">stray</text></p>'
+    issues = validate_html(bad)
+    assert any(i.kind == "p-wraps-svg" for i in issues)
+
+
+def test_validate_catches_svg_tag_mismatch():
+    bad = '<svg role="img"><title>t</title>'  # missing </svg>
+    issues = validate_html(bad)
+    assert any(i.kind == "svg-tag-mismatch" for i in issues)
+
+
+def test_validate_catches_svg_missing_title():
+    bad = '<svg viewBox="0 0 1 1" role="img"><text>x</text></svg>'  # no <title>
+    issues = validate_html(bad)
+    assert any(i.kind == "svg-missing-title" for i in issues)
+
+
+def test_validate_catches_svg_missing_role_img():
+    bad = '<svg viewBox="0 0 1 1"><title>t</title></svg>'  # no role="img"
+    issues = validate_html(bad)
+    assert any(i.kind == "svg-missing-role" for i in issues)
+
+
+def test_validate_returns_multiple_issues_at_once():
+    bad = '<p><svg></svg></p><p><text>x</text></p>'  # two <p> wraps + tag mismatch + missing title
+    issues = validate_html(bad)
+    kinds = [i.kind for i in issues]
+    assert kinds.count("p-wraps-svg") >= 2
+
+
+def test_validate_issue_includes_snippet():
+    bad = '<p><svg></svg></p>'
+    issues = validate_html(bad)
+    p_issues = [i for i in issues if i.kind == "p-wraps-svg"]
+    assert len(p_issues) >= 1
+    assert "<svg" in p_issues[0].snippet
