@@ -55,7 +55,19 @@
 `tests/test_blog_lint.py`:
 ```python
 """Tests for src.services.blog_lint."""
+import pytest
+
 from src.services.blog_lint import LintError, LintFix, lint_body
+
+
+def test_module_exports_public_surface():
+    """The module exports `LintError`, `LintFix`, `lint_body` as the public API."""
+    with pytest.raises(LintError):
+        raise LintError("test")
+    fix = LintFix(kind="named-entity", count=1, detail="example")
+    assert fix.kind == "named-entity"
+    assert fix.count == 1
+    assert fix.detail == "example"
 
 
 def test_lint_body_returns_tuple_of_text_and_fixes():
@@ -64,6 +76,8 @@ def test_lint_body_returns_tuple_of_text_and_fixes():
     assert fixed == text
     assert fixes == []
 ```
+
+(Both tests in the same file — the first exercises `LintError`/`LintFix` directly so the imports aren't unused, the second locks in the no-op return contract.)
 
 - [ ] **Step 1.2: Run test to verify it fails**
 
