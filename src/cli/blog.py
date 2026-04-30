@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any
 
 from src.config.settings import settings
-from src.services.blog_frontmatter import parse_blog
+from src.services.blog_frontmatter import ensure_id, parse_blog
 from src.services.projects import ProjectService
 
 logger = logging.getLogger(__name__)
@@ -114,6 +114,7 @@ def _cmd_validate(args: argparse.Namespace) -> int:
 
 def _cmd_submit(args: argparse.Namespace) -> int:
     try:
+        ensure_id(args.path)
         payload = _payload_from_blog(args.path)
     except Exception as exc:  # noqa: BLE001
         print(f"INVALID: {exc}", file=sys.stderr)
@@ -137,6 +138,7 @@ def _cmd_submit(args: argparse.Namespace) -> int:
 
 def _cmd_update(args: argparse.Namespace) -> int:
     try:
+        ensure_id(args.path)
         payload = _payload_from_blog(args.path)
     except Exception as exc:  # noqa: BLE001
         print(f"INVALID: {exc}", file=sys.stderr)
