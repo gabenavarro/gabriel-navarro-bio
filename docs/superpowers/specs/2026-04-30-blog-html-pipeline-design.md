@@ -301,6 +301,7 @@ BigQuery doesn't allow column renames, so the migration is `ADD body_html` → b
 ### Migration log
 
 - **2026-04-30T21:25Z** — `ALTER TABLE noble-office-299208.portfolio.gn-blog ADD COLUMN body_html STRING;` executed (BigQuery job `afbb8615-44c9-4115-9235-d5dc832ebe4c`). Verified: schema now has 12 fields; `body_html` (STRING) is present and `body` (legacy STRING) is preserved. End-to-end smoke test on `assets/blogs/0021-portello.md --dry-run` confirms the BlogRow payload contains both fields (body=67056 chars, body_html=78579 chars).
+- **2026-04-30T22:30Z** — `python scripts/backfill_blog_html.py` completed: 22 succeeded / 0 hard-failed / 0 streaming-buffer retries. All 22 rows now carry both `body` and `body_html` (lengths: min 5,170 / avg 29,201 / max 102,510 chars). Phase A (`--dry-run`) earlier in the run touched only `0022-spike-sparse-sink-anatomy-massive.md` (84 internal-blank-line lint fixes); legacy posts 0001–0020 were already lint-clean.
 
 ### Migration risks
 
