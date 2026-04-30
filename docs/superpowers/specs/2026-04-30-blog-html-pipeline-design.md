@@ -298,6 +298,10 @@ BigQuery doesn't allow column renames, so the migration is `ADD body_html` → b
    ```
    `Project.body` and `BlogRow` no longer reference it. `_payload_from_blog` stops writing it.
 
+### Migration log
+
+- **2026-04-30T21:25Z** — `ALTER TABLE noble-office-299208.portfolio.gn-blog ADD COLUMN body_html STRING;` executed (BigQuery job `afbb8615-44c9-4115-9235-d5dc832ebe4c`). Verified: schema now has 12 fields; `body_html` (STRING) is present and `body` (legacy STRING) is preserved. End-to-end smoke test on `assets/blogs/0021-portello.md --dry-run` confirms the BlogRow payload contains both fields (body=67056 chars, body_html=78579 chars).
+
 ### Migration risks
 
 - **Streaming-buffer constraint on `update`.** Each `update` is DELETE+INSERT, and the streaming buffer holds rows for ~30 min. Backfilling 22 posts naively will trip this. The backfill script handles it with a 35-minute retry loop.
