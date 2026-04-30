@@ -88,6 +88,30 @@ def _replace_named_entities(body: str) -> tuple[str, int]:
     return _ENTITY_PATTERN.sub(_sub, body), count
 
 
+_SVG_OPEN_PATTERN = re.compile(r"<svg\b([^>]*)>", re.DOTALL)
+
+
+def _collapse_svg_open_tags(body: str) -> tuple[str, int]:
+    """Collapse multi-line `<svg ...>` opening tags onto a single line.
+
+    Returns (transformed_body, count_collapsed). A "collapse" means the
+    opening tag spanned multiple lines in the source; if it was already on
+    one line, no change is recorded for that tag.
+    """
+    count = 0
+
+    def _sub(match: re.Match[str]) -> str:
+        nonlocal count
+        inner = match.group(1)
+        if "\n" not in inner:
+            return match.group(0)
+        count += 1
+        collapsed = re.sub(r"\s+", " ", inner).strip()
+        return f"<svg {collapsed}>" if collapsed else "<svg>"
+
+    return _SVG_OPEN_PATTERN.sub(_sub, body), count
+
+
 def lint_body(body: str) -> tuple[str, list[LintFix]]:
     """Apply all three lint rules to `body`, returning the fixed text + list of fixes.
 
@@ -101,5 +125,12 @@ def lint_body(body: str) -> tuple[str, list[LintFix]]:
             kind="named-entity",
             count=n,
             detail=f"replaced {n} HTML named entit{'y' if n == 1 else 'ies'} with Unicode literals",
+        ))
+    body, n = _collapse_svg_open_tags(body)
+    if n:
+        fixes.append(LintFix(
+            kind="multi-line-svg-open",
+            count=n,
+            detail=f"collapsed {n} multi-line <svg ...> opening tag(s) to single line",
         ))
     return body, fixes

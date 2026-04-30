@@ -50,3 +50,37 @@ def test_lint_raises_on_unmapped_entity():
     src = "<svg><text>nonsense &zzznotreal;</text></svg>"
     with pytest.raises(LintError, match="zzznotreal"):
         lint_body(src)
+
+
+def test_lint_collapses_multi_line_svg_open():
+    src = (
+        '<svg viewBox="0 0 100 100"\n'
+        '     xmlns="http://www.w3.org/2000/svg"\n'
+        '     role="img">\n'
+        '  <title>x</title>\n'
+        '</svg>'
+    )
+    fixed, fixes = lint_body(src)
+    first_line = fixed.split("\n", 1)[0]
+    assert first_line == '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img">'
+    assert any(f.kind == "multi-line-svg-open" and f.count == 1 for f in fixes)
+
+
+def test_lint_leaves_single_line_svg_open_alone():
+    src = '<svg viewBox="0 0 100 100" xmlns="..." role="img"><title>x</title></svg>'
+    fixed, fixes = lint_body(src)
+    assert fixed == src
+    assert all(f.kind != "multi-line-svg-open" for f in fixes)
+
+
+def test_lint_collapses_only_svg_tag_not_other_multi_line_tags():
+    # <text> spanning lines is FINE — common in SVG body. We only care about <svg> opens.
+    src = (
+        '<svg viewBox="0 0 100 100" xmlns="..." role="img">\n'
+        '  <text x="10" y="20"\n'
+        '        font-size="13">hello</text>\n'
+        '</svg>'
+    )
+    fixed, _ = lint_body(src)
+    # The multi-line <text> should be unchanged; the <svg> open is already on one line.
+    assert "<text x=\"10\" y=\"20\"\n        font-size=\"13\">" in fixed
