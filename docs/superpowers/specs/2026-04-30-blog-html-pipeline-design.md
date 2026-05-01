@@ -302,6 +302,14 @@ BigQuery doesn't allow column renames, so the migration is `ADD body_html` → b
 
 - **2026-04-30T21:25Z** — `ALTER TABLE noble-office-299208.portfolio.gn-blog ADD COLUMN body_html STRING;` executed (BigQuery job `afbb8615-44c9-4115-9235-d5dc832ebe4c`). Verified: schema now has 12 fields; `body_html` (STRING) is present and `body` (legacy STRING) is preserved. End-to-end smoke test on `assets/blogs/0021-portello.md --dry-run` confirms the BlogRow payload contains both fields (body=67056 chars, body_html=78579 chars).
 - **2026-04-30T22:30Z** — `python scripts/backfill_blog_html.py` completed: 22 succeeded / 0 hard-failed / 0 streaming-buffer retries. All 22 rows now carry both `body` and `body_html` (lengths: min 5,170 / avg 29,201 / max 102,510 chars). Phase A (`--dry-run`) earlier in the run touched only `0022-spike-sparse-sink-anatomy-massive.md` (84 internal-blank-line lint fixes); legacy posts 0001–0020 were already lint-clean.
+- **2026-05-01** — Pre-merge `validate_html` sweep across all 22 stored `body_html` values: 22/22 clean, 0 issues. Branch `feat/blog-html-pipeline` ready for merge to `main`.
+
+### Soak window
+
+- **Start:** 2026-05-01 (commit `87be52a`, "feat(blog-detail): render body_html in preference to body").
+- **Min duration:** 7 days. The cutover is reversible by reverting `87be52a` until the legacy `body` column is dropped (Task 19).
+- **Earliest DROP COLUMN date:** 2026-05-08.
+- **Final sweep before DROP:** rerun the same `validate_html` query as above.
 
 ### Migration risks
 
