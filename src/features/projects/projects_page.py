@@ -51,7 +51,7 @@ def _render_blog_detail(project):
             cls="blog-detail-meta",
         ),
         Div(
-            render_md(project.body),
+            NotStr(project.body_html) if project.body_html else render_md(project.body),
             cls="factory-markdown-content blog-detail-body",
         ),
         Div(

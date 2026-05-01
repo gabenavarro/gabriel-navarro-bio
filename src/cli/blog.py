@@ -18,7 +18,9 @@ from pathlib import Path
 from typing import Any
 
 from src.config.settings import settings
-from src.services.blog_frontmatter import parse_blog
+from src.services.blog_frontmatter import BlogRow, ensure_id, parse_blog
+from src.services.blog_lint import LintError, lint_body
+from src.services.blog_render import RenderError, render_to_html, validate_html
 from src.services.projects import ProjectService
 
 logger = logging.getLogger(__name__)
@@ -78,13 +80,60 @@ def run_blog(args: argparse.Namespace) -> int:
 
 
 def _payload_from_blog(path: Path) -> dict[str, Any]:
-    """Parse ``path`` and produce a BigQuery-ready row dict."""
+    """Parse `path`, lint the body, render to HTML, validate, and return a BlogRow dict.
+
+    Side effects:
+      * Backfills a UUID into the file (via ensure_id) if missing.
+      * Writes lint fixes back to the file if any rule applied.
+    """
+    ensure_id(path)
     blog = parse_blog(path)
-    payload = blog.model_dump(mode="json")
-    # BigQuery's TIMESTAMP type expects an ISO-8601 string; pydantic's
-    # mode="json" already serialises datetimes that way. ``HttpUrl`` is also
-    # rendered as a plain string in mode="json".
-    return payload
+
+    try:
+        fixed_body, fixes = lint_body(blog.body)
+    except LintError as exc:
+        raise ValueError(f"lint_body failed: {exc}") from exc
+
+    if fixes and fixed_body != blog.body:
+        _persist_body_to_file(path, blog.body, fixed_body)
+        for f in fixes:
+            print(f"[lint] {f.kind}: {f.detail}")
+        # Re-parse so the in-memory model reflects the on-disk file.
+        blog = parse_blog(path)
+
+    try:
+        html = render_to_html(blog.body)
+    except RenderError as exc:
+        raise ValueError(f"render_to_html failed: {exc}") from exc
+
+    issues = validate_html(html)
+    if issues:
+        for i in issues:
+            print(
+                f"[error] {i.kind} (line {i.line}): {i.snippet[:120]}",
+                file=sys.stderr,
+            )
+        raise ValueError(f"validate_html found {len(issues)} issue(s); fix the source and re-run")
+
+    row = BlogRow(**{**blog.model_dump(), "body_html": html})
+    return row.model_dump(mode="json")
+
+
+def _persist_body_to_file(path: Path, old_body: str, new_body: str) -> None:
+    """Replace the body of `path` with `new_body`, preserving the frontmatter block.
+
+    Writes byte-for-byte except for the body section after the closing
+    frontmatter delimiter.
+    """
+    text = path.read_text(encoding="utf-8")
+    if not text.endswith(old_body):
+        # Defensive: the body should always be the trailing portion of the file.
+        # If it's not, refuse to mangle the file.
+        raise ValueError(
+            f"refusing to persist lint fixes: body of {path} does not appear at end of file"
+        )
+    new_text = text[: -len(old_body)] + new_body
+    path.write_text(new_text, encoding="utf-8")
 
 
 def _bq_client():  # pragma: no cover - thin wrapper around external SDK
@@ -103,17 +152,47 @@ def _bq_client():  # pragma: no cover - thin wrapper around external SDK
 
 
 def _cmd_validate(args: argparse.Namespace) -> int:
+    """Read-only check: parse, run lint preview, render, validate.
+
+    Does NOT write to disk and does NOT submit to BigQuery. Use this from
+    pre-commit or CI to catch issues before `submit`.
+    """
     try:
         blog = parse_blog(args.path)
-    except Exception as exc:  # noqa: BLE001 - CLI surface, want any failure to be reported.
+    except Exception as exc:  # noqa: BLE001
         print(f"INVALID: {exc}", file=sys.stderr)
         return 1
+
+    # Lint preview — report what `submit` would auto-fix, but don't write.
+    try:
+        _, fixes = lint_body(blog.body)
+    except LintError as exc:
+        print(f"INVALID (lint): {exc}", file=sys.stderr)
+        return 1
+    for f in fixes:
+        print(f"[lint preview] would {f.kind}: {f.detail}")
+
+    # Render + validate against the LINTED body, since that's what submit would push.
+    fixed_body, _ = lint_body(blog.body)
+    try:
+        html = render_to_html(fixed_body)
+    except RenderError as exc:
+        print(f"INVALID (render): {exc}", file=sys.stderr)
+        return 1
+
+    issues = validate_html(html)
+    if issues:
+        for i in issues:
+            print(f"[error] {i.kind} (line {i.line}): {i.snippet[:120]}", file=sys.stderr)
+        return 1
+
     print(f"OK: {blog.title}")
     return 0
 
 
 def _cmd_submit(args: argparse.Namespace) -> int:
     try:
+        ensure_id(args.path)
         payload = _payload_from_blog(args.path)
     except Exception as exc:  # noqa: BLE001
         print(f"INVALID: {exc}", file=sys.stderr)
@@ -137,6 +216,7 @@ def _cmd_submit(args: argparse.Namespace) -> int:
 
 def _cmd_update(args: argparse.Namespace) -> int:
     try:
+        ensure_id(args.path)
         payload = _payload_from_blog(args.path)
     except Exception as exc:  # noqa: BLE001
         print(f"INVALID: {exc}", file=sys.stderr)

@@ -189,3 +189,35 @@ def ensure_id(path: Path) -> str:
         p.write_text(f"---\n{dumped}---\n{body}", encoding="utf-8")
 
     return new_id
+
+
+class BlogRow(BaseModel):
+    """The shape of a row in the BigQuery `gn-blog` table.
+
+    During the migration window this carries both `body` (legacy markdown)
+    and `body_html` (rendered HTML). After the legacy `body` column is
+    dropped from the BigQuery table, `body` will be removed from this model
+    and `_payload_from_blog` in src.cli.blog will stop populating it.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str
+    title: str
+    date: datetime
+    tags: list[str]
+    description: str
+    image: HttpUrl
+    type: Literal["note", "article"]
+    disabled: bool
+    views: int
+    likes: int
+    body: str
+    body_html: str
+
+    @field_validator("body_html")
+    @classmethod
+    def _body_html_not_empty(cls, value: str) -> str:
+        if not value or not value.strip():
+            raise ValueError("body_html must be non-empty")
+        return value
