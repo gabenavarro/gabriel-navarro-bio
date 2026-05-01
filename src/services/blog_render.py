@@ -47,8 +47,15 @@ class ValidationIssue:
 
 # Tags whose presence inside a <p> wrap is the diagnostic of the class-3 bug.
 _SVG_INTERNAL_TAGS = (
-    "svg", "text", "rect", "line", "circle", "path",
-    "g", "defs", "marker",
+    "svg",
+    "text",
+    "rect",
+    "line",
+    "circle",
+    "path",
+    "g",
+    "defs",
+    "marker",
 )
 _P_WRAPS_SVG = re.compile(
     r"<p\b[^>]*>\s*<(?:" + "|".join(_SVG_INTERNAL_TAGS) + r"|!--)\b",
@@ -71,21 +78,25 @@ def validate_html(html: str) -> list[ValidationIssue]:
 
     # Rule 1: <p>-wraps-SVG-internal-tag
     for match in _P_WRAPS_SVG.finditer(html):
-        issues.append(ValidationIssue(
-            kind="p-wraps-svg",
-            line=_line_of(html, match.start()),
-            snippet=html[match.start(): match.start() + 120],
-        ))
+        issues.append(
+            ValidationIssue(
+                kind="p-wraps-svg",
+                line=_line_of(html, match.start()),
+                snippet=html[match.start() : match.start() + 120],
+            )
+        )
 
     # Rule 2: <svg> open count == </svg> close count
     n_open = len(_SVG_OPEN.findall(html))
     n_close = len(_SVG_CLOSE.findall(html))
     if n_open != n_close:
-        issues.append(ValidationIssue(
-            kind="svg-tag-mismatch",
-            line=None,
-            snippet=f"<svg> opens={n_open}, </svg> closes={n_close}",
-        ))
+        issues.append(
+            ValidationIssue(
+                kind="svg-tag-mismatch",
+                line=None,
+                snippet=f"<svg> opens={n_open}, </svg> closes={n_close}",
+            )
+        )
 
     # Rules 3+4 operate per top-level SVG block.
     # We don't try to detect nesting here — top-level SVGs are the only ones
@@ -94,18 +105,22 @@ def validate_html(html: str) -> list[ValidationIssue]:
         block = match.group(0)
         line = _line_of(html, match.start())
         if not _HAS_TITLE_CHILD.search(block):
-            issues.append(ValidationIssue(
-                kind="svg-missing-title",
-                line=line,
-                snippet=block[:120],
-            ))
+            issues.append(
+                ValidationIssue(
+                    kind="svg-missing-title",
+                    line=line,
+                    snippet=block[:120],
+                )
+            )
         # Inspect the opening tag specifically (first match within the block).
         open_match = _SVG_OPEN.match(block)
         if open_match and not _HAS_ROLE_IMG.search(open_match.group(0)):
-            issues.append(ValidationIssue(
-                kind="svg-missing-role",
-                line=line,
-                snippet=open_match.group(0),
-            ))
+            issues.append(
+                ValidationIssue(
+                    kind="svg-missing-role",
+                    line=line,
+                    snippet=open_match.group(0),
+                )
+            )
 
     return issues

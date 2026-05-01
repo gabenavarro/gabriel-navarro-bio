@@ -115,6 +115,7 @@ def test_blog_row_validates_minimal_payload():
     """BlogRow accepts a complete payload (markdown + html) with no errors."""
     from datetime import datetime, timezone
     from src.services.blog_frontmatter import BlogRow
+
     row = BlogRow(
         id="00000000-0000-0000-0000-000000000000",
         title="Test",
@@ -136,6 +137,7 @@ def test_blog_row_rejects_empty_body_html():
     from datetime import datetime, timezone
     from pydantic import ValidationError
     from src.services.blog_frontmatter import BlogRow
+
     with pytest.raises(ValidationError, match="body_html"):
         BlogRow(
             id="x",
@@ -157,13 +159,20 @@ def test_blog_row_extra_fields_forbidden():
     from datetime import datetime, timezone
     from pydantic import ValidationError
     from src.services.blog_frontmatter import BlogRow
+
     with pytest.raises(ValidationError):
         BlogRow(
-            id="x", title="t",
+            id="x",
+            title="t",
             date=datetime(2026, 1, 1, tzinfo=timezone.utc),
-            tags=[], description="d",
+            tags=[],
+            description="d",
             image="https://e.com/i.svg",
-            type="note", disabled=False, views=0, likes=0,
-            body="md", body_html="<h1/>",
+            type="note",
+            disabled=False,
+            views=0,
+            likes=0,
+            body="md",
+            body_html="<h1/>",
             unexpected="boom",
         )

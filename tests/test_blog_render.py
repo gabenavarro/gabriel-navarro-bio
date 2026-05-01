@@ -1,4 +1,5 @@
 """Tests for src.services.blog_render."""
+
 from src.services.blog_render import render_to_html
 from src.services.blog_render import ValidationIssue, validate_html
 
@@ -21,9 +22,9 @@ def test_render_returns_plain_string_not_notstr():
 def test_render_preserves_inline_svg_when_clean():
     md = (
         '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img">\n'
-        '  <title>t</title>\n'
-        '  <text>x</text>\n'
-        '</svg>'
+        "  <title>t</title>\n"
+        "  <text>x</text>\n"
+        "</svg>"
     )
     html = render_to_html(md)
     assert "<svg" in html
@@ -40,7 +41,7 @@ def test_validate_returns_empty_for_clean_html():
 
 
 def test_validate_catches_p_wrapping_svg():
-    bad = '<p><svg></svg></p>'
+    bad = "<p><svg></svg></p>"
     issues = validate_html(bad)
     assert any(i.kind == "p-wraps-svg" for i in issues)
     assert all(isinstance(i, ValidationIssue) for i in issues)
@@ -71,14 +72,14 @@ def test_validate_catches_svg_missing_role_img():
 
 
 def test_validate_returns_multiple_issues_at_once():
-    bad = '<p><svg></svg></p><p><text>x</text></p>'  # two <p> wraps + tag mismatch + missing title
+    bad = "<p><svg></svg></p><p><text>x</text></p>"  # two <p> wraps + tag mismatch + missing title
     issues = validate_html(bad)
     kinds = [i.kind for i in issues]
     assert kinds.count("p-wraps-svg") >= 2
 
 
 def test_validate_issue_includes_snippet():
-    bad = '<p><svg></svg></p>'
+    bad = "<p><svg></svg></p>"
     issues = validate_html(bad)
     p_issues = [i for i in issues if i.kind == "p-wraps-svg"]
     assert len(p_issues) >= 1

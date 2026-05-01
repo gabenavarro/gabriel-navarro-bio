@@ -39,24 +39,48 @@ class LintFix:
 # entities (amp/lt/gt/apos/quot) are intentionally absent — they're valid in
 # both XML and HTML and do not need substitution.
 ENTITY_MAP: dict[str, str] = {
-    "mdash": "—", "ndash": "–",
-    "middot": "·", "bull": "•",
-    "times": "×", "divide": "÷",
-    "plusmn": "±", "minus": "−",
-    "rarr": "→", "larr": "←",
-    "uarr": "↑", "darr": "↓", "harr": "↔",
+    "mdash": "—",
+    "ndash": "–",
+    "middot": "·",
+    "bull": "•",
+    "times": "×",
+    "divide": "÷",
+    "plusmn": "±",
+    "minus": "−",
+    "rarr": "→",
+    "larr": "←",
+    "uarr": "↑",
+    "darr": "↓",
+    "harr": "↔",
     "hellip": "…",
-    "asymp": "≈", "ne": "≠",
-    "ge": "≥", "le": "≤",
+    "asymp": "≈",
+    "ne": "≠",
+    "ge": "≥",
+    "le": "≤",
     "deg": "°",
-    "radic": "√", "infin": "∞",
-    "alpha": "α", "beta": "β", "gamma": "γ", "delta": "δ",
-    "epsilon": "ε", "theta": "θ", "lambda": "λ", "mu": "μ",
-    "pi": "π", "sigma": "σ", "phi": "φ", "omega": "ω",
-    "Sigma": "Σ", "Delta": "Δ", "Omega": "Ω",
-    "sum": "∑", "prod": "∏",
+    "radic": "√",
+    "infin": "∞",
+    "alpha": "α",
+    "beta": "β",
+    "gamma": "γ",
+    "delta": "δ",
+    "epsilon": "ε",
+    "theta": "θ",
+    "lambda": "λ",
+    "mu": "μ",
+    "pi": "π",
+    "sigma": "σ",
+    "phi": "φ",
+    "omega": "ω",
+    "Sigma": "Σ",
+    "Delta": "Δ",
+    "Omega": "Ω",
+    "sum": "∑",
+    "prod": "∏",
     "nbsp": " ",
-    "copy": "©", "reg": "®", "trade": "™",
+    "copy": "©",
+    "reg": "®",
+    "trade": "™",
 }
 
 _XML_SAFE_ENTITIES = frozenset({"amp", "lt", "gt", "apos", "quot"})
@@ -180,24 +204,30 @@ def lint_body(body: str) -> tuple[str, list[LintFix]]:
     fixes: list[LintFix] = []
     body, n = _replace_named_entities(body)
     if n:
-        fixes.append(LintFix(
-            kind="named-entity",
-            count=n,
-            detail=f"replaced {n} HTML named entit{'y' if n == 1 else 'ies'} with Unicode literals",
-        ))
+        fixes.append(
+            LintFix(
+                kind="named-entity",
+                count=n,
+                detail=f"replaced {n} HTML named entit{'y' if n == 1 else 'ies'} with Unicode literals",
+            )
+        )
     body, n = _collapse_svg_open_tags(body)
     if n:
-        fixes.append(LintFix(
-            kind="multi-line-svg-open",
-            count=n,
-            detail=f"collapsed {n} multi-line <svg ...> opening tag(s) to single line",
-        ))
+        fixes.append(
+            LintFix(
+                kind="multi-line-svg-open",
+                count=n,
+                detail=f"collapsed {n} multi-line <svg ...> opening tag(s) to single line",
+            )
+        )
     body, n = _strip_blank_lines_in_svg(body)
     if n:
-        fixes.append(LintFix(
-            kind="blank-line-in-svg",
-            count=n,
-            detail=f"stripped {n} blank line(s) inside <svg>...</svg> blocks",
-        ))
+        fixes.append(
+            LintFix(
+                kind="blank-line-in-svg",
+                count=n,
+                detail=f"stripped {n} blank line(s) inside <svg>...</svg> blocks",
+            )
+        )
     body = _restore_fenced_code(body, stash)
     return body, fixes

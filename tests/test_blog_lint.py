@@ -1,4 +1,5 @@
 """Tests for src.services.blog_lint."""
+
 import pytest
 
 from src.services.blog_lint import LintError, LintFix, lint_body
@@ -57,8 +58,8 @@ def test_lint_collapses_multi_line_svg_open():
         '<svg viewBox="0 0 100 100"\n'
         '     xmlns="http://www.w3.org/2000/svg"\n'
         '     role="img">\n'
-        '  <title>x</title>\n'
-        '</svg>'
+        "  <title>x</title>\n"
+        "</svg>"
     )
     fixed, fixes = lint_body(src)
     first_line = fixed.split("\n", 1)[0]
@@ -79,25 +80,17 @@ def test_lint_collapses_only_svg_tag_not_other_multi_line_tags():
         '<svg viewBox="0 0 100 100" xmlns="..." role="img">\n'
         '  <text x="10" y="20"\n'
         '        font-size="13">hello</text>\n'
-        '</svg>'
+        "</svg>"
     )
     fixed, _ = lint_body(src)
     # The multi-line <text> should be unchanged; the <svg> open is already on one line.
-    assert "<text x=\"10\" y=\"20\"\n        font-size=\"13\">" in fixed
+    assert '<text x="10" y="20"\n        font-size="13">' in fixed
 
 
 def test_lint_strips_blank_lines_inside_svg():
-    src = (
-        '<svg>\n'
-        '  <title>t</title>\n'
-        '\n'
-        '  <text>line a</text>\n'
-        '\n'
-        '  <text>line b</text>\n'
-        '</svg>'
-    )
+    src = "<svg>\n  <title>t</title>\n\n  <text>line a</text>\n\n  <text>line b</text>\n</svg>"
     fixed, fixes = lint_body(src)
-    inside = fixed[fixed.index("<svg>"):fixed.index("</svg>")]
+    inside = fixed[fixed.index("<svg>") : fixed.index("</svg>")]
     assert "\n\n" not in inside
     assert "<text>line a</text>" in fixed and "<text>line b</text>" in fixed
     assert any(f.kind == "blank-line-in-svg" for f in fixes)
@@ -109,11 +102,11 @@ def test_lint_preserves_blank_lines_outside_svg():
         "\n"
         "Paragraph two.\n"
         "\n"
-        '<svg>\n'
-        '  <title>t</title>\n'
-        '\n'
-        '  <text>x</text>\n'
-        '</svg>\n'
+        "<svg>\n"
+        "  <title>t</title>\n"
+        "\n"
+        "  <text>x</text>\n"
+        "</svg>\n"
         "\n"
         "Paragraph three.\n"
     )
@@ -123,13 +116,7 @@ def test_lint_preserves_blank_lines_outside_svg():
 
 
 def test_lint_preserves_indentation_in_svg():
-    src = (
-        '<svg>\n'
-        '  <title>t</title>\n'
-        '\n'
-        '  <text>indented body</text>\n'
-        '</svg>'
-    )
+    src = "<svg>\n  <title>t</title>\n\n  <text>indented body</text>\n</svg>"
     fixed, _ = lint_body(src)
     assert "  <text>indented body</text>" in fixed
 
@@ -150,7 +137,7 @@ def test_lint_does_not_mangle_fenced_code_blocks():
         "And here's a real one:\n"
         "\n"
         '<svg viewBox="0 0 200 200" xmlns="..." role="img">\n'
-        '  <title>real</title>\n'
+        "  <title>real</title>\n"
         "\n"
         "  <text>real text</text>\n"
         "</svg>\n"
@@ -158,7 +145,7 @@ def test_lint_does_not_mangle_fenced_code_blocks():
     fixed, fixes = lint_body(src)
     # The CODE BLOCK content must be preserved verbatim — multi-line open and blanks stay.
     assert (
-        '```svg\n'
+        "```svg\n"
         '<svg viewBox="0 0 100 100"\n'
         '     xmlns="..."\n'
         '     role="img">\n'
@@ -180,10 +167,10 @@ def test_lint_is_idempotent():
         '<svg viewBox="0 0 100 100"\n'
         '     xmlns="..."\n'
         '     role="img">\n'
-        '  <title>t &mdash; subtitle</title>\n'
-        '\n'
-        '  <text>x &times; y</text>\n'
-        '</svg>'
+        "  <title>t &mdash; subtitle</title>\n"
+        "\n"
+        "  <text>x &times; y</text>\n"
+        "</svg>"
     )
     once, _ = lint_body(src)
     twice, fixes_second = lint_body(once)
@@ -204,10 +191,10 @@ def test_lint_does_not_mangle_indented_widget_svg():
     src = (
         '<div class="ptb-state" id="s1">\n'
         '    <svg viewBox="0 0 100 100" xmlns="..." role="img">\n'
-        '      <title>indented</title>\n'
-        '      <text>x</text>\n'
-        '    </svg>\n'
-        '</div>'
+        "      <title>indented</title>\n"
+        "      <text>x</text>\n"
+        "    </svg>\n"
+        "</div>"
     )
     fixed, fixes = lint_body(src)
     # No changes expected — this SVG is already lint-clean.
@@ -223,10 +210,12 @@ def test_lint_canary_against_real_post_0022():
     assert that after lint, the body has no <svg> block with a blank line in it.
     """
     from pathlib import Path
+
     src = Path("assets/blogs/0022-spike-sparse-sink-anatomy-massive.md").read_text(encoding="utf-8")
     fixed, _ = lint_body(src)
     # Find every <svg>...</svg> and check no blank line inside.
     import re
+
     for m in re.finditer(r"<svg\b[^>]*>.*?</svg>", fixed, re.DOTALL):
         block = m.group(0)
         for line in block.split("\n"):

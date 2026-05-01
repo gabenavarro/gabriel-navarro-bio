@@ -3,6 +3,7 @@
 
 def test_iter_blog_paths_returns_sorted_md_files(tmp_path):
     from scripts.backfill_blog_html import iter_blog_paths
+
     (tmp_path / "0003-c.md").write_text("@{}\n", encoding="utf-8")
     (tmp_path / "0001-a.md").write_text("@{}\n", encoding="utf-8")
     (tmp_path / "0002-b.md").write_text("@{}\n", encoding="utf-8")
@@ -26,6 +27,7 @@ def test_dry_run_does_not_call_submit(tmp_path, monkeypatch, capsys):
     # Stub out _payload_from_blog so we don't need real Pydantic frontmatter.
     def fake_payload(path):
         return {"id": "x", "body": path.read_text(), "body_html": "<p>html</p>"}
+
     monkeypatch.setattr(blog_module, "_payload_from_blog", fake_payload)
 
     blogs = tmp_path / "blogs"

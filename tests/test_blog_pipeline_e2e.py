@@ -3,6 +3,7 @@
 Uses real files in assets/blogs/ as fixtures. These tests run BEFORE BigQuery
 is touched — they exercise pure-Python pipeline only.
 """
+
 from pathlib import Path
 
 from src.services.blog_lint import lint_body

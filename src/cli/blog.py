@@ -113,9 +113,7 @@ def _payload_from_blog(path: Path) -> dict[str, Any]:
                 f"[error] {i.kind} (line {i.line}): {i.snippet[:120]}",
                 file=sys.stderr,
             )
-        raise ValueError(
-            f"validate_html found {len(issues)} issue(s); fix the source and re-run"
-        )
+        raise ValueError(f"validate_html found {len(issues)} issue(s); fix the source and re-run")
 
     row = BlogRow(**{**blog.model_dump(), "body_html": html})
     return row.model_dump(mode="json")

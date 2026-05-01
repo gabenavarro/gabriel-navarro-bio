@@ -40,16 +40,17 @@ def test_payload_from_blog_includes_body_html(tmp_path):
     """_payload_from_blog returns a dict with both `body` (markdown) and
     `body_html` (rendered)."""
     from src.cli.blog import _payload_from_blog
+
     md = tmp_path / "post.md"
     md.write_text(
-        "@{title = \"T\"\n"
-        "  date = \"2026-01-01T00:00:00Z\"\n"
-        "  tags = [\"x\"]\n"
+        '@{title = "T"\n'
+        '  date = "2026-01-01T00:00:00Z"\n'
+        '  tags = ["x"]\n'
         "  views = 0\n"
         "  likes = 0\n"
-        "  image = \"https://e.com/i.svg\"\n"
-        "  description = \"d\"\n"
-        "  type = \"note\"\n"
+        '  image = "https://e.com/i.svg"\n'
+        '  description = "d"\n'
+        '  type = "note"\n'
         "  disabled = false\n"
         "}\n"
         "# Body\n",
@@ -64,16 +65,17 @@ def test_payload_from_blog_includes_body_html(tmp_path):
 def test_payload_from_blog_persists_lint_fixes_to_disk(tmp_path, capsys):
     """If lint changes the body, the .md file is overwritten with the linted text."""
     from src.cli.blog import _payload_from_blog
+
     md = tmp_path / "post.md"
     raw = (
-        "@{title = \"T\"\n"
-        "  date = \"2026-01-01T00:00:00Z\"\n"
-        "  tags = [\"x\"]\n"
+        '@{title = "T"\n'
+        '  date = "2026-01-01T00:00:00Z"\n'
+        '  tags = ["x"]\n'
         "  views = 0\n"
         "  likes = 0\n"
-        "  image = \"https://e.com/i.svg\"\n"
-        "  description = \"d\"\n"
-        "  type = \"note\"\n"
+        '  image = "https://e.com/i.svg"\n'
+        '  description = "d"\n'
+        '  type = "note"\n'
         "  disabled = false\n"
         "}\n"
         "# Body\n"
@@ -94,21 +96,22 @@ def test_payload_from_blog_persists_lint_fixes_to_disk(tmp_path, capsys):
 def test_payload_from_blog_raises_on_validation_failure(tmp_path):
     """If validate_html finds an issue, _payload_from_blog raises."""
     from src.cli.blog import _payload_from_blog
+
     md = tmp_path / "post.md"
     # Body contains an SVG with no <title> and no role="img" — both will fail validation.
     md.write_text(
-        "@{title = \"T\"\n"
-        "  date = \"2026-01-01T00:00:00Z\"\n"
-        "  tags = [\"x\"]\n"
+        '@{title = "T"\n'
+        '  date = "2026-01-01T00:00:00Z"\n'
+        '  tags = ["x"]\n'
         "  views = 0\n"
         "  likes = 0\n"
-        "  image = \"https://e.com/i.svg\"\n"
-        "  description = \"d\"\n"
-        "  type = \"note\"\n"
+        '  image = "https://e.com/i.svg"\n'
+        '  description = "d"\n'
+        '  type = "note"\n'
         "  disabled = false\n"
         "}\n"
         "# Body\n"
-        "<svg viewBox=\"0 0 100 100\"><text>x</text></svg>\n",
+        '<svg viewBox="0 0 100 100"><text>x</text></svg>\n',
         encoding="utf-8",
     )
     with pytest.raises(ValueError, match="validate_html"):
@@ -118,17 +121,18 @@ def test_payload_from_blog_raises_on_validation_failure(tmp_path):
 def test_validate_reports_lint_issues_without_writing(tmp_path, capsys):
     """`blog validate` reports lint issues but does NOT write the file."""
     from src.cli.__main__ import main
+
     md = tmp_path / "post.md"
     raw = (
-        "@{id = \"00000000-0000-0000-0000-000000000000\"\n"
-        "  title = \"T\"\n"
-        "  date = \"2026-01-01T00:00:00Z\"\n"
-        "  tags = [\"x\"]\n"
+        '@{id = "00000000-0000-0000-0000-000000000000"\n'
+        '  title = "T"\n'
+        '  date = "2026-01-01T00:00:00Z"\n'
+        '  tags = ["x"]\n'
         "  views = 0\n"
         "  likes = 0\n"
-        "  image = \"https://e.com/i.svg\"\n"
-        "  description = \"d\"\n"
-        "  type = \"note\"\n"
+        '  image = "https://e.com/i.svg"\n'
+        '  description = "d"\n'
+        '  type = "note"\n'
         "  disabled = false\n"
         "}\n"
         "# B\n"
@@ -150,20 +154,21 @@ def test_validate_reports_lint_issues_without_writing(tmp_path, capsys):
 def test_validate_exits_nonzero_on_validation_issue(tmp_path):
     """`blog validate` exits nonzero when validate_html finds an issue."""
     from src.cli.__main__ import main
+
     md = tmp_path / "post.md"
     md.write_text(
-        "@{id = \"00000000-0000-0000-0000-000000000000\"\n"
-        "  title = \"T\"\n"
-        "  date = \"2026-01-01T00:00:00Z\"\n"
-        "  tags = [\"x\"]\n"
+        '@{id = "00000000-0000-0000-0000-000000000000"\n'
+        '  title = "T"\n'
+        '  date = "2026-01-01T00:00:00Z"\n'
+        '  tags = ["x"]\n'
         "  views = 0\n"
         "  likes = 0\n"
-        "  image = \"https://e.com/i.svg\"\n"
-        "  description = \"d\"\n"
-        "  type = \"note\"\n"
+        '  image = "https://e.com/i.svg"\n'
+        '  description = "d"\n'
+        '  type = "note"\n'
         "  disabled = false\n"
         "}\n"
-        "# B\n<svg viewBox=\"0 0 1 1\"><text>missing title and role</text></svg>\n",
+        '# B\n<svg viewBox="0 0 1 1"><text>missing title and role</text></svg>\n',
         encoding="utf-8",
     )
     rc = main(["blog", "validate", str(md)])
