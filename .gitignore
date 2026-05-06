@@ -182,3 +182,8 @@ cython_debug/
 
 # Secret directories
 /assets/secrets/*
+
+# Dev environment artifacts (per-developer; not shared)
+.claude/
+.devcontainer/
+.playwright-mcp/
