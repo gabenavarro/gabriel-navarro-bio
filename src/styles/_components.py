@@ -357,4 +357,32 @@ pre.shiki::after, .uk-codeblock::after {
         padding-top: 0;
     }
 }
+
+/* Inline critical-read call-out for journal-club / paper-analysis posts.
+   Used in blog markdown via <aside class="critical-read">...</aside>.
+   See /app/.claude/skills/paper-to-blog for usage convention. */
+aside.critical-read {
+    border-left: 3px solid var(--color-accent-100);
+    padding: 0.6rem 0.9rem 0.6rem 1rem;
+    margin: 1.25rem 0;
+    font-size: 0.92em;
+    line-height: 1.55;
+    color: var(--color-base-300);
+    background: rgba(239, 111, 46, 0.06);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+aside.critical-read::before {
+    content: "Critical read \\2014\\00a0";
+    font-weight: 600;
+    font-style: italic;
+    color: var(--color-accent-100);
+}
+aside.critical-read p {
+    display: inline;
+    margin: 0;
+}
+aside.critical-read p + p {
+    display: block;
+    margin-top: 0.5rem;
+}
 """
