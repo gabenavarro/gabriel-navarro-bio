@@ -1,4 +1,4 @@
-@{id = "7d49b82f-5ce0-4215-8beb-fc569f9a468e"
+@{id = "b805efc1-8155-496e-bc7c-d48eb5bff03e"
   title = "DINO-VITS: A Self-Supervised Sidecar for Noise-Robust Zero-Shot Voice Cloning"
   date = "2026-05-06T00:00:00Z"
   tags = ['journal club', 'machine learning', 'arxiv', 'speech synthesis', 'self-supervised learning']
