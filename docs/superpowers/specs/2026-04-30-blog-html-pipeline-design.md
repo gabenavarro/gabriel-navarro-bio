@@ -82,8 +82,9 @@ Pure-Python, no I/O coupling. Exposes:
 @dataclass
 class LintFix:
     kind: Literal["named-entity", "multi-line-svg-open", "blank-line-in-svg"]
-    count: int        # how many sites the rule fixed
-    detail: str       # short human-readable summary
+    count: int  # how many sites the rule fixed
+    detail: str  # short human-readable summary
+
 
 def lint_body(body: str) -> tuple[str, list[LintFix]]: ...
 ```
@@ -112,6 +113,7 @@ class ValidationIssue:
     line: int | None
     snippet: str
 
+
 def render_to_html(body: str) -> str: ...
 def validate_html(html: str) -> list[ValidationIssue]: ...
 ```
@@ -133,6 +135,7 @@ class BlogRow(BaseModel):
     step 10 drops the `body` column, the field is removed from this
     model and its callers.
     """
+
     model_config = ConfigDict(extra="forbid")
     id: str
     title: str
@@ -144,8 +147,8 @@ class BlogRow(BaseModel):
     disabled: bool
     views: int
     likes: int
-    body: str          # legacy markdown source; dropped at step 10
-    body_html: str     # rendered HTML; the new source of truth for the renderer
+    body: str  # legacy markdown source; dropped at step 10
+    body_html: str  # rendered HTML; the new source of truth for the renderer
 
     @field_validator("body_html")
     @classmethod
@@ -163,10 +166,10 @@ class BlogRow(BaseModel):
 
 ```python
 def _payload_from_blog(path: Path) -> dict[str, Any]:
-    blog = parse_blog(path)                     # BlogFrontmatter
+    blog = parse_blog(path)  # BlogFrontmatter
     fixed, fixes = lint_body(blog.body)
     if fixes:
-        _persist_lint_fixes(path, fixed)        # write back to .md
+        _persist_lint_fixes(path, fixed)  # write back to .md
         for f in fixes:
             print(f"[lint] {f.kind}: {f.detail} (×{f.count})")
     html = render_to_html(fixed)
@@ -194,9 +197,9 @@ Note that `blog.body` (the linted markdown) and `html` (rendered) are both writt
 Single line change:
 ```python
 # before
-render_md(project.body),
+(render_md(project.body),)
 # after
-NotStr(project.body_html),
+(NotStr(project.body_html),)
 ```
 
 ### New script: `scripts/backfill_blog_html.py`

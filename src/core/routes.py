@@ -1,6 +1,8 @@
 from fasthtml.common import *
 from starlette.responses import Response
 
+from src.features.cv import CV_PAGE
+from src.features.feed.rss import build_rss_feed
 from src.features.hero import HERO_PAGE
 from src.features.projects import (
     PROJECTS_PAGE,
@@ -8,8 +10,6 @@ from src.features.projects import (
     create_blog_page_by_slug,
     create_masonry_page,
 )
-from src.features.cv import CV_PAGE
-from src.features.feed.rss import build_rss_feed
 from src.services.projects import ProjectService
 
 
@@ -23,11 +23,11 @@ def register_routes(app, rt):
         return HERO_PAGE
 
     @rt("/projects")
-    def projects(tag: str = None):
+    def projects(tag: str | None = None):
         return PROJECTS_PAGE
 
     @rt("/blogs")
-    def blogs(tag: str = None):
+    def blogs(tag: str | None = None):
         return create_masonry_page(tag)
 
     @rt("/blogs/slug/{slug}")

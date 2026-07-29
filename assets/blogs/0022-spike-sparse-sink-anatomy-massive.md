@@ -418,6 +418,7 @@ A minimal sketch of the directional quadratic amplifier — the part of SwiGLU t
 import torch
 import torch.nn as nn
 
+
 class DirectionalQuadraticAmplifier(nn.Module):
     """SwiGLU FFN, simplified to the regime that produces massive activations.
 
@@ -431,14 +432,14 @@ class DirectionalQuadraticAmplifier(nn.Module):
     def __init__(self, d_model: int, d_ffn: int):
         super().__init__()
         self.W_gate = nn.Linear(d_model, d_ffn, bias=False)
-        self.W_up   = nn.Linear(d_model, d_ffn, bias=False)
+        self.W_up = nn.Linear(d_model, d_ffn, bias=False)
         self.W_down = nn.Linear(d_ffn, d_model, bias=False)
 
     def forward(self, h: torch.Tensor) -> torch.Tensor:
         # h shape: (batch, seq, d_model). Each output channel k will end up
         # behaving like a quadratic form h^T S_k h.
         gate = self.W_gate(h)
-        up   = self.W_up(h)
+        up = self.W_up(h)
 
         # SwiGLU normally applies SiLU here; for spike tokens it is
         # near-identity, so the multiplicative gate is the dominant nonlinearity.

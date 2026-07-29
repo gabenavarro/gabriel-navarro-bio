@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import List
 
 from slugify import slugify
 
@@ -16,7 +15,7 @@ class Project:
     title: str
     description: str
     image: str
-    tags: List[str] = field(default_factory=list)
+    tags: list[str] = field(default_factory=list)
     disabled: bool = False
     views: int = 0
     likes: int = 0

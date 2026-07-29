@@ -364,6 +364,7 @@ A minimal sketch of the inner loop. This is a faithful translation of the paper'
 ```python
 from dataclasses import dataclass, field
 
+
 @dataclass
 class TrainingFreeGRPO:
     """One epoch of Training-Free GRPO over a small training set.
@@ -375,9 +376,10 @@ class TrainingFreeGRPO:
     The buffer E starts empty and grows into a few-dozen-line block
     of natural-language lessons that the next epoch's rollouts read.
     """
-    llm: "LLM"                              # frontier API client
-    reward_fn: callable                     # scores one trajectory
-    group_size: int = 5                     # paper used G=5 (math), G=3 (web)
+
+    llm: "LLM"  # frontier API client
+    reward_fn: callable  # scores one trajectory
+    group_size: int = 5  # paper used G=5 (math), G=3 (web)
     experience: list[str] = field(default_factory=list)
 
     def step(self, query: str, ground_truth: str) -> None:
@@ -414,17 +416,21 @@ class TrainingFreeGRPO:
     def _render_buffer(self) -> str:
         if not self.experience:
             return ""
-        lines = "\n".join(f"[{i+1}] {e}" for i, e in enumerate(self.experience))
+        lines = "\n".join(f"[{i + 1}] {e}" for i, e in enumerate(self.experience))
         return f"Useful experiences from prior problems:\n{lines}"
 
     def _apply(self, ops: list[dict]) -> None:
         # ops example: [{"type": "add", "text": "Verify rectangle..."}, ...]
         for op in ops:
             match op["type"]:
-                case "add":    self.experience.append(op["text"])
-                case "delete": self.experience.pop(op["index"])
-                case "modify": self.experience[op["index"]] = op["text"]
-                case "keep":   pass
+                case "add":
+                    self.experience.append(op["text"])
+                case "delete":
+                    self.experience.pop(op["index"])
+                case "modify":
+                    self.experience[op["index"]] = op["text"]
+                case "keep":
+                    pass
 ```
 
 ### Key Takeaways

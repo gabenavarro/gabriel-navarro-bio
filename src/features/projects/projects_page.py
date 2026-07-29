@@ -1,8 +1,10 @@
 from fasthtml.common import *
 from monsterui.all import *
+
 from src.components.base import button_ghost, button_primary
 from src.components.layout.page import StandardPage
 from src.services.projects import ProjectService
+
 from .components import render_project_card
 
 

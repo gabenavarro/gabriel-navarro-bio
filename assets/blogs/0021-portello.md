@@ -414,8 +414,8 @@ class CountsBP(TypedDict):
 
 
 def basecall_error_reduction(
-    pbmm2: CountsBP,    # FN/FP from conventional read mapping
-    portello: CountsBP, # FN/FP from assembly-based remapping
+    pbmm2: CountsBP,  # FN/FP from conventional read mapping
+    portello: CountsBP,  # FN/FP from assembly-based remapping
 ) -> dict[str, float]:
     """Fraction of small-variant basecall errors removed by switching mapper.
 
@@ -429,7 +429,7 @@ def basecall_error_reduction(
     precision-driven.
     """
     # Step 1: total errors per arm
-    err_pbmm2    = pbmm2["fn"]    + pbmm2["fp"]
+    err_pbmm2 = pbmm2["fn"] + pbmm2["fp"]
     err_portello = portello["fn"] + portello["fp"]
 
     # Step 2: relative reduction (positive = portello better)
@@ -444,7 +444,7 @@ def basecall_error_reduction(
 
 # HG002 numbers from Table S1, BASEPAIR row
 hg002 = basecall_error_reduction(
-    pbmm2   ={"fn": 326_253, "fp": 49_381},
+    pbmm2={"fn": 326_253, "fp": 49_381},
     portello={"fn": 156_775, "fp": 42_593},
 )
 # {'total_reduction': 0.469..., 'fn_reduction': 0.519..., 'fp_reduction': 0.137...}
@@ -637,8 +637,8 @@ import numpy as np
 
 
 def transfer_read_alignment(
-    read_to_contig: np.ndarray,   # (L, 2) — (read_pos, contig_pos) per matched base
-    contig_to_ref: np.ndarray,    # (M, 2) — (contig_pos, ref_pos) per matched base
+    read_to_contig: np.ndarray,  # (L, 2) — (read_pos, contig_pos) per matched base
+    contig_to_ref: np.ndarray,  # (M, 2) — (contig_pos, ref_pos) per matched base
 ) -> np.ndarray:
     """Compose read->contig and contig->reference into read->reference.
 

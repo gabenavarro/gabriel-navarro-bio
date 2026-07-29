@@ -337,9 +337,7 @@ class DinoSpeakerLoss(nn.Module):
         loss = -(teacher_probs * student_log_probs).sum(dim=-1).mean()
         # Update center as EMA over the batch mean of (un-centered) teacher outputs.
         batch_center = teacher_out.detach().mean(dim=0, keepdim=True)
-        self.center.mul_(self.center_momentum).add_(
-            batch_center, alpha=1.0 - self.center_momentum
-        )
+        self.center.mul_(self.center_momentum).add_(batch_center, alpha=1.0 - self.center_momentum)
         return loss
 ```
 

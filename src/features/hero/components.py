@@ -1,5 +1,6 @@
 from fasthtml.common import *
 from monsterui.all import *
+
 from src.components.base import Card, button_ghost
 from src.config import settings
 

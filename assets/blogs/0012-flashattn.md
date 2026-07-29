@@ -71,13 +71,13 @@ We download a minute-resolution Bitcoin CSV from Kaggle, then:
 import pandas as pd, numpy as np
 
 df = pd.read_csv("btc_usd_1-min.csv").sort_values("Timestamp")
-for col in ["Open","High","Low","Close"]:
+for col in ["Open", "High", "Low", "Close"]:
     df[col] = np.log(df[col].clip(lower=0.01))
 df["Volume"] = np.log1p(df["Volume"].clip(lower=0))
 
 # Z-score normalization per feature
 stats = {}
-for feat in ["Open","High","Low","Close","Volume"]:
+for feat in ["Open", "High", "Low", "Close", "Volume"]:
     μ, σ = df[feat].mean(), df[feat].std() or 1.0
     stats[feat] = (μ, σ)
     df[feat] = (df[feat] - μ) / σ
@@ -104,27 +104,32 @@ from flash_attn.modules.mha import MHA
 from flash_attn.ops.rms_norm import RMSNorm
 import torch.nn as nn
 
+
 class TransformerLayer(nn.Module):
     def __init__(self, dim, heads):
         super().__init__()
         self.attn = MHA(dim, heads, causal=True, use_flash_attn=True)
         self.norm1 = RMSNorm(dim)
-        self.mlp   = nn.Sequential(nn.Linear(dim, 4*dim), nn.GELU(), nn.Linear(4*dim, dim))
+        self.mlp = nn.Sequential(nn.Linear(dim, 4 * dim), nn.GELU(), nn.Linear(4 * dim, dim))
         self.norm2 = RMSNorm(dim)
+
     def forward(self, x):
         x = x + self.attn(self.norm1(x))
         x = x + self.mlp(self.norm2(x))
         return x
 
+
 class BTCTransformer(nn.Module):
     def __init__(self):
         super().__init__()
-        self.in_proj  = nn.Linear(5, 64)
-        self.layers   = nn.ModuleList([TransformerLayer(64,8) for _ in range(4)])
+        self.in_proj = nn.Linear(5, 64)
+        self.layers = nn.ModuleList([TransformerLayer(64, 8) for _ in range(4)])
         self.out_proj = nn.Linear(64, 5)
+
     def forward(self, x):
         x = self.in_proj(x)
-        for l in self.layers: x = l(x)
+        for l in self.layers:
+            x = l(x)
         return self.out_proj(x)
 ```
 
@@ -144,11 +149,11 @@ We wrap our model in a `pl.LightningModule` to handle:
 ```python
 trainer = pl.Trainer(
     max_epochs=10,
-    accelerator="gpu", devices=1,
+    accelerator="gpu",
+    devices=1,
     precision="bf16-mixed",
     gradient_clip_val=0.5,
-    callbacks=[EarlyStopping("val_loss", patience=5),
-               ModelCheckpoint(monitor="val_loss")]
+    callbacks=[EarlyStopping("val_loss", patience=5), ModelCheckpoint(monitor="val_loss")],
 )
 trainer.fit(model, train_loader, val_loader)
 ```

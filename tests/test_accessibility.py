@@ -4,8 +4,9 @@ import re
 from unittest.mock import patch
 
 from fasthtml.common import to_xml
-from src.features.hero import HERO_PAGE
+
 from src.features.cv import CV_PAGE
+from src.features.hero import HERO_PAGE
 
 
 def _img_tags_without_alt(html: str) -> list[str]:

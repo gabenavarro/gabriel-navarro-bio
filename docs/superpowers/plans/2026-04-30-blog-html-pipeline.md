@@ -55,6 +55,7 @@
 `tests/test_blog_lint.py`:
 ```python
 """Tests for src.services.blog_lint."""
+
 import pytest
 
 from src.services.blog_lint import LintError, LintFix, lint_body
@@ -205,24 +206,48 @@ import re
 # entities (amp/lt/gt/apos/quot) are intentionally absent — they're valid in
 # both XML and HTML and do not need substitution.
 ENTITY_MAP: dict[str, str] = {
-    "mdash": "—", "ndash": "–",
-    "middot": "·", "bull": "•",
-    "times": "×", "divide": "÷",
-    "plusmn": "±", "minus": "−",
-    "rarr": "→", "larr": "←",
-    "uarr": "↑", "darr": "↓", "harr": "↔",
+    "mdash": "—",
+    "ndash": "–",
+    "middot": "·",
+    "bull": "•",
+    "times": "×",
+    "divide": "÷",
+    "plusmn": "±",
+    "minus": "−",
+    "rarr": "→",
+    "larr": "←",
+    "uarr": "↑",
+    "darr": "↓",
+    "harr": "↔",
     "hellip": "…",
-    "asymp": "≈", "ne": "≠",
-    "ge": "≥", "le": "≤",
+    "asymp": "≈",
+    "ne": "≠",
+    "ge": "≥",
+    "le": "≤",
     "deg": "°",
-    "radic": "√", "infin": "∞",
-    "alpha": "α", "beta": "β", "gamma": "γ", "delta": "δ",
-    "epsilon": "ε", "theta": "θ", "lambda": "λ", "mu": "μ",
-    "pi": "π", "sigma": "σ", "phi": "φ", "omega": "ω",
-    "Sigma": "Σ", "Delta": "Δ", "Omega": "Ω",
-    "sum": "∑", "prod": "∏",
+    "radic": "√",
+    "infin": "∞",
+    "alpha": "α",
+    "beta": "β",
+    "gamma": "γ",
+    "delta": "δ",
+    "epsilon": "ε",
+    "theta": "θ",
+    "lambda": "λ",
+    "mu": "μ",
+    "pi": "π",
+    "sigma": "σ",
+    "phi": "φ",
+    "omega": "ω",
+    "Sigma": "Σ",
+    "Delta": "Δ",
+    "Omega": "Ω",
+    "sum": "∑",
+    "prod": "∏",
     "nbsp": " ",
-    "copy": "©", "reg": "®", "trade": "™",
+    "copy": "©",
+    "reg": "®",
+    "trade": "™",
 }
 
 _XML_SAFE_ENTITIES = frozenset({"amp", "lt", "gt", "apos", "quot"})
@@ -261,11 +286,13 @@ def lint_body(body: str) -> tuple[str, list[LintFix]]:
     fixes: list[LintFix] = []
     body, n = _replace_named_entities(body)
     if n:
-        fixes.append(LintFix(
-            kind="named-entity",
-            count=n,
-            detail=f"replaced {n} HTML named entit{'y' if n == 1 else 'ies'} with Unicode literals",
-        ))
+        fixes.append(
+            LintFix(
+                kind="named-entity",
+                count=n,
+                detail=f"replaced {n} HTML named entit{'y' if n == 1 else 'ies'} with Unicode literals",
+            )
+        )
     return body, fixes
 ```
 
@@ -298,8 +325,8 @@ def test_lint_collapses_multi_line_svg_open():
         '<svg viewBox="0 0 100 100"\n'
         '     xmlns="http://www.w3.org/2000/svg"\n'
         '     role="img">\n'
-        '  <title>x</title>\n'
-        '</svg>'
+        "  <title>x</title>\n"
+        "</svg>"
     )
     fixed, fixes = lint_body(src)
     first_line = fixed.split("\n", 1)[0]
@@ -320,11 +347,11 @@ def test_lint_collapses_only_svg_tag_not_other_multi_line_tags():
         '<svg viewBox="0 0 100 100" xmlns="..." role="img">\n'
         '  <text x="10" y="20"\n'
         '        font-size="13">hello</text>\n'
-        '</svg>'
+        "</svg>"
     )
     fixed, _ = lint_body(src)
     # The multi-line <text> should be unchanged; the <svg> open is already on one line.
-    assert "<text x=\"10\" y=\"20\"\n        font-size=\"13\">" in fixed
+    assert '<text x="10" y="20"\n        font-size="13">' in fixed
 ```
 
 - [ ] **Step 3.2: Run tests to verify they fail**
@@ -368,10 +395,22 @@ def lint_body(body: str) -> tuple[str, list[LintFix]]:
     fixes: list[LintFix] = []
     body, n = _replace_named_entities(body)
     if n:
-        fixes.append(LintFix("named-entity", n, f"replaced {n} HTML named entit{'y' if n == 1 else 'ies'} with Unicode literals"))
+        fixes.append(
+            LintFix(
+                "named-entity",
+                n,
+                f"replaced {n} HTML named entit{'y' if n == 1 else 'ies'} with Unicode literals",
+            )
+        )
     body, n = _collapse_svg_open_tags(body)
     if n:
-        fixes.append(LintFix("multi-line-svg-open", n, f"collapsed {n} multi-line <svg ...> opening tag(s) to single line"))
+        fixes.append(
+            LintFix(
+                "multi-line-svg-open",
+                n,
+                f"collapsed {n} multi-line <svg ...> opening tag(s) to single line",
+            )
+        )
     return body, fixes
 ```
 
@@ -400,17 +439,9 @@ git commit -m "feat(blog-lint): collapse multi-line <svg> opening tags to single
 Append to `tests/test_blog_lint.py`:
 ```python
 def test_lint_strips_blank_lines_inside_svg():
-    src = (
-        '<svg>\n'
-        '  <title>t</title>\n'
-        '\n'
-        '  <text>line a</text>\n'
-        '\n'
-        '  <text>line b</text>\n'
-        '</svg>'
-    )
+    src = "<svg>\n  <title>t</title>\n\n  <text>line a</text>\n\n  <text>line b</text>\n</svg>"
     fixed, fixes = lint_body(src)
-    inside = fixed[fixed.index("<svg>"):fixed.index("</svg>")]
+    inside = fixed[fixed.index("<svg>") : fixed.index("</svg>")]
     assert "\n\n" not in inside
     assert "<text>line a</text>" in fixed and "<text>line b</text>" in fixed
     assert any(f.kind == "blank-line-in-svg" for f in fixes)
@@ -422,11 +453,11 @@ def test_lint_preserves_blank_lines_outside_svg():
         "\n"
         "Paragraph two.\n"
         "\n"
-        '<svg>\n'
-        '  <title>t</title>\n'
-        '\n'
-        '  <text>x</text>\n'
-        '</svg>\n'
+        "<svg>\n"
+        "  <title>t</title>\n"
+        "\n"
+        "  <text>x</text>\n"
+        "</svg>\n"
         "\n"
         "Paragraph three.\n"
     )
@@ -436,13 +467,7 @@ def test_lint_preserves_blank_lines_outside_svg():
 
 
 def test_lint_preserves_indentation_in_svg():
-    src = (
-        '<svg>\n'
-        '  <title>t</title>\n'
-        '\n'
-        '  <text>indented body</text>\n'
-        '</svg>'
-    )
+    src = "<svg>\n  <title>t</title>\n\n  <text>indented body</text>\n</svg>"
     fixed, _ = lint_body(src)
     assert "  <text>indented body</text>" in fixed
 ```
@@ -492,13 +517,29 @@ def lint_body(body: str) -> tuple[str, list[LintFix]]:
     fixes: list[LintFix] = []
     body, n = _replace_named_entities(body)
     if n:
-        fixes.append(LintFix("named-entity", n, f"replaced {n} HTML named entit{'y' if n == 1 else 'ies'} with Unicode literals"))
+        fixes.append(
+            LintFix(
+                "named-entity",
+                n,
+                f"replaced {n} HTML named entit{'y' if n == 1 else 'ies'} with Unicode literals",
+            )
+        )
     body, n = _collapse_svg_open_tags(body)
     if n:
-        fixes.append(LintFix("multi-line-svg-open", n, f"collapsed {n} multi-line <svg ...> opening tag(s) to single line"))
+        fixes.append(
+            LintFix(
+                "multi-line-svg-open",
+                n,
+                f"collapsed {n} multi-line <svg ...> opening tag(s) to single line",
+            )
+        )
     body, n = _strip_blank_lines_in_svg(body)
     if n:
-        fixes.append(LintFix("blank-line-in-svg", n, f"stripped {n} blank line(s) inside <svg>...</svg> blocks"))
+        fixes.append(
+            LintFix(
+                "blank-line-in-svg", n, f"stripped {n} blank line(s) inside <svg>...</svg> blocks"
+            )
+        )
     return body, fixes
 ```
 
@@ -544,7 +585,7 @@ def test_lint_does_not_mangle_fenced_code_blocks():
         "And here's a real one:\n"
         "\n"
         '<svg viewBox="0 0 200 200" xmlns="..." role="img">\n'
-        '  <title>real</title>\n'
+        "  <title>real</title>\n"
         "\n"
         "  <text>real text</text>\n"
         "</svg>\n"
@@ -552,7 +593,7 @@ def test_lint_does_not_mangle_fenced_code_blocks():
     fixed, fixes = lint_body(src)
     # The CODE BLOCK content must be preserved verbatim — multi-line open and blanks stay.
     assert (
-        '```svg\n'
+        "```svg\n"
         '<svg viewBox="0 0 100 100"\n'
         '     xmlns="..."\n'
         '     role="img">\n'
@@ -612,13 +653,29 @@ def lint_body(body: str) -> tuple[str, list[LintFix]]:
     fixes: list[LintFix] = []
     body, n = _replace_named_entities(body)
     if n:
-        fixes.append(LintFix("named-entity", n, f"replaced {n} HTML named entit{'y' if n == 1 else 'ies'} with Unicode literals"))
+        fixes.append(
+            LintFix(
+                "named-entity",
+                n,
+                f"replaced {n} HTML named entit{'y' if n == 1 else 'ies'} with Unicode literals",
+            )
+        )
     body, n = _collapse_svg_open_tags(body)
     if n:
-        fixes.append(LintFix("multi-line-svg-open", n, f"collapsed {n} multi-line <svg ...> opening tag(s) to single line"))
+        fixes.append(
+            LintFix(
+                "multi-line-svg-open",
+                n,
+                f"collapsed {n} multi-line <svg ...> opening tag(s) to single line",
+            )
+        )
     body, n = _strip_blank_lines_in_svg(body)
     if n:
-        fixes.append(LintFix("blank-line-in-svg", n, f"stripped {n} blank line(s) inside <svg>...</svg> blocks"))
+        fixes.append(
+            LintFix(
+                "blank-line-in-svg", n, f"stripped {n} blank line(s) inside <svg>...</svg> blocks"
+            )
+        )
     body = _restore_fenced_code(body, stash)
     return body, fixes
 ```
@@ -652,10 +709,10 @@ def test_lint_is_idempotent():
         '<svg viewBox="0 0 100 100"\n'
         '     xmlns="..."\n'
         '     role="img">\n'
-        '  <title>t &mdash; subtitle</title>\n'
-        '\n'
-        '  <text>x &times; y</text>\n'
-        '</svg>'
+        "  <title>t &mdash; subtitle</title>\n"
+        "\n"
+        "  <text>x &times; y</text>\n"
+        "</svg>"
     )
     once, _ = lint_body(src)
     twice, fixes_second = lint_body(once)
@@ -676,10 +733,10 @@ def test_lint_does_not_mangle_indented_widget_svg():
     src = (
         '<div class="ptb-state" id="s1">\n'
         '    <svg viewBox="0 0 100 100" xmlns="..." role="img">\n'
-        '      <title>indented</title>\n'
-        '      <text>x</text>\n'
-        '    </svg>\n'
-        '</div>'
+        "      <title>indented</title>\n"
+        "      <text>x</text>\n"
+        "    </svg>\n"
+        "</div>"
     )
     fixed, fixes = lint_body(src)
     # No changes expected — this SVG is already lint-clean.
@@ -695,10 +752,12 @@ def test_lint_canary_against_real_post_0022():
     assert that after lint, the body has no <svg> block with a blank line in it.
     """
     from pathlib import Path
+
     src = Path("assets/blogs/0022-spike-sparse-sink-anatomy-massive.md").read_text(encoding="utf-8")
     fixed, _ = lint_body(src)
     # Find every <svg>...</svg> and check no blank line inside.
     import re
+
     for m in re.finditer(r"<svg\b[^>]*>.*?</svg>", fixed, re.DOTALL):
         block = m.group(0)
         for line in block.split("\n"):
@@ -730,6 +789,7 @@ git commit -m "test(blog-lint): idempotency, indented widget skip, real-post can
 `tests/test_blog_render.py`:
 ```python
 """Tests for src.services.blog_render."""
+
 import pytest
 from src.services.blog_render import RenderError, render_to_html
 
@@ -752,9 +812,9 @@ def test_render_returns_plain_string_not_notstr():
 def test_render_preserves_inline_svg_when_clean():
     md = (
         '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img">\n'
-        '  <title>t</title>\n'
-        '  <text>x</text>\n'
-        '</svg>'
+        "  <title>t</title>\n"
+        "  <text>x</text>\n"
+        "</svg>"
     )
     html = render_to_html(md)
     assert "<svg" in html
@@ -845,7 +905,7 @@ def test_validate_returns_empty_for_clean_html():
 
 
 def test_validate_catches_p_wrapping_svg():
-    bad = '<p><svg></svg></p>'
+    bad = "<p><svg></svg></p>"
     issues = validate_html(bad)
     assert any(i.kind == "p-wraps-svg" for i in issues)
 
@@ -875,14 +935,14 @@ def test_validate_catches_svg_missing_role_img():
 
 
 def test_validate_returns_multiple_issues_at_once():
-    bad = '<p><svg></svg></p><p><text>x</text></p>'  # two <p> wraps + tag mismatch + missing title
+    bad = "<p><svg></svg></p><p><text>x</text></p>"  # two <p> wraps + tag mismatch + missing title
     issues = validate_html(bad)
     kinds = [i.kind for i in issues]
     assert kinds.count("p-wraps-svg") >= 2
 
 
 def test_validate_issue_includes_snippet():
-    bad = '<p><svg></svg></p>'
+    bad = "<p><svg></svg></p>"
     issues = validate_html(bad)
     p_issues = [i for i in issues if i.kind == "p-wraps-svg"]
     assert len(p_issues) >= 1
@@ -910,8 +970,15 @@ class ValidationIssue:
 
 # Tags whose presence inside a <p> wrap is the diagnostic of the class-3 bug.
 _SVG_INTERNAL_TAGS = (
-    "svg", "text", "rect", "line", "circle", "path",
-    "g", "defs", "marker",
+    "svg",
+    "text",
+    "rect",
+    "line",
+    "circle",
+    "path",
+    "g",
+    "defs",
+    "marker",
 )
 _P_WRAPS_SVG = re.compile(
     r"<p\b[^>]*>\s*<(?:" + "|".join(_SVG_INTERNAL_TAGS) + r"|!--)\b",
@@ -934,21 +1001,25 @@ def validate_html(html: str) -> list[ValidationIssue]:
 
     # Rule 1: <p>-wraps-SVG-internal-tag
     for match in _P_WRAPS_SVG.finditer(html):
-        issues.append(ValidationIssue(
-            kind="p-wraps-svg",
-            line=_line_of(html, match.start()),
-            snippet=html[match.start(): match.start() + 120],
-        ))
+        issues.append(
+            ValidationIssue(
+                kind="p-wraps-svg",
+                line=_line_of(html, match.start()),
+                snippet=html[match.start() : match.start() + 120],
+            )
+        )
 
     # Rule 2: <svg> open count == </svg> close count
     n_open = len(_SVG_OPEN.findall(html))
     n_close = len(_SVG_CLOSE.findall(html))
     if n_open != n_close:
-        issues.append(ValidationIssue(
-            kind="svg-tag-mismatch",
-            line=None,
-            snippet=f"<svg> opens={n_open}, </svg> closes={n_close}",
-        ))
+        issues.append(
+            ValidationIssue(
+                kind="svg-tag-mismatch",
+                line=None,
+                snippet=f"<svg> opens={n_open}, </svg> closes={n_close}",
+            )
+        )
 
     # Rules 3+4 operate per top-level SVG block.
     # We don't try to detect nesting here — top-level SVGs are the only ones
@@ -957,19 +1028,23 @@ def validate_html(html: str) -> list[ValidationIssue]:
         block = match.group(0)
         line = _line_of(html, match.start())
         if not _HAS_TITLE_CHILD.search(block):
-            issues.append(ValidationIssue(
-                kind="svg-missing-title",
-                line=line,
-                snippet=block[:120],
-            ))
+            issues.append(
+                ValidationIssue(
+                    kind="svg-missing-title",
+                    line=line,
+                    snippet=block[:120],
+                )
+            )
         # Inspect the opening tag specifically (first match within the block).
         open_match = _SVG_OPEN.match(block)
         if open_match and not _HAS_ROLE_IMG.search(open_match.group(0)):
-            issues.append(ValidationIssue(
-                kind="svg-missing-role",
-                line=line,
-                snippet=open_match.group(0),
-            ))
+            issues.append(
+                ValidationIssue(
+                    kind="svg-missing-role",
+                    line=line,
+                    snippet=open_match.group(0),
+                )
+            )
 
     return issues
 ```
@@ -1004,6 +1079,7 @@ def test_blog_row_validates_minimal_payload():
     """BlogRow accepts a complete payload (markdown + html) with no errors."""
     from datetime import datetime, timezone
     from src.services.blog_frontmatter import BlogRow
+
     row = BlogRow(
         id="00000000-0000-0000-0000-000000000000",
         title="Test",
@@ -1025,6 +1101,7 @@ def test_blog_row_rejects_empty_body_html():
     from datetime import datetime, timezone
     from pydantic import ValidationError
     from src.services.blog_frontmatter import BlogRow
+
     with pytest.raises(ValidationError, match="body_html"):
         BlogRow(
             id="x",
@@ -1046,14 +1123,21 @@ def test_blog_row_extra_fields_forbidden():
     from datetime import datetime, timezone
     from pydantic import ValidationError
     from src.services.blog_frontmatter import BlogRow
+
     with pytest.raises(ValidationError):
         BlogRow(
-            id="x", title="t",
+            id="x",
+            title="t",
             date=datetime(2026, 1, 1, tzinfo=timezone.utc),
-            tags=[], description="d",
+            tags=[],
+            description="d",
             image="https://e.com/i.svg",
-            type="note", disabled=False, views=0, likes=0,
-            body="md", body_html="<h1/>",
+            type="note",
+            disabled=False,
+            views=0,
+            likes=0,
+            body="md",
+            body_html="<h1/>",
             unexpected="boom",
         )
 ```
@@ -1128,16 +1212,17 @@ def test_payload_from_blog_includes_body_html(tmp_path):
     """_payload_from_blog returns a dict with both `body` (markdown) and
     `body_html` (rendered)."""
     from src.cli.blog import _payload_from_blog
+
     md = tmp_path / "post.md"
     md.write_text(
-        "@{title = \"T\"\n"
-        "  date = \"2026-01-01T00:00:00Z\"\n"
-        "  tags = [\"x\"]\n"
+        '@{title = "T"\n'
+        '  date = "2026-01-01T00:00:00Z"\n'
+        '  tags = ["x"]\n'
         "  views = 0\n"
         "  likes = 0\n"
-        "  image = \"https://e.com/i.svg\"\n"
-        "  description = \"d\"\n"
-        "  type = \"note\"\n"
+        '  image = "https://e.com/i.svg"\n'
+        '  description = "d"\n'
+        '  type = "note"\n'
         "  disabled = false\n"
         "}\n"
         "# Body\n",
@@ -1152,16 +1237,17 @@ def test_payload_from_blog_includes_body_html(tmp_path):
 def test_payload_from_blog_persists_lint_fixes_to_disk(tmp_path, capsys):
     """If lint changes the body, the .md file is overwritten with the linted text."""
     from src.cli.blog import _payload_from_blog
+
     md = tmp_path / "post.md"
     raw = (
-        "@{title = \"T\"\n"
-        "  date = \"2026-01-01T00:00:00Z\"\n"
-        "  tags = [\"x\"]\n"
+        '@{title = "T"\n'
+        '  date = "2026-01-01T00:00:00Z"\n'
+        '  tags = ["x"]\n'
         "  views = 0\n"
         "  likes = 0\n"
-        "  image = \"https://e.com/i.svg\"\n"
-        "  description = \"d\"\n"
-        "  type = \"note\"\n"
+        '  image = "https://e.com/i.svg"\n'
+        '  description = "d"\n'
+        '  type = "note"\n'
         "  disabled = false\n"
         "}\n"
         "# Body\n"
@@ -1182,21 +1268,22 @@ def test_payload_from_blog_persists_lint_fixes_to_disk(tmp_path, capsys):
 def test_payload_from_blog_raises_on_validation_failure(tmp_path):
     """If validate_html finds an issue, _payload_from_blog raises."""
     from src.cli.blog import _payload_from_blog
+
     md = tmp_path / "post.md"
     # Body contains an SVG with no <title> and no role="img" — both will fail validation.
     md.write_text(
-        "@{title = \"T\"\n"
-        "  date = \"2026-01-01T00:00:00Z\"\n"
-        "  tags = [\"x\"]\n"
+        '@{title = "T"\n'
+        '  date = "2026-01-01T00:00:00Z"\n'
+        '  tags = ["x"]\n'
         "  views = 0\n"
         "  likes = 0\n"
-        "  image = \"https://e.com/i.svg\"\n"
-        "  description = \"d\"\n"
-        "  type = \"note\"\n"
+        '  image = "https://e.com/i.svg"\n'
+        '  description = "d"\n'
+        '  type = "note"\n'
         "  disabled = false\n"
         "}\n"
         "# Body\n"
-        "<svg viewBox=\"0 0 100 100\"><text>x</text></svg>\n",
+        '<svg viewBox="0 0 100 100"><text>x</text></svg>\n',
         encoding="utf-8",
     )
     with pytest.raises(ValueError, match="validate_html"):
@@ -1257,9 +1344,7 @@ def _payload_from_blog(path: Path) -> dict[str, Any]:
                 f"[error] {i.kind} (line {i.line}): {i.snippet[:120]}",
                 file=sys.stderr,
             )
-        raise ValueError(
-            f"validate_html found {len(issues)} issue(s); fix the source and re-run"
-        )
+        raise ValueError(f"validate_html found {len(issues)} issue(s); fix the source and re-run")
 
     row = BlogRow(**{**blog.model_dump(), "body_html": html})
     return row.model_dump(mode="json")
@@ -1309,20 +1394,21 @@ Append to `tests/test_cli_blog.py`:
 def test_validate_reports_lint_issues_without_writing(tmp_path, capsys):
     """`blog validate` reports lint issues but does NOT write the file."""
     from src.cli.__main__ import main
+
     md = tmp_path / "post.md"
     raw = (
-        "@{id = \"00000000-0000-0000-0000-000000000000\"\n"
-        "  title = \"T\"\n"
-        "  date = \"2026-01-01T00:00:00Z\"\n"
-        "  tags = [\"x\"]\n"
+        '@{id = "00000000-0000-0000-0000-000000000000"\n'
+        '  title = "T"\n'
+        '  date = "2026-01-01T00:00:00Z"\n'
+        '  tags = ["x"]\n'
         "  views = 0\n"
         "  likes = 0\n"
-        "  image = \"https://e.com/i.svg\"\n"
-        "  description = \"d\"\n"
-        "  type = \"note\"\n"
+        '  image = "https://e.com/i.svg"\n'
+        '  description = "d"\n'
+        '  type = "note"\n'
         "  disabled = false\n"
         "}\n"
-        "# B\n<svg viewBox=\"0 0 1 1\" xmlns=\"...\" role=\"img\"><title>x &mdash; y</title></svg>\n"
+        '# B\n<svg viewBox="0 0 1 1" xmlns="..." role="img"><title>x &mdash; y</title></svg>\n'
     )
     md.write_text(raw, encoding="utf-8")
     rc = main(["blog", "validate", str(md)])
@@ -1338,20 +1424,21 @@ def test_validate_reports_lint_issues_without_writing(tmp_path, capsys):
 def test_validate_exits_nonzero_on_validation_issue(tmp_path):
     """`blog validate` exits nonzero when validate_html finds an issue."""
     from src.cli.__main__ import main
+
     md = tmp_path / "post.md"
     md.write_text(
-        "@{id = \"00000000-0000-0000-0000-000000000000\"\n"
-        "  title = \"T\"\n"
-        "  date = \"2026-01-01T00:00:00Z\"\n"
-        "  tags = [\"x\"]\n"
+        '@{id = "00000000-0000-0000-0000-000000000000"\n'
+        '  title = "T"\n'
+        '  date = "2026-01-01T00:00:00Z"\n'
+        '  tags = ["x"]\n'
         "  views = 0\n"
         "  likes = 0\n"
-        "  image = \"https://e.com/i.svg\"\n"
-        "  description = \"d\"\n"
-        "  type = \"note\"\n"
+        '  image = "https://e.com/i.svg"\n'
+        '  description = "d"\n'
+        '  type = "note"\n'
         "  disabled = false\n"
         "}\n"
-        "# B\n<svg viewBox=\"0 0 1 1\"><text>missing title and role</text></svg>\n",
+        '# B\n<svg viewBox="0 0 1 1"><text>missing title and role</text></svg>\n',
         encoding="utf-8",
     )
     rc = main(["blog", "validate", str(md)])
@@ -1437,6 +1524,7 @@ git commit -m "feat(cli-blog): upgrade validate command to read-only lint+render
 Uses real files in assets/blogs/ as fixtures. These tests run BEFORE BigQuery
 is touched — they exercise pure-Python pipeline only.
 """
+
 from pathlib import Path
 
 from src.services.blog_lint import lint_body
@@ -1556,6 +1644,7 @@ git commit -m "chore(bq): add body_html column to gn-blog table"
 `tests/test_backfill_blog_html.py`:
 ```python
 """Tests for scripts.backfill_blog_html."""
+
 from pathlib import Path
 
 import pytest
@@ -1563,6 +1652,7 @@ import pytest
 
 def test_iter_blog_paths_returns_sorted_md_files(tmp_path):
     from scripts.backfill_blog_html import iter_blog_paths
+
     (tmp_path / "0003-c.md").write_text("@{}\n", encoding="utf-8")
     (tmp_path / "0001-a.md").write_text("@{}\n", encoding="utf-8")
     (tmp_path / "0002-b.md").write_text("@{}\n", encoding="utf-8")
@@ -1586,6 +1676,7 @@ def test_dry_run_does_not_call_submit(tmp_path, monkeypatch, capsys):
     # Stub out _payload_from_blog so we don't need real Pydantic frontmatter.
     def fake_payload(path):
         return {"id": "x", "body": path.read_text(), "body_html": "<p>html</p>"}
+
     monkeypatch.setattr(blog_module, "_payload_from_blog", fake_payload)
 
     blogs = tmp_path / "blogs"
@@ -1605,7 +1696,9 @@ def test_classify_streaming_buffer_error_recognizes_known_message():
     class MockExc(Exception):
         pass
 
-    err = MockExc("UPDATE or DELETE statement over table ... would affect rows in the streaming buffer, which is not supported")
+    err = MockExc(
+        "UPDATE or DELETE statement over table ... would affect rows in the streaming buffer, which is not supported"
+    )
     assert is_streaming_buffer_error(err)
     assert not is_streaming_buffer_error(MockExc("permission denied"))
 ```
@@ -1686,7 +1779,9 @@ def run_backfill(blogs_dir: Path, dry_run: bool) -> int:
             continue
 
         if dry_run:
-            print(f"[dry-run] would update id={payload.get('id', '?')} (body_html: {len(payload.get('body_html', ''))} chars)")
+            print(
+                f"[dry-run] would update id={payload.get('id', '?')} (body_html: {len(payload.get('body_html', ''))} chars)"
+            )
             successes.append(path)
             continue
 
@@ -1706,7 +1801,9 @@ def run_backfill(blogs_dir: Path, dry_run: bool) -> int:
             successes.append(path)
 
     if streaming_failures and not dry_run:
-        print(f"\n=== Sleeping 35 minutes before retrying {len(streaming_failures)} streaming-buffer post(s) ===")
+        print(
+            f"\n=== Sleeping 35 minutes before retrying {len(streaming_failures)} streaming-buffer post(s) ==="
+        )
         time.sleep(35 * 60)
         for path in streaming_failures:
             print(f"\n--- retry: {path.name} ---")
@@ -1731,8 +1828,14 @@ def run_backfill(blogs_dir: Path, dry_run: bool) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--dry-run", action="store_true", help="Preview only; do not push to BigQuery.")
-    parser.add_argument("--blogs-dir", default=str(DEFAULT_BLOGS_DIR), help="Directory containing the blog .md files.")
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Preview only; do not push to BigQuery."
+    )
+    parser.add_argument(
+        "--blogs-dir",
+        default=str(DEFAULT_BLOGS_DIR),
+        help="Directory containing the blog .md files.",
+    )
     args = parser.parse_args(argv)
     return run_backfill(Path(args.blogs_dir), dry_run=args.dry_run)
 
@@ -1821,6 +1924,7 @@ Expected: `n_total == n_with_html` and equal to the number of posts.
 `tests/test_project_model.py` (or extend existing):
 ```python
 """Tests for src.models.project."""
+
 from src.models.project import Project
 
 
@@ -1872,8 +1976,8 @@ class Project:
     views: int = 0
     likes: int = 0
     date: str = ""
-    body: str = ""           # legacy markdown source; dropped after the body column is dropped
-    body_html: str = ""      # rendered HTML; the new source for the renderer
+    body: str = ""  # legacy markdown source; dropped after the body column is dropped
+    body_html: str = ""  # rendered HTML; the new source for the renderer
     slug: str = ""
 
     @classmethod
@@ -1920,9 +2024,9 @@ git commit -m "feat(models): Project gains body_html field for rendered HTML"
 In `src/features/projects/projects_page.py`, line 54:
 ```python
 # before
-render_md(project.body),
+(render_md(project.body),)
 # after
-NotStr(project.body_html) if project.body_html else render_md(project.body),
+(NotStr(project.body_html) if project.body_html else render_md(project.body),)
 ```
 
 Why the conditional: it's a defensive fallback so a row missing `body_html` (e.g. if someone manually inserts a row in the BQ console without going through the CLI) doesn't render as a blank page. Once we DROP the `body` column at task 20, the fallback is removed.
@@ -1932,6 +2036,7 @@ Why the conditional: it's a defensive fallback so a row missing `body_html` (e.g
 In `tests/test_blog_detail_view.py` (new file):
 ```python
 """Tests that the blog detail page reads body_html in preference to body."""
+
 from src.models.project import Project
 
 
@@ -1940,8 +2045,13 @@ def test_blog_detail_uses_body_html_when_present(monkeypatch):
     from src.features.projects import projects_page
 
     project = Project(
-        id="x", blog_id="x", title="T", description="d", image="i",
-        body="# markdown", body_html="<h1>html-rendered</h1>",
+        id="x",
+        blog_id="x",
+        title="T",
+        description="d",
+        image="i",
+        body="# markdown",
+        body_html="<h1>html-rendered</h1>",
     )
     out = projects_page._render_blog_detail(project)
     rendered = str(out)
@@ -1954,8 +2064,13 @@ def test_blog_detail_falls_back_to_body_when_html_missing():
     from src.features.projects import projects_page
 
     project = Project(
-        id="x", blog_id="x", title="T", description="d", image="i",
-        body="# markdown", body_html="",
+        id="x",
+        blog_id="x",
+        title="T",
+        description="d",
+        image="i",
+        body="# markdown",
+        body_html="",
     )
     out = projects_page._render_blog_detail(project)
     rendered = str(out)
@@ -2109,6 +2224,7 @@ class BlogRow(BaseModel):
     The legacy `body` column was dropped on YYYY-MM-DD; only `body_html`
     is stored.
     """
+
     model_config = ConfigDict(extra="forbid")
     id: str
     title: str
@@ -2151,7 +2267,7 @@ class Project:
 
 In `src/features/projects/projects_page.py`:
 ```python
-NotStr(project.body_html),
+(NotStr(project.body_html),)
 ```
 (remove the conditional fallback).
 

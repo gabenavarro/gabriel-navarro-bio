@@ -38,7 +38,7 @@ def test_e2e_post_0022_renders_clean():
 
 def test_e2e_post_0001_renders_clean():
     """Old prose-only post (no SVG) should still pass through cleanly."""
-    html, issues = _full_pipeline(Path("assets/blogs/0001-fastp.md"))
+    _html, issues = _full_pipeline(Path("assets/blogs/0001-fastp.md"))
     assert issues == [], f"Issues found: {[i.kind for i in issues]}"
 
 

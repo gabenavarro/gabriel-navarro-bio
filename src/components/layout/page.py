@@ -1,9 +1,11 @@
 from fasthtml.common import *
 from monsterui.all import *
-from .footer import Footer
-from .navigation import navigation
+
 from src.services.javascript.bfcache_scroll import BFCACHE_SCROLL_RESET_JS
 from src.styles import FACTORY_CSS, THEME_CSS
+
+from .footer import Footer
+from .navigation import navigation
 
 
 def StandardPage(

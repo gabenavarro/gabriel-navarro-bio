@@ -1,5 +1,7 @@
 import argparse
+
 from fasthtml.common import serve
+
 from src.core.app_factory import create_app
 from src.core.routes import register_routes
 

@@ -183,24 +183,25 @@ The Problem: Current LLMs use only computation for both!
 import numpy as np
 from typing import List, Tuple, Dict
 
+
 class NgramMemoryLookup:
     """
     Simplified implementation of Engram's core N-gram memory lookup.
     Demonstrates how static patterns can be retrieved via O(1) hashing
     rather than expensive multi-layer reconstruction.
     """
-    
+
     def __init__(
-        self, 
-        vocab_size: int = 128000, 
+        self,
+        vocab_size: int = 128000,
         ngram_orders: List[int] = [2, 3],
         num_heads: int = 8,
         embedding_dim: int = 256,
-        table_size: int = 1000003  # Prime number for better hashing
+        table_size: int = 1000003,  # Prime number for better hashing
     ):
         """
         Initialize the N-gram memory module.
-        
+
         Args:
             vocab_size: Size of vocabulary
             ngram_orders: N-gram orders to use (e.g., [2, 3] for bigrams and trigrams)
@@ -213,28 +214,27 @@ class NgramMemoryLookup:
         self.num_heads = num_heads
         self.embedding_dim_per_head = embedding_dim // num_heads
         self.table_size = table_size
-        
+
         # Initialize embedding tables for each (n-gram order, hash head) pair
         self.embeddings = {}
         for n in ngram_orders:
             for k in range(num_heads):
                 # Each table stores embeddings for this n-gram order and head
-                self.embeddings[(n, k)] = np.random.randn(
-                    table_size, 
-                    self.embedding_dim_per_head
-                ) * 0.01
-        
+                self.embeddings[(n, k)] = (
+                    np.random.randn(table_size, self.embedding_dim_per_head) * 0.01
+                )
+
         # Hash seeds for each head to ensure different collision patterns
         self.hash_seeds = [i * 1000003 for i in range(num_heads)]
-    
+
     def _hash_ngram(self, ngram: Tuple[int, ...], head: int) -> int:
         """
         Hash an n-gram to a table index using multiplicative hashing.
-        
+
         Args:
             ngram: Tuple of token IDs
             head: Hash head index
-            
+
         Returns:
             Index in the hash table
         """
@@ -243,83 +243,75 @@ class NgramMemoryLookup:
         for token_id in ngram:
             hash_val = (hash_val * 31 + token_id) ^ (token_id << 5)
         return hash_val % self.table_size
-    
+
     def lookup_ngrams(self, token_sequence: List[int], position: int) -> np.ndarray:
         """
         Retrieve memory vectors for all n-grams ending at position.
-        
+
         This is the O(1) lookup that replaces multi-layer reconstruction!
-        
+
         Args:
             token_sequence: List of token IDs
             position: Current position in sequence
-            
+
         Returns:
             Concatenated embeddings from all n-grams and heads
         """
         retrieved_embeddings = []
-        
+
         # For each n-gram order (e.g., 2-gram, 3-gram)
         for n in self.ngram_orders:
             # Extract the suffix n-gram ending at this position
             if position >= n - 1:
                 ngram = tuple(token_sequence[position - n + 1 : position + 1])
-                
+
                 # Retrieve from each hash head
                 for k in range(self.num_heads):
                     idx = self._hash_ngram(ngram, k)
                     embedding = self.embeddings[(n, k)][idx]
                     retrieved_embeddings.append(embedding)
-        
+
         # Concatenate all retrieved embeddings
         return np.concatenate(retrieved_embeddings)
-    
+
     def compare_with_traditional(self, entity_tokens: List[int]) -> Dict:
         """
         Compare Engram lookup with traditional multi-layer processing.
-        
+
         Returns:
             Statistics showing the efficiency gain
         """
         # Engram: Single O(1) lookup
         engram_time = 1  # Constant time
         engram_layers = 0  # No layers consumed
-        
+
         # Traditional: Must process through multiple layers
         traditional_layers = len(entity_tokens)  # Roughly 1 layer per token
         traditional_time = traditional_layers * 100  # Arbitrary units
-        
+
         return {
             "entity_length": len(entity_tokens),
             "engram": {
                 "operations": engram_time,
                 "layers_consumed": engram_layers,
-                "depth_freed": traditional_layers
+                "depth_freed": traditional_layers,
             },
             "traditional": {
                 "operations": traditional_time,
                 "layers_consumed": traditional_layers,
-                "depth_freed": 0
+                "depth_freed": 0,
             },
             "speedup": traditional_time / engram_time,
-            "depth_gained": traditional_layers
+            "depth_gained": traditional_layers,
         }
 
+
 # Example: Process "Alexander the Great"
-vocab = {
-    "Alexander": 1001,
-    "the": 42,
-    "Great": 2003,
-    "could": 156,
-    "tame": 5678
-}
+vocab = {"Alexander": 1001, "the": 42, "Great": 2003, "could": 156, "tame": 5678}
 
 # Initialize Engram memory
 engram = NgramMemoryLookup(
-    vocab_size=len(vocab),
-    ngram_orders=[2, 3],
-    num_heads=4,
-    embedding_dim=256
+    vocab_size=len(vocab), ngram_orders=[2, 3], num_heads=4, embedding_dim=256
 )
 
 # Simulate processing the entity
@@ -557,11 +549,12 @@ import numpy as np
 from typing import List, Tuple, Dict
 import hashlib
 
+
 class MultiHeadHashedNgram:
     """
     Multi-head hashing strategy for N-gram embeddings with collision mitigation.
     """
-    
+
     def __init__(
         self,
         vocab_size: int = 128000,
@@ -569,11 +562,11 @@ class MultiHeadHashedNgram:
         ngram_orders: List[int] = [2, 3],
         num_heads: int = 8,
         table_sizes: Dict[int, int] = {2: 1000003, 3: 1500007},  # Prime sizes
-        embedding_dim_per_head: int = 32
+        embedding_dim_per_head: int = 32,
     ):
         """
         Initialize multi-head hashed N-gram embedding system.
-        
+
         Args:
             vocab_size: Original vocabulary size
             compressed_vocab_size: Size after tokenizer compression
@@ -588,34 +581,30 @@ class MultiHeadHashedNgram:
         self.num_heads = num_heads
         self.table_sizes = table_sizes
         self.embedding_dim_per_head = embedding_dim_per_head
-        
+
         # Create tokenizer compression map (simplified)
         self.compression_map = self._create_compression_map()
-        
+
         # Initialize embedding tables: E[n,k][idx] for each (order, head)
         self.embedding_tables = {}
         for n in ngram_orders:
             for k in range(num_heads):
                 table_size = table_sizes[n]
-                self.embedding_tables[(n, k)] = np.random.randn(
-                    table_size,
-                    embedding_dim_per_head
-                ) * 0.01
-        
+                self.embedding_tables[(n, k)] = (
+                    np.random.randn(table_size, embedding_dim_per_head) * 0.01
+                )
+
         # Prime numbers for multiplicative hashing (one per head)
-        self.hash_primes = [
-            1000003, 1500007, 2000003, 2500009,
-            3000017, 3500017, 4000037, 4500007
-        ]
-    
+        self.hash_primes = [1000003, 1500007, 2000003, 2500009, 3000017, 3500017, 4000037, 4500007]
+
     def _create_compression_map(self) -> np.ndarray:
         """
         Create vocabulary compression map.
-        
+
         Simulates mapping variants like "Apple", "apple", " apple" to same ID.
         """
         compression = np.arange(self.vocab_size)
-        
+
         # Simplified: map every group of 3 consecutive tokens to first token
         # (Real implementation uses NFKC normalization + case folding)
         for i in range(0, self.vocab_size, 3):
@@ -623,138 +612,134 @@ class MultiHeadHashedNgram:
                 compression[i + 1] = compression[i]
             if i + 2 < self.vocab_size:
                 compression[i + 2] = compression[i]
-        
+
         return compression
-    
+
     def compress_tokens(self, token_ids: List[int]) -> List[int]:
         """
         Apply tokenizer compression to normalize semantically equivalent tokens.
-        
+
         Args:
             token_ids: Original token IDs
-            
+
         Returns:
             Compressed token IDs
         """
-        return [int(self.compression_map[tid % self.vocab_size]) 
-                for tid in token_ids]
-    
+        return [int(self.compression_map[tid % self.vocab_size]) for tid in token_ids]
+
     def _hash_ngram(self, ngram: Tuple[int, ...], head: int, n: int) -> int:
         """
         Hash an n-gram using multiplicative hashing with XOR mixing.
-        
+
         Args:
             ngram: Tuple of compressed token IDs
             head: Hash head index
             n: N-gram order
-            
+
         Returns:
             Index in hash table for this (n, head) combination
         """
         # Multiplicative hashing: h(x) = ((a·x) mod p) mod m
         hash_val = self.hash_primes[head]
-        
+
         for token_id in ngram:
             # Mix with multiplicative and XOR operations
             hash_val = (hash_val * 31 + token_id) & 0x7FFFFFFF
-            hash_val ^= (token_id << (head + 1))
-        
+            hash_val ^= token_id << (head + 1)
+
         return hash_val % self.table_sizes[n]
-    
+
     def retrieve_embeddings(
-        self, 
-        token_sequence: List[int], 
-        position: int
+        self, token_sequence: List[int], position: int
     ) -> Tuple[np.ndarray, Dict]:
         """
         Retrieve all embeddings for n-grams ending at position.
-        
+
         Args:
             token_sequence: List of token IDs
             position: Current position
-            
+
         Returns:
             concatenated_embeddings: All retrieved embeddings
             debug_info: Information about retrieval for analysis
         """
         # First, apply tokenizer compression
         compressed_tokens = self.compress_tokens(token_sequence)
-        
+
         retrieved_embeddings = []
         debug_info = {"ngrams": [], "hash_indices": []}
-        
+
         # For each n-gram order
         for n in self.ngram_orders:
             if position >= n - 1:
                 # Extract suffix n-gram
                 ngram = tuple(compressed_tokens[position - n + 1 : position + 1])
                 debug_info["ngrams"].append((n, ngram))
-                
+
                 # Retrieve from each hash head
                 head_embeddings = []
                 head_indices = []
                 for k in range(self.num_heads):
                     idx = self._hash_ngram(ngram, k, n)
                     head_indices.append(idx)
-                    
+
                     # Lookup in embedding table
                     embedding = self.embedding_tables[(n, k)][idx]
                     head_embeddings.append(embedding)
-                
+
                 debug_info["hash_indices"].append((n, head_indices))
                 retrieved_embeddings.extend(head_embeddings)
-        
+
         # Concatenate all embeddings
         final_embedding = np.concatenate(retrieved_embeddings)
-        
+
         return final_embedding, debug_info
-    
-    def analyze_collision_probability(
-        self, 
-        sample_ngrams: List[Tuple[int, ...]]
-    ) -> Dict:
+
+    def analyze_collision_probability(self, sample_ngrams: List[Tuple[int, ...]]) -> Dict:
         """
         Analyze collision probability for sample n-grams.
-        
+
         Returns:
             Statistics about hash collisions
         """
         collisions_per_head = {k: 0 for k in range(self.num_heads)}
         total_pairs = len(sample_ngrams) * (len(sample_ngrams) - 1) // 2
-        
+
         n = len(sample_ngrams[0])  # Assume all same order
-        
+
         # Check all pairs
         for i in range(len(sample_ngrams)):
             for j in range(i + 1, len(sample_ngrams)):
                 ngram1 = sample_ngrams[i]
                 ngram2 = sample_ngrams[j]
-                
+
                 # Check each head
                 for k in range(self.num_heads):
                     idx1 = self._hash_ngram(ngram1, k, n)
                     idx2 = self._hash_ngram(ngram2, k, n)
                     if idx1 == idx2:
                         collisions_per_head[k] += 1
-        
+
         # Calculate probability of all heads colliding
         all_heads_collide = sum(
-            1 for i in range(len(sample_ngrams))
+            1
+            for i in range(len(sample_ngrams))
             for j in range(i + 1, len(sample_ngrams))
             if all(
-                self._hash_ngram(sample_ngrams[i], k, n) ==
-                self._hash_ngram(sample_ngrams[j], k, n)
+                self._hash_ngram(sample_ngrams[i], k, n) == self._hash_ngram(sample_ngrams[j], k, n)
                 for k in range(self.num_heads)
             )
         )
-        
+
         return {
             "total_pairs": total_pairs,
             "collisions_per_head": collisions_per_head,
-            "single_head_collision_rate": sum(collisions_per_head.values()) / (total_pairs * self.num_heads),
+            "single_head_collision_rate": sum(collisions_per_head.values())
+            / (total_pairs * self.num_heads),
             "all_heads_collision_count": all_heads_collide,
-            "all_heads_collision_prob": all_heads_collide / total_pairs if total_pairs > 0 else 0
+            "all_heads_collision_prob": all_heads_collide / total_pairs if total_pairs > 0 else 0,
         }
+
 
 # Example usage
 hasher = MultiHeadHashedNgram(
@@ -762,7 +747,7 @@ hasher = MultiHeadHashedNgram(
     compressed_vocab_size=98304,
     ngram_orders=[2, 3],
     num_heads=8,
-    embedding_dim_per_head=32
+    embedding_dim_per_head=32,
 )
 
 # Process sentence: "Only Alexander the Great could"
@@ -772,7 +757,7 @@ sentence_tokens = [45, 1001, 42, 2003, 156]
 print("Original tokens:", sentence_tokens)
 compressed = hasher.compress_tokens(sentence_tokens)
 print("After compression:", compressed)
-print(f"Compression achieved: {(1 - len(set(compressed))/len(set(sentence_tokens)))*100:.1f}%")
+print(f"Compression achieved: {(1 - len(set(compressed)) / len(set(sentence_tokens))) * 100:.1f}%")
 
 # Retrieve at position 3 (after "Alexander the Great")
 embedding, info = hasher.retrieve_embeddings(sentence_tokens, position=3)
@@ -783,9 +768,9 @@ print(f"Hash indices for 3-gram: {info['hash_indices'][1]}")
 # Analyze collision probability
 sample_ngrams = [
     (1001, 42, 2003),  # "Alexander the Great"
-    (5678, 91, 234),   # "Princess of Wales" (hypothetical)
-    (111, 222, 333),   # Random pattern
-    (444, 555, 666),   # Random pattern
+    (5678, 91, 234),  # "Princess of Wales" (hypothetical)
+    (111, 222, 333),  # Random pattern
+    (444, 555, 666),  # Random pattern
 ]
 collision_stats = hasher.analyze_collision_probability(sample_ngrams)
 print(f"\nCollision Analysis:")
@@ -903,23 +888,24 @@ Input:
 import numpy as np
 from typing import Tuple
 
+
 class ContextAwareGating:
     """
     Implements the context-aware gating mechanism that dynamically
     modulates retrieved memory based on semantic alignment with
     current hidden state.
     """
-    
+
     def __init__(
         self,
         hidden_dim: int = 2560,
         memory_dim: int = 256,
         conv_kernel_size: int = 4,
-        conv_dilation: int = 3  # max n-gram order
+        conv_dilation: int = 3,  # max n-gram order
     ):
         """
         Initialize gating module.
-        
+
         Args:
             hidden_dim: Dimension of hidden states from attention
             memory_dim: Dimension of retrieved memory vectors
@@ -930,154 +916,149 @@ class ContextAwareGating:
         self.memory_dim = memory_dim
         self.conv_kernel_size = conv_kernel_size
         self.conv_dilation = conv_dilation
-        
+
         # Key and Value projection matrices
         self.W_K = np.random.randn(memory_dim, hidden_dim) * 0.01
         self.W_V = np.random.randn(memory_dim, hidden_dim) * 0.01
-        
+
         # Convolution kernel (simplified, 1D depthwise)
         self.conv_kernel = np.random.randn(conv_kernel_size, hidden_dim) * 0.01
-    
+
     def rms_norm(self, x: np.ndarray, eps: float = 1e-6) -> np.ndarray:
         """
         Root Mean Square Layer Normalization.
-        
+
         More stable than LayerNorm for large models.
         """
-        rms = np.sqrt(np.mean(x ** 2, axis=-1, keepdims=True) + eps)
+        rms = np.sqrt(np.mean(x**2, axis=-1, keepdims=True) + eps)
         return x / rms
-    
+
     def sigmoid(self, x: np.ndarray) -> np.ndarray:
         """Sigmoid activation for gate."""
         return 1 / (1 + np.exp(-np.clip(x, -10, 10)))
-    
+
     def silu(self, x: np.ndarray) -> np.ndarray:
         """
         SiLU (Swish) activation: x * sigmoid(x).
-        
+
         Smooth, non-monotonic activation that works well for deep networks.
         """
         return x * self.sigmoid(x)
-    
+
     def compute_gate(
-        self, 
+        self,
         hidden_state: np.ndarray,  # h_t, shape: (hidden_dim,)
-        memory: np.ndarray          # e_t, shape: (memory_dim,)
+        memory: np.ndarray,  # e_t, shape: (memory_dim,)
     ) -> float:
         """
         Compute attention-style gate to modulate memory retrieval.
-        
+
         Gate α_t measures semantic alignment between current context
         and retrieved memory. High alignment → use memory strongly.
         Low alignment → suppress (likely collision or wrong context).
-        
+
         Args:
             hidden_state: Current hidden state from attention layer
             memory: Retrieved memory vector from n-gram lookup
-            
+
         Returns:
             Gate value in (0, 1)
         """
         # Normalize both inputs for stability
         h_norm = self.rms_norm(hidden_state)
-        
+
         # Project memory to key space
         key = memory @ self.W_K  # shape: (hidden_dim,)
         k_norm = self.rms_norm(key)
-        
+
         # Scaled dot-product (like attention)
         scale = np.sqrt(self.hidden_dim)
         score = np.dot(h_norm, k_norm) / scale
-        
+
         # Sigmoid to get gate in (0, 1)
         gate = self.sigmoid(score)
-        
+
         return gate
-    
+
     def apply_gating(
-        self,
-        hidden_state: np.ndarray,
-        memory: np.ndarray
+        self, hidden_state: np.ndarray, memory: np.ndarray
     ) -> Tuple[np.ndarray, float]:
         """
         Apply context-aware gating to memory retrieval.
-        
+
         Args:
             hidden_state: Current hidden state
             memory: Retrieved memory vector
-            
+
         Returns:
             gated_value: Memory modulated by gate
             gate: The gate value (for analysis)
         """
         # Compute gate
         gate = self.compute_gate(hidden_state, memory)
-        
+
         # Project memory to value space
         value = memory @ self.W_V
-        
+
         # Modulate by gate
         gated_value = gate * value
-        
+
         return gated_value, gate
-    
+
     def depthwise_conv(
         self,
         sequence: np.ndarray,  # Shape: (seq_len, hidden_dim)
-        position: int
+        position: int,
     ) -> np.ndarray:
         """
         Apply causal depthwise convolution to expand receptive field.
-        
+
         "Depthwise" means each channel is convolved independently.
         "Causal" means only look at past positions, not future.
-        
+
         Args:
             sequence: Full sequence of gated values
             position: Current position
-            
+
         Returns:
             Convolved output at this position
         """
         # Extract causal window (only past positions)
         start = max(0, position - (self.conv_kernel_size - 1) * self.conv_dilation)
         window_positions = [
-            start + i * self.conv_dilation 
+            start + i * self.conv_dilation
             for i in range(self.conv_kernel_size)
             if start + i * self.conv_dilation <= position
         ]
-        
+
         # Get values at these positions
         window = sequence[window_positions]
-        
+
         # Depthwise convolution (simplified)
         if len(window) < self.conv_kernel_size:
             # Pad with zeros if at sequence start
             pad_size = self.conv_kernel_size - len(window)
-            window = np.vstack([
-                np.zeros((pad_size, self.hidden_dim)),
-                window
-            ])
-        
+            window = np.vstack([np.zeros((pad_size, self.hidden_dim)), window])
+
         # Element-wise multiplication and sum (simplified depthwise)
-        conv_out = np.sum(window * self.conv_kernel[:len(window)], axis=0)
-        
+        conv_out = np.sum(window * self.conv_kernel[: len(window)], axis=0)
+
         return conv_out
-    
+
     def forward(
         self,
-        hidden_sequence: np.ndarray,   # (seq_len, hidden_dim)
-        memory_sequence: np.ndarray,   # (seq_len, memory_dim)
-        position: int
+        hidden_sequence: np.ndarray,  # (seq_len, hidden_dim)
+        memory_sequence: np.ndarray,  # (seq_len, memory_dim)
+        position: int,
     ) -> Tuple[np.ndarray, Dict]:
         """
         Full forward pass of context-aware gating.
-        
+
         Args:
             hidden_sequence: Hidden states from attention
             memory_sequence: Retrieved memory vectors
             position: Current position
-            
+
         Returns:
             output: Gated and refined output
             debug_info: Information about gating decisions
@@ -1085,67 +1066,64 @@ class ContextAwareGating:
         # Step 1: Apply gating
         h_t = hidden_sequence[position]
         e_t = memory_sequence[position]
-        
+
         gated_value, gate = self.apply_gating(h_t, e_t)
-        
+
         # Step 2: Apply RMS normalization
         gated_value_norm = self.rms_norm(gated_value)
-        
+
         # Step 3: Depthwise convolution
         # (Need to build sequence of gated values first - simplified here)
         conv_input = gated_value_norm.reshape(1, -1)
         conv_out = self.depthwise_conv(conv_input, 0)
-        
+
         # Step 4: SiLU activation and residual
         output = self.silu(conv_out) + gated_value_norm
-        
+
         debug_info = {
             "gate_value": gate,
             "memory_magnitude": np.linalg.norm(e_t),
             "hidden_magnitude": np.linalg.norm(h_t),
-            "output_magnitude": np.linalg.norm(output)
+            "output_magnitude": np.linalg.norm(output),
         }
-        
+
         return output, debug_info
-    
+
     def visualize_gating_pattern(
-        self,
-        sentence_tokens: list,
-        hidden_states: np.ndarray,
-        memory_vectors: np.ndarray
+        self, sentence_tokens: list, hidden_states: np.ndarray, memory_vectors: np.ndarray
     ) -> Dict:
         """
         Visualize how gating responds to different contexts.
-        
+
         Returns:
             Gating pattern for each token
         """
         pattern = []
-        
+
         for pos in range(len(sentence_tokens)):
             h_t = hidden_states[pos]
             e_t = memory_vectors[pos]
             gate = self.compute_gate(h_t, e_t)
-            
-            pattern.append({
-                "position": pos,
-                "token": sentence_tokens[pos],
-                "gate": gate,
-                "decision": "USE" if gate > 0.5 else "SUPPRESS"
-            })
-        
+
+            pattern.append(
+                {
+                    "position": pos,
+                    "token": sentence_tokens[pos],
+                    "gate": gate,
+                    "decision": "USE" if gate > 0.5 else "SUPPRESS",
+                }
+            )
+
         return {
             "tokens": sentence_tokens,
             "pattern": pattern,
             "mean_gate": np.mean([p["gate"] for p in pattern]),
-            "high_confidence_count": sum(1 for p in pattern if p["gate"] > 0.7)
+            "high_confidence_count": sum(1 for p in pattern if p["gate"] > 0.7),
         }
 
+
 # Example usage
-gating = ContextAwareGating(
-    hidden_dim=2560,
-    memory_dim=256
-)
+gating = ContextAwareGating(hidden_dim=2560, memory_dim=256)
 
 # Simulate scenario 1: Correct retrieval
 # Hidden state encodes "Alexander" + royal context
@@ -1329,21 +1307,22 @@ import numpy as np
 from typing import Dict, List, Tuple
 import matplotlib.pyplot as plt
 
+
 class SparsityAllocationAnalyzer:
     """
     Simulate the sparsity allocation trade-off between MoE and Engram
     to find optimal parameter distribution.
     """
-    
+
     def __init__(
         self,
-        total_params: float = 10e9,      # 10B total
-        active_params: float = 1e9,      # 1B active (determines FLOPs)
-        base_loss: float = 1.80          # Starting loss
+        total_params: float = 10e9,  # 10B total
+        active_params: float = 1e9,  # 1B active (determines FLOPs)
+        base_loss: float = 1.80,  # Starting loss
     ):
         """
         Initialize analyzer with parameter budget.
-        
+
         Args:
             total_params: Total parameter count
             active_params: Activated parameters per token
@@ -1353,35 +1332,31 @@ class SparsityAllocationAnalyzer:
         self.active_params = active_params
         self.sparse_params = total_params - active_params
         self.base_loss = base_loss
-    
-    def compute_loss_at_allocation(
-        self, 
-        rho: float,
-        compute_budget: float = 6e20
-    ) -> float:
+
+    def compute_loss_at_allocation(self, rho: float, compute_budget: float = 6e20) -> float:
         """
         Simulate validation loss for a given allocation ratio.
-        
+
         This is a simplified model that captures the U-shaped relationship.
         Real experiments use actual training!
-        
+
         Args:
             rho: Allocation ratio (0-1), fraction to MoE
             compute_budget: Training FLOPs
-            
+
         Returns:
             Predicted validation loss
         """
         # MoE capacity (number of experts increases with rho)
         moe_params = rho * self.sparse_params
         num_experts = max(1, int(moe_params / 1e8))  # ~100M per expert
-        
+
         # Engram capacity (embedding slots increase with 1-rho)
         memory_params = (1 - rho) * self.sparse_params
         memory_slots = max(1000, int(memory_params / 1000))  # ~1K per slot
-        
+
         # Loss components (simplified model)
-        
+
         # 1. MoE benefit: log(num_experts) / log(max_experts)
         #    More experts → better specialization
         max_experts = int(self.sparse_params / 1e8)
@@ -1389,7 +1364,7 @@ class SparsityAllocationAnalyzer:
             moe_benefit = np.log(num_experts) / np.log(max_experts)
         else:
             moe_benefit = 0
-        
+
         # 2. Memory benefit: log(memory_slots) / log(max_slots)
         #    More memory → better pattern coverage
         max_slots = int(self.sparse_params / 1000)
@@ -1397,55 +1372,51 @@ class SparsityAllocationAnalyzer:
             memory_benefit = np.log(memory_slots) / np.log(max_slots)
         else:
             memory_benefit = 0
-        
+
         # 3. Synergy term: MoE and memory complement each other
         #    Peak synergy at ~75-80% MoE allocation
         optimal_rho = 0.77
-        synergy = np.exp(-10 * (rho - optimal_rho)**2)
-        
+        synergy = np.exp(-10 * (rho - optimal_rho) ** 2)
+
         # Combine effects (U-shaped due to synergy term)
         total_benefit = (
-            0.4 * moe_benefit +      # Conditional computation
-            0.4 * memory_benefit +   # Conditional memory
-            0.2 * synergy            # Synergy between both
+            0.4 * moe_benefit  # Conditional computation
+            + 0.4 * memory_benefit  # Conditional memory
+            + 0.2 * synergy  # Synergy between both
         )
-        
+
         # Final loss
         loss = self.base_loss * (1 - 0.08 * total_benefit)
-        
+
         return loss
-    
-    def sweep_allocation_ratios(
-        self,
-        compute_budget: float = 6e20,
-        num_points: int = 20
-    ) -> Dict:
+
+    def sweep_allocation_ratios(self, compute_budget: float = 6e20, num_points: int = 20) -> Dict:
         """
         Sweep allocation ratios to find optimal distribution.
-        
+
         Args:
             compute_budget: Training FLOPs
             num_points: Number of points to sample
-            
+
         Returns:
             Results dictionary with losses and optimal point
         """
         ratios = np.linspace(0.1, 1.0, num_points)
         losses = []
-        
+
         for rho in ratios:
             loss = self.compute_loss_at_allocation(rho, compute_budget)
             losses.append(loss)
-        
+
         # Find optimal
         optimal_idx = np.argmin(losses)
         optimal_rho = ratios[optimal_idx]
         optimal_loss = losses[optimal_idx]
-        
+
         # Pure baselines
         pure_moe_loss = self.compute_loss_at_allocation(1.0, compute_budget)
         pure_memory_loss = self.compute_loss_at_allocation(0.0, compute_budget)
-        
+
         return {
             "ratios": ratios,
             "losses": losses,
@@ -1454,105 +1425,112 @@ class SparsityAllocationAnalyzer:
             "pure_moe_loss": pure_moe_loss,
             "pure_memory_loss": pure_memory_loss,
             "improvement_over_moe": pure_moe_loss - optimal_loss,
-            "improvement_over_memory": pure_memory_loss - optimal_loss
+            "improvement_over_memory": pure_memory_loss - optimal_loss,
         }
-    
-    def analyze_infinite_memory_regime(
-        self,
-        memory_slots_range: List[int]
-    ) -> Dict:
+
+    def analyze_infinite_memory_regime(self, memory_slots_range: List[int]) -> Dict:
         """
         Analyze scaling behavior when memory budget is unconstrained.
-        
+
         Args:
             memory_slots_range: Range of memory slots to test
-            
+
         Returns:
             Scaling results showing log-linear relationship
         """
         losses = []
-        
+
         for slots in memory_slots_range:
             # Fixed MoE backbone, varying memory only
             fixed_moe_params = 3e9  # 3B parameters in MoE
             memory_params = slots * 1000  # ~1K per slot
-            
+
             total = fixed_moe_params + memory_params
-            
+
             # Loss decreases log-linearly with memory slots
             memory_benefit = np.log(slots) / np.log(memory_slots_range[-1])
             loss = self.base_loss * (1 - 0.05 * memory_benefit)
-            
+
             losses.append(loss)
-        
+
         # Compute scaling coefficient (slope in log space)
         log_slots = np.log10(memory_slots_range)
         slope = (losses[0] - losses[-1]) / (log_slots[-1] - log_slots[0])
-        
+
         return {
             "memory_slots": memory_slots_range,
             "losses": losses,
             "scaling_coefficient": slope,
-            "log_linear": True  # Memory exhibits log-linear scaling
+            "log_linear": True,  # Memory exhibits log-linear scaling
         }
-    
+
     def visualize_allocation_law(self, results: Dict):
         """
         Visualize the U-shaped allocation law.
         """
         plt.figure(figsize=(10, 6))
-        
-        plt.plot(results["ratios"] * 100, results["losses"], 
-                'b-', linewidth=2, label='Hybrid Models')
-        
+
+        plt.plot(
+            results["ratios"] * 100, results["losses"], "b-", linewidth=2, label="Hybrid Models"
+        )
+
         # Mark optimal point
-        plt.plot(results["optimal_rho"] * 100, results["optimal_loss"],
-                'ro', markersize=10, label=f'Optimal (ρ={results["optimal_rho"]:.2f})')
-        
+        plt.plot(
+            results["optimal_rho"] * 100,
+            results["optimal_loss"],
+            "ro",
+            markersize=10,
+            label=f"Optimal (ρ={results['optimal_rho']:.2f})",
+        )
+
         # Mark pure baselines
-        plt.axhline(y=results["pure_moe_loss"], color='g', linestyle='--',
-                   label='Pure MoE (ρ=1.0)')
-        plt.axhline(y=results["pure_memory_loss"], color='orange', linestyle='--',
-                   label='Pure Memory (ρ=0.0)')
-        
-        plt.xlabel('MoE Allocation Ratio ρ (%)', fontsize=12)
-        plt.ylabel('Validation Loss', fontsize=12)
-        plt.title('U-Shaped Scaling Law: Optimal Sparsity Allocation', fontsize=14)
+        plt.axhline(y=results["pure_moe_loss"], color="g", linestyle="--", label="Pure MoE (ρ=1.0)")
+        plt.axhline(
+            y=results["pure_memory_loss"],
+            color="orange",
+            linestyle="--",
+            label="Pure Memory (ρ=0.0)",
+        )
+
+        plt.xlabel("MoE Allocation Ratio ρ (%)", fontsize=12)
+        plt.ylabel("Validation Loss", fontsize=12)
+        plt.title("U-Shaped Scaling Law: Optimal Sparsity Allocation", fontsize=14)
         plt.legend(fontsize=10)
         plt.grid(True, alpha=0.3)
-        
+
         # Add annotation
         plt.annotate(
-            f'Δ = {results["improvement_over_moe"]:.4f}\nvs Pure MoE',
+            f"Δ = {results['improvement_over_moe']:.4f}\nvs Pure MoE",
             xy=(results["optimal_rho"] * 100, results["optimal_loss"]),
             xytext=(results["optimal_rho"] * 100 - 15, results["optimal_loss"] + 0.01),
-            arrowprops=dict(arrowstyle='->', color='red', lw=1.5),
-            fontsize=10
+            arrowprops=dict(arrowstyle="->", color="red", lw=1.5),
+            fontsize=10,
         )
-        
+
         plt.tight_layout()
-        plt.savefig('/home/claude/allocation_law.png', dpi=150)
+        plt.savefig("/home/claude/allocation_law.png", dpi=150)
         print("✓ Saved visualization to allocation_law.png")
 
+
 # Run analysis
-analyzer = SparsityAllocationAnalyzer(
-    total_params=10e9,
-    active_params=1e9,
-    base_loss=1.73
-)
+analyzer = SparsityAllocationAnalyzer(total_params=10e9, active_params=1e9, base_loss=1.73)
 
 # Sweep allocation ratios
 results = analyzer.sweep_allocation_ratios(compute_budget=6e20, num_points=30)
 
 print("=== Sparsity Allocation Analysis ===\n")
 print(f"Optimal Allocation Ratio (ρ): {results['optimal_rho']:.3f}")
-print(f"  → {results['optimal_rho']*100:.1f}% to MoE")
-print(f"  → {(1-results['optimal_rho'])*100:.1f}% to Engram")
+print(f"  → {results['optimal_rho'] * 100:.1f}% to MoE")
+print(f"  → {(1 - results['optimal_rho']) * 100:.1f}% to Engram")
 print(f"\nOptimal Loss: {results['optimal_loss']:.4f}")
 print(f"Pure MoE Loss: {results['pure_moe_loss']:.4f}")
 print(f"Pure Memory Loss: {results['pure_memory_loss']:.4f}")
-print(f"\nImprovement over Pure MoE: {results['improvement_over_moe']:.4f} ({(results['improvement_over_moe']/results['pure_moe_loss']*100):.2f}%)")
-print(f"Improvement over Pure Memory: {results['improvement_over_memory']:.4f} ({(results['improvement_over_memory']/results['pure_memory_loss']*100):.2f}%)")
+print(
+    f"\nImprovement over Pure MoE: {results['improvement_over_moe']:.4f} ({(results['improvement_over_moe'] / results['pure_moe_loss'] * 100):.2f}%)"
+)
+print(
+    f"Improvement over Pure Memory: {results['improvement_over_memory']:.4f} ({(results['improvement_over_memory'] / results['pure_memory_loss'] * 100):.2f}%)"
+)
 
 # Analyze infinite memory regime
 memory_slots = [int(10**x) for x in np.linspace(5, 8, 10)]  # 100K to 100M

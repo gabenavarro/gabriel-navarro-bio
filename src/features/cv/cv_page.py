@@ -1,12 +1,14 @@
 from fasthtml.common import *
 from monsterui.all import *
+
 from src.components.layout.page import StandardPage
+
 from .components import (
-    cv_experience,
     cv_education,
-    cv_skills,
+    cv_experience,
     cv_patents,
     cv_publications,
+    cv_skills,
 )
 
 CV_PAGE = StandardPage(

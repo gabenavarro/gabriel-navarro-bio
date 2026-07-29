@@ -7,7 +7,7 @@ today; future subcommands (e.g. project import/export) plug in here.
 from __future__ import annotations
 
 import argparse
-from typing import Sequence
+from collections.abc import Sequence
 
 from .blog import register_blog_parser, run_blog
 
