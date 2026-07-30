@@ -29,7 +29,7 @@ def render_to_html(body: str) -> str:
     """
     try:
         rendered = render_md(body)
-    except Exception as exc:  # noqa: BLE001 - we want to wrap any failure
+    except Exception as exc:
         raise RenderError(f"render_md failed: {exc}") from exc
 
     # monsterui returns a NotStr (subclass of str). __str__ is the HTML.

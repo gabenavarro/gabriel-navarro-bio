@@ -1,7 +1,6 @@
 """Tests for src.services.blog_render."""
 
-from src.services.blog_render import render_to_html
-from src.services.blog_render import ValidationIssue, validate_html
+from src.services.blog_render import ValidationIssue, render_to_html, validate_html
 
 
 def test_render_passes_simple_markdown_to_html():

@@ -82,8 +82,7 @@ def _split_frontmatter(text: str) -> tuple[str, str, str]:
         head = lines[first_idx][len("@{") :]
         if head.strip():
             inner_lines.append(head)
-        for ln in lines[first_idx + 1 : end_idx]:
-            inner_lines.append(ln)
+        inner_lines.extend(lines[first_idx + 1 : end_idx])
         return "legacy", "".join(inner_lines), "".join(lines[end_idx + 1 :])
 
     if first.startswith("---"):
@@ -127,7 +126,9 @@ def _parse_yaml(frontmatter: str) -> dict[str, Any]:
     if data is None:
         return {}
     if not isinstance(data, dict):
-        raise ValueError("YAML frontmatter must be a mapping at the top level")
+        # ValueError (not TypeError) keeps this consistent with every other
+        # malformed-frontmatter failure in this module, so callers catch one type.
+        raise ValueError("YAML frontmatter must be a mapping at the top level")  # noqa: TRY004
     return data
 
 

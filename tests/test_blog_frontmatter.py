@@ -1,6 +1,6 @@
 """Tests for src.services.blog_frontmatter."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 import yaml
@@ -20,7 +20,7 @@ def test_parses_legacy_at_brace_format():
     assert result.disabled is False
     assert result.views == 0
     assert result.likes == 0
-    assert result.date == datetime(2025, 4, 26, 0, 0, 0, tzinfo=timezone.utc)
+    assert result.date == datetime(2025, 4, 26, 0, 0, 0, tzinfo=UTC)
     assert str(result.image).startswith("https://")
     assert result.body.strip().startswith("# Speeding Up FASTQ Preprocessing with FastP")
 
@@ -113,13 +113,14 @@ def test_empty_body_raises(tmp_path):
 
 def test_blog_row_validates_minimal_payload():
     """BlogRow accepts a complete payload (markdown + html) with no errors."""
-    from datetime import datetime, timezone
+    from datetime import datetime
+
     from src.services.blog_frontmatter import BlogRow
 
     row = BlogRow(
         id="00000000-0000-0000-0000-000000000000",
         title="Test",
-        date=datetime(2026, 1, 1, tzinfo=timezone.utc),
+        date=datetime(2026, 1, 1, tzinfo=UTC),
         tags=["test"],
         description="d",
         image="https://example.com/img.svg",
@@ -134,15 +135,17 @@ def test_blog_row_validates_minimal_payload():
 
 
 def test_blog_row_rejects_empty_body_html():
-    from datetime import datetime, timezone
+    from datetime import datetime
+
     from pydantic import ValidationError
+
     from src.services.blog_frontmatter import BlogRow
 
     with pytest.raises(ValidationError, match="body_html"):
         BlogRow(
             id="x",
             title="t",
-            date=datetime(2026, 1, 1, tzinfo=timezone.utc),
+            date=datetime(2026, 1, 1, tzinfo=UTC),
             tags=[],
             description="d",
             image="https://e.com/i.svg",
@@ -156,15 +159,17 @@ def test_blog_row_rejects_empty_body_html():
 
 
 def test_blog_row_extra_fields_forbidden():
-    from datetime import datetime, timezone
+    from datetime import datetime
+
     from pydantic import ValidationError
+
     from src.services.blog_frontmatter import BlogRow
 
     with pytest.raises(ValidationError):
         BlogRow(
             id="x",
             title="t",
-            date=datetime(2026, 1, 1, tzinfo=timezone.utc),
+            date=datetime(2026, 1, 1, tzinfo=UTC),
             tags=[],
             description="d",
             image="https://e.com/i.svg",

@@ -148,12 +148,15 @@ We leverage **PyTorch Lightning** for:
 ```python
 trainer = pl.Trainer(
     max_epochs=100,
-    accelerator="gpu", devices=1,
+    accelerator="gpu",
+    devices=1,
     precision="bf16-mixed",
     accumulate_grad_batches=8,
     gradient_clip_val=0.5,
-    callbacks=[EarlyStopping("val_loss", patience=10),
-               ModelCheckpoint(monitor="val_loss", save_top_k=1)]
+    callbacks=[
+        EarlyStopping("val_loss", patience=10),
+        ModelCheckpoint(monitor="val_loss", save_top_k=1),
+    ],
 )
 trainer.fit(model, train_loader, val_loader)
 ```

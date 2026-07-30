@@ -1,9 +1,10 @@
-from fasthtml.common import Style, Script, Div, H2, Span, Button
+from fasthtml.common import H2, Button, Div, Script, Span, Style
+
 from src.components.base.icons import (
     COPY_ICON,
-    linkedin_icon,
-    github_icon,
     bluesky_icon,
+    github_icon,
+    linkedin_icon,
 )
 from src.styles import CONTACT_MODAL_CSS
 

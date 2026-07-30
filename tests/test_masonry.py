@@ -3,6 +3,7 @@
 from unittest.mock import patch
 
 from fasthtml.common import to_xml
+
 from src.features.projects.projects_page import create_masonry_page
 from src.models.project import Project
 

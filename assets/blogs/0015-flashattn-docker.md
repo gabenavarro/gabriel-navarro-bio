@@ -212,13 +212,12 @@ HEALTHCHECK --interval=30s --timeout=30s --retries=3 \
 
 	# Vertex AI Configuration
 	SERVICE_KEY_PATH = os.getenv(
-		"GOOGLE_APPLICATION_CREDENTIALS",
-		"/path/to/your/service_account_key.json"
+	    "GOOGLE_APPLICATION_CREDENTIALS", "/path/to/your/service_account_key.json"
 	)
-	LOCATION = "your-gcp-region"         # e.g., "us-central1"
-	ZONE = "your-gcp-zone"               # e.g., "us-central1-a"
-	PROJECT_ID = "your-gcp-project-id"   # e.g., "my-project-12345"
-	RESERVATION_TYPE = "ANY"             # or "ANY_RESERVATION"
+	LOCATION = "your-gcp-region"  # e.g., "us-central1"
+	ZONE = "your-gcp-zone"  # e.g., "us-central1-a"
+	PROJECT_ID = "your-gcp-project-id"  # e.g., "my-project-12345"
+	RESERVATION_TYPE = "ANY"  # or "ANY_RESERVATION"
 	STAGING_BUCKET = "gs://your-gcp-training-bucket/flash-attn-example/staging"
 	SERVICE_ACCOUNT = f"vertex-ai@{PROJECT_ID}.iam.gserviceaccount.com"
 	TRAIN_IMAGE = f"your-location-docker.pkg.dev/{PROJECT_ID}/repositories/flash-attention:latest"
@@ -232,50 +231,43 @@ HEALTHCHECK --interval=30s --timeout=30s --retries=3 \
 
 	# Training Command
 	CMD = [
-		"python3",
-		"/gcs/your-gcp-training-bucket/flash-attn-example/scripts/flash_attn_train.py",
-		"--config",
-		"/gcs/your-gcp-training-bucket/flash-attn-example/config/flash_attn_crypto_model_config.yaml",
+	    "python3",
+	    "/gcs/your-gcp-training-bucket/flash-attn-example/scripts/flash_attn_train.py",
+	    "--config",
+	    "/gcs/your-gcp-training-bucket/flash-attn-example/config/flash_attn_crypto_model_config.yaml",
 	]
 
 	# Worker pool specification
-	worker_pool_specs=[
-		{
-			"replica_count": NODES,
-			"machine_spec": {
-				"machine_type": MACHINE_TYPE,
-				"accelerator_type": ACCELERATOR_TYPE,
-				"accelerator_count": ACCELERATOR_COUNT,
-				"reservation_affinity": {
-					"reservation_affinity_type": RESERVATION_TYPE,
-				}
-			},
-			"container_spec": {
-				"image_uri": TRAIN_IMAGE,
-				"command": CMD
-			}
-		}
+	worker_pool_specs = [
+	    {
+	        "replica_count": NODES,
+	        "machine_spec": {
+	            "machine_type": MACHINE_TYPE,
+	            "accelerator_type": ACCELERATOR_TYPE,
+	            "accelerator_count": ACCELERATOR_COUNT,
+	            "reservation_affinity": {
+	                "reservation_affinity_type": RESERVATION_TYPE,
+	            },
+	        },
+	        "container_spec": {"image_uri": TRAIN_IMAGE, "command": CMD},
+	    }
 	]
 
 	# Initialize Vertex AI
 	aiplatform.init(
-		project=PROJECT_ID,
-		location=LOCATION,
-		credentials=service_account.Credentials.from_service_account_file(
-			SERVICE_KEY_PATH
-		)
+	    project=PROJECT_ID,
+	    location=LOCATION,
+	    credentials=service_account.Credentials.from_service_account_file(SERVICE_KEY_PATH),
 	)
 
 	# Create and submit the training job
 	job = aiplatform.CustomJob(
-		display_name=DISPLAY_NAME,
-		worker_pool_specs=worker_pool_specs,
-		staging_bucket=STAGING_BUCKET,
+	    display_name=DISPLAY_NAME,
+	    worker_pool_specs=worker_pool_specs,
+	    staging_bucket=STAGING_BUCKET,
 	)
 
-	job.submit(
-		service_account=SERVICE_ACCOUNT
-	)
+	job.submit(service_account=SERVICE_ACCOUNT)
 
 	# Print job details
 	print(f"Job ID: {job.resource_name}")

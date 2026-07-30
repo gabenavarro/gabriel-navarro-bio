@@ -125,19 +125,20 @@ from google.oauth2 import service_account
 import os
 
 # ——— Configuration ———
-PROJECT_ID  = "my-project"
-REGION      = "us-central1"
-BUCKET      = "gs://flashattn-example"
-IMAGE_URI   = f"{REGION}-docker.pkg.dev/{PROJECT_ID}/repo/flash-attention:latest"
+PROJECT_ID = "my-project"
+REGION = "us-central1"
+BUCKET = "gs://flashattn-example"
+IMAGE_URI = f"{REGION}-docker.pkg.dev/{PROJECT_ID}/repo/flash-attention:latest"
 SERVICE_KEY = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-SERVICE_ACCT= f"vertex-ai@{PROJECT_ID}.iam.gserviceaccount.com"
-DISPLAY     = "flash-attn-crypto-training"
+SERVICE_ACCT = f"vertex-ai@{PROJECT_ID}.iam.gserviceaccount.com"
+DISPLAY = "flash-attn-crypto-training"
 
 # Command to launch inside container
 CMD = [
     "python3",
     "/gcs/flashattn-example/scripts/flash_attn_train.py",
-    "--config", "/gcs/flashattn-example/config/flash_attn_crypto_model_config.yaml",
+    "--config",
+    "/gcs/flashattn-example/config/flash_attn_crypto_model_config.yaml",
 ]
 
 # GPU machine spec
@@ -148,12 +149,9 @@ worker_pool_specs = [
             "machine_type": "a3-megagpu-8g",
             "accelerator_type": "NVIDIA_H100_MEGA_80GB",
             "accelerator_count": 8,
-            "reservation_affinity": { "reservation_affinity_type": "ANY" }
+            "reservation_affinity": {"reservation_affinity_type": "ANY"},
         },
-        "container_spec": {
-            "image_uri": IMAGE_URI,
-            "command": CMD
-        }
+        "container_spec": {"image_uri": IMAGE_URI, "command": CMD},
     }
 ]
 
@@ -161,14 +159,12 @@ worker_pool_specs = [
 aiplatform.init(
     project=PROJECT_ID,
     location=REGION,
-    credentials=service_account.Credentials.from_service_account_file(SERVICE_KEY)
+    credentials=service_account.Credentials.from_service_account_file(SERVICE_KEY),
 )
 
 # Create & submit the CustomJob
 job = aiplatform.CustomJob(
-    display_name=DISPLAY,
-    worker_pool_specs=worker_pool_specs,
-    staging_bucket=BUCKET + "/staging"
+    display_name=DISPLAY, worker_pool_specs=worker_pool_specs, staging_bucket=BUCKET + "/staging"
 )
 job.submit(service_account=SERVICE_ACCT)
 

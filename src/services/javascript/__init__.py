@@ -1,6 +1,6 @@
 from .bfcache_scroll import BFCACHE_SCROLL_RESET_JS
-from .scroll_animations import SCROLL_JS
 from .masonry import MasonryJS
+from .scroll_animations import SCROLL_JS
 
 # NOTE: `marked.py` does NOT export a `MarkedJS` symbol — the previous
 # `from .marked import MarkedJS` here raised ImportError on first access

@@ -4,9 +4,8 @@ Pure stdlib XML construction (no feedgen, no lxml). Caps at 50 items per
 the RSS spec convention; CDATA-wraps title/description to avoid escaping.
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from email.utils import format_datetime
-from typing import List
 
 from src.models.project import Project
 
@@ -26,13 +25,14 @@ def _format_pub_date(date_str: str) -> str:
     """Convert an ISO 8601 string (BigQuery format) to RFC 822 for RSS."""
     if not date_str:
         return ""
-    # BigQuery serializes timestamps with trailing Z; normalize for fromisoformat
+    # BigQuery serializes timestamps with a trailing Z; Python 3.11+
+    # fromisoformat parses that natively, so no normalization is needed.
     try:
-        dt = datetime.fromisoformat(date_str.replace("Z", "+00:00"))
+        dt = datetime.fromisoformat(date_str)
     except ValueError:
         return ""
     if dt.tzinfo is None:
-        dt = dt.replace(tzinfo=timezone.utc)
+        dt = dt.replace(tzinfo=UTC)
     return format_datetime(dt)
 
 
@@ -49,9 +49,9 @@ def _item_xml(project: Project) -> str:
     </item>"""
 
 
-def build_rss_feed(projects: List[Project], site_url: str = SITE_URL) -> str:
+def build_rss_feed(projects: list[Project], site_url: str = SITE_URL) -> str:
     """Render an RSS 2.0 feed for the given projects (cap 50 items)."""
-    last_build = format_datetime(datetime.now(timezone.utc))
+    last_build = format_datetime(datetime.now(UTC))
     items = "\n".join(_item_xml(p) for p in projects[:50])
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">

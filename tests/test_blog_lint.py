@@ -142,7 +142,7 @@ def test_lint_does_not_mangle_fenced_code_blocks():
         "  <text>real text</text>\n"
         "</svg>\n"
     )
-    fixed, fixes = lint_body(src)
+    fixed, _fixes = lint_body(src)
     # The CODE BLOCK content must be preserved verbatim — multi-line open and blanks stay.
     assert (
         "```svg\n"

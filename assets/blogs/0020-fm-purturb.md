@@ -243,11 +243,12 @@ Remarkably, on the K562 cell line, the best single embedding closes 77% of the g
 import numpy as np
 from typing import Dict, List, Tuple
 
+
 def knn_perturbation_prediction(
-    train_embeddings: np.ndarray,   # (N_train, d) - embeddings of training perturbations
-    train_lfc: np.ndarray,          # (N_train, G) - observed LFC for training perturbations
-    test_embeddings: np.ndarray,    # (N_test, d)  - embeddings of test perturbations
-    k: int = 20
+    train_embeddings: np.ndarray,  # (N_train, d) - embeddings of training perturbations
+    train_lfc: np.ndarray,  # (N_train, G) - observed LFC for training perturbations
+    test_embeddings: np.ndarray,  # (N_test, d)  - embeddings of test perturbations
+    k: int = 20,
 ) -> np.ndarray:
     """
     Predict perturbation response using kNN in embedding space.
@@ -279,6 +280,7 @@ def knn_perturbation_prediction(
         predictions.append(predicted_lfc)
 
     return np.array(predictions)
+
 
 # Example: evaluate with L2 error
 def evaluate_l2(true_lfc: np.ndarray, pred_lfc: np.ndarray) -> float:
@@ -354,11 +356,12 @@ The takeaway is sobering: current perturbation datasets may be too small to reli
 import numpy as np
 from typing import Optional
 
+
 def in_silico_ko_prediction(
     control_expression: np.ndarray,  # (G,) mean expression of control cells
-    target_gene_idx: int,            # index of knocked-out gene
-    encoder_fn,                      # FM encoder: (G,) → (G, d)
-    prediction_head_fn               # head: (d,) → (G,)
+    target_gene_idx: int,  # index of knocked-out gene
+    encoder_fn,  # FM encoder: (G,) → (G, d)
+    prediction_head_fn,  # head: (d,) → (G,)
 ) -> np.ndarray:
     """
     In-Silico Knockout: mask the target gene, encode with FM,
@@ -635,17 +638,23 @@ However, fusion did not help for chemical perturbations, likely because individu
 import numpy as np
 from typing import List, Dict, Optional
 
+
 class EmbeddingFusionModel:
     """
     Simplified attention-based fusion of multiple FM embeddings.
-    
-    Each perturbation is represented by J embeddings from different 
-    FMs. A transformer learns to attend across these sources and 
+
+    Each perturbation is represented by J embeddings from different
+    FMs. A transformer learns to attend across these sources and
     produce a unified prediction.
     """
-    
-    def __init__(self, embedding_dims: List[int], common_dim: int = 100,
-                 n_heads: int = 5, n_genes: int = 1000):
+
+    def __init__(
+        self,
+        embedding_dims: List[int],
+        common_dim: int = 100,
+        n_heads: int = 5,
+        n_genes: int = 1000,
+    ):
         """
         Args:
             embedding_dims: Dimension of each source embedding
@@ -655,52 +664,42 @@ class EmbeddingFusionModel:
         """
         self.common_dim = common_dim
         self.n_sources = len(embedding_dims)
-        
+
         # Per-source projection matrices: map each to common_dim
-        self.projections = [
-            np.random.randn(d, common_dim) * 0.1
-            for d in embedding_dims
-        ]
-        
+        self.projections = [np.random.randn(d, common_dim) * 0.1 for d in embedding_dims]
+
         # Learnable cell line embeddings
         self.cell_line_embeddings: Dict[str, np.ndarray] = {}
-        
+
         # Prediction head weights (simplified)
         self.pred_weights = np.random.randn(common_dim, n_genes) * 0.01
-    
-    def project_embeddings(
-        self, 
-        embeddings: List[Optional[np.ndarray]]
-    ) -> np.ndarray:
+
+    def project_embeddings(self, embeddings: List[Optional[np.ndarray]]) -> np.ndarray:
         """
         Project each source embedding to the common space.
         Handles missing embeddings (not all sources cover all genes).
-        
+
         Returns:
             tokens: (n_valid + 1, common_dim) including CLS token
         """
         tokens = []
-        
+
         # CLS token for aggregation
         cls_token = np.zeros(self.common_dim)
         tokens.append(cls_token)
-        
+
         # Project each available embedding
         for i, emb in enumerate(embeddings):
             if emb is not None:
                 projected = emb @ self.projections[i]
                 tokens.append(projected)
-        
+
         return np.array(tokens)  # (n_tokens, common_dim)
-    
-    def predict(
-        self, 
-        embeddings: List[Optional[np.ndarray]],
-        cell_line: str
-    ) -> np.ndarray:
+
+    def predict(self, embeddings: List[Optional[np.ndarray]], cell_line: str) -> np.ndarray:
         """
         Predict LFC by fusing all available embeddings.
-        
+
         Returns:
             predicted_lfc: (n_genes,) vector
         """
@@ -708,14 +707,14 @@ class EmbeddingFusionModel:
         tokens = self.project_embeddings(embeddings)
         if cell_line in self.cell_line_embeddings:
             tokens += self.cell_line_embeddings[cell_line]
-        
+
         # Step 2: Self-attention (simplified as mean for illustration)
         # In practice: multi-head self-attention transformer layers
         cls_output = tokens.mean(axis=0)  # (common_dim,)
-        
+
         # Step 3: Predict LFC from CLS output
         predicted_lfc = cls_output @ self.pred_weights  # (n_genes,)
-        
+
         return predicted_lfc
 ```
 
@@ -785,12 +784,13 @@ The primary evaluation metric is the L2 error between predicted and observed LFC
 import numpy as np
 from typing import Dict, List
 
+
 def compute_batch_aware_ate(
-    expression_matrix: np.ndarray,       # (N, G) normalized expression
-    cell_labels: np.ndarray,             # (N,) perturbation ID or 'ctrl'
-    batch_labels: np.ndarray,            # (N,) batch assignment
+    expression_matrix: np.ndarray,  # (N, G) normalized expression
+    cell_labels: np.ndarray,  # (N,) perturbation ID or 'ctrl'
+    batch_labels: np.ndarray,  # (N,) batch assignment
     perturbation_id: str,
-    use_global_control: bool = False     # True for small-batch datasets
+    use_global_control: bool = False,  # True for small-batch datasets
 ) -> np.ndarray:
     """
     Compute Batch-Aware Average Treatment Effect (BA-ATE).
@@ -808,18 +808,21 @@ def compute_batch_aware_ate(
     Returns:
         lfc: (G,) vector of per-gene treatment effects
     """
-    ctrl_mask = cell_labels == 'ctrl'
+    ctrl_mask = cell_labels == "ctrl"
     pert_mask = cell_labels == perturbation_id
     G = expression_matrix.shape[1]
 
     if use_global_control:
         # Small-batch mode: compute global control mean
         batches = np.unique(batch_labels)
-        global_ctrl = np.mean([
-            expression_matrix[ctrl_mask & (batch_labels == b)].mean(axis=0)
-            for b in batches
-            if np.any(ctrl_mask & (batch_labels == b))
-        ], axis=0)
+        global_ctrl = np.mean(
+            [
+                expression_matrix[ctrl_mask & (batch_labels == b)].mean(axis=0)
+                for b in batches
+                if np.any(ctrl_mask & (batch_labels == b))
+            ],
+            axis=0,
+        )
 
     # Find batches containing both control and perturbed cells
     valid_batches = []

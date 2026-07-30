@@ -168,6 +168,7 @@ Here's how you might implement a simple RLM-style processor:
 ```python
 from typing import Callable, Any
 
+
 class SimpleRLM:
     """A simplified RLM that processes long documents recursively."""
 
@@ -203,7 +204,7 @@ class SimpleRLM:
             # Recursive sub-query on each chunk
             sub_prompt = f"""Extract information relevant to: {prompt}
 
-This is chunk {i+1} of {len(chunks)}. Only extract relevant info."""
+This is chunk {i + 1} of {len(chunks)}. Only extract relevant info."""
 
             sub_answer = self.llm_call(f"{sub_prompt}\n\n{chunk}")
             sub_answers.append(sub_answer)
@@ -213,7 +214,7 @@ This is chunk {i+1} of {len(chunks)}. Only extract relevant info."""
 
 I've processed {len(chunks)} chunks. Here are the findings:
 
-{chr(10).join(f"Chunk {i+1}: {ans}" for i, ans in enumerate(sub_answers))}
+{chr(10).join(f"Chunk {i + 1}: {ans}" for i, ans in enumerate(sub_answers))}
 
 Synthesize these to answer the original question."""
 
@@ -221,7 +222,7 @@ Synthesize these to answer the original question."""
 
     def _smart_chunk(self, text: str, max_size: int) -> list[str]:
         """Split text at paragraph boundaries when possible."""
-        paragraphs = text.split('\n\n')
+        paragraphs = text.split("\n\n")
         chunks = []
         current_chunk = []
         current_size = 0
@@ -229,7 +230,7 @@ Synthesize these to answer the original question."""
         for para in paragraphs:
             para_size = len(para)
             if current_size + para_size > max_size and current_chunk:
-                chunks.append('\n\n'.join(current_chunk))
+                chunks.append("\n\n".join(current_chunk))
                 current_chunk = [para]
                 current_size = para_size
             else:
@@ -237,7 +238,7 @@ Synthesize these to answer the original question."""
                 current_size += para_size
 
         if current_chunk:
-            chunks.append('\n\n'.join(current_chunk))
+            chunks.append("\n\n".join(current_chunk))
 
         return chunks
 
@@ -247,10 +248,11 @@ def mock_llm(prompt: str) -> str:
     """Placeholder for actual LLM API call."""
     return "Extracted relevant info..."
 
+
 rlm = SimpleRLM(llm_call=mock_llm, chunk_size=5000)
 answer = rlm.process(
     prompt="What are the key findings about protein folding?",
-    context=ten_million_character_biology_paper  # Can handle this!
+    context=ten_million_character_biology_paper,  # Can handle this!
 )
 ```
 
@@ -427,13 +429,13 @@ festival_keywords = ["festival", "La Union", "celebration", "event"]
 results = {}
 
 # Only examine chunks containing keywords
-for i, chunk in enumerate(context.split('\n')):
+for i, chunk in enumerate(context.split("\n")):
     if any(keyword.lower() in chunk.lower() for keyword in festival_keywords):
         results[i] = chunk
         print(f"Found relevant line {i}: {chunk[:100]}...")
 
 # Step 2: Only send filtered content to sub-LLM
-relevant_context = '\n'.join(results.values())
+relevant_context = "\n".join(results.values())
 answer = llm_query(f"About the festival: {relevant_context}")
 ```
 
@@ -681,6 +683,7 @@ import anthropic
 
 client = anthropic.Anthropic(api_key="your-key")
 
+
 def rlm_process(question: str, long_document: str) -> str:
     """Simple RLM-style processing."""
 
@@ -701,22 +704,22 @@ Think step-by-step and use code to explore the document before answering."""
         model="claude-sonnet-4-20250514",
         max_tokens=4000,
         system=system_prompt,
-        messages=[{
-            "role": "user",
-            "content": f"""Question: {question}
+        messages=[
+            {
+                "role": "user",
+                "content": f"""Question: {question}
 
 The document is available as the 'context' variable.
-Use code to explore it and build your answer."""
-        }]
+Use code to explore it and build your answer.""",
+            }
+        ],
     )
 
     return response.content
 
+
 # Example:
-answer = rlm_process(
-    "What are the main findings?",
-    your_10mb_document
-)
+answer = rlm_process("What are the main findings?", your_10mb_document)
 ```
 
 ---

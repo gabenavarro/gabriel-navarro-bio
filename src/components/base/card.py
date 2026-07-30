@@ -2,7 +2,6 @@
 
 from fasthtml.common import A, Div
 
-
 _PADDING_CLASSES = {
     "sm": "factory-card-padding-sm",
     "md": "factory-card-padding-md",

@@ -1,5 +1,5 @@
-from typing import List, Tuple
-from fasthtml.common import Div, Button, Style, Script
+from fasthtml.common import Button, Div, Script, Style
+
 from src.styles import CHIPS_CSS
 
 
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
     )
 
 
-def filter_chips(chips: List[Tuple[str, str, str, bool]]) -> Div:
+def filter_chips(chips: list[tuple[str, str, str, bool]]) -> Div:
     chip_list = [
         Button(
             name,

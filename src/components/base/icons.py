@@ -1,5 +1,5 @@
-from fasthtml.svg import Svg, Path, Rect, Circle
 from fasthtml.common import A, Style
+from fasthtml.svg import Circle, Path, Rect, Svg
 
 SOCIAL_BTN_CSS = """
 .social-btn {

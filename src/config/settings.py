@@ -7,6 +7,7 @@ UI constants, color schemes, and content for the hero page.
 
 import logging
 import os
+from typing import ClassVar
 
 logger = logging.getLogger(__name__)
 
@@ -34,13 +35,13 @@ class Settings:
     # ============================================================================
     # Navigation & Social Links
     # ============================================================================
-    NAV_LINKS = [
+    NAV_LINKS: ClassVar[list[dict[str, str]]] = [
         {"label": "Projects", "href": "/projects"},
         {"label": "Blogs", "href": "/blogs"},
         {"label": "CV", "href": "/cv"},
     ]
 
-    SOCIAL_LINKS = [
+    SOCIAL_LINKS: ClassVar[list[dict[str, str]]] = [
         {"label": "LinkedIn", "href": "https://www.linkedin.com/in/gcnavarro/"},
         {"label": "GitHub", "href": "https://github.com/gabenavarro"},
         {"label": "Email", "href": "mailto:gchinonavarro@gmail.com"},
@@ -49,7 +50,7 @@ class Settings:
     # ============================================================================
     # Category Mapping
     # ============================================================================
-    CATEGORY_MAP = {
+    CATEGORY_MAP: ClassVar[dict[str, str]] = {
         "bioinformatics": "omics",
         "genomics": "omics",
         "transcriptomics": "omics",
@@ -73,14 +74,14 @@ class Settings:
     # ============================================================================
     # Hero Skills & Descriptions
     # ============================================================================
-    HERO_SKILLS = [
+    HERO_SKILLS: ClassVar[list[str]] = [
         "Computational Scientist",
         "Machine Learning Researcher",
         "Bioinformatician",
         "Synthetic Chemist",
     ]
 
-    HERO_SKILLS_DESCRIPTION = {
+    HERO_SKILLS_DESCRIPTION: ClassVar[dict[str, str]] = {
         "Bioinformatician": "I decode complex biological datasets to uncover hidden insights and accelerate scientific breakthroughs. Let's transform data into discoveries together!",
         "Data Engineer": "I build robust, scalable pipelines that efficiently handle petabyte-scale datasets. Let's turn massive data into actionable insights together!",
         "Computational Scientist": "I employ cutting-edge computational methods to solve challenging scientific problems. Let's push the boundaries of research together!",
@@ -107,7 +108,7 @@ class Settings:
     # ============================================================================
     # Hero Page Content
     # ============================================================================
-    HERO_CONTENT = {
+    HERO_CONTENT: ClassVar[dict[str, str]] = {
         "greeting": "Hi, I'm Gabriel Navarro, PhD ",
         "portrait_url": "https://storage.googleapis.com/gn-portfolio/images/portriat.png",
         "default_skill": "Computational Scientist",

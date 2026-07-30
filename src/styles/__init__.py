@@ -10,19 +10,19 @@ compatibility with existing per-component `Style(...)` injections.
 """
 
 from ._base import BASE_CSS
-from ._layout import LAYOUT_CSS
 from ._components import COMPONENTS_CSS
+from ._layout import LAYOUT_CSS
 from ._pages import PAGES_CSS
+from .custom_css import *
 from .theme import THEME_CSS
-from .custom_css import *  # noqa: F401,F403  re-export individual *_CSS constants
 
-FACTORY_CSS = "\n".join([BASE_CSS, LAYOUT_CSS, COMPONENTS_CSS, PAGES_CSS])
+FACTORY_CSS = f"{BASE_CSS}\n{LAYOUT_CSS}\n{COMPONENTS_CSS}\n{PAGES_CSS}"
 
 __all__ = [
-    "FACTORY_CSS",
-    "THEME_CSS",
     "BASE_CSS",
-    "LAYOUT_CSS",
     "COMPONENTS_CSS",
+    "FACTORY_CSS",
+    "LAYOUT_CSS",
     "PAGES_CSS",
+    "THEME_CSS",
 ]

@@ -1,14 +1,13 @@
-from typing import List, Optional
-from src.services.gcp.bigquery import BigQueryClient
-from src.models.project import Project
 from src.config.settings import settings
+from src.models.project import Project
+from src.services.gcp.bigquery import BigQueryClient
 
 
 class ProjectService:
     def __init__(self):
         self.client = BigQueryClient(project_id=settings.GOOGLE_PROJECT_ID)
 
-    def get_all_projects(self, limit: int = 1000, include_disabled: bool = False) -> List[Project]:
+    def get_all_projects(self, limit: int = 1000, include_disabled: bool = False) -> list[Project]:
         """Fetches all projects from BigQuery.
 
         By default, rows where `disabled = true` are filtered out at the SQL
@@ -31,7 +30,7 @@ class ProjectService:
 
         return [Project.from_dict(r) for r in results]
 
-    def get_project_by_id(self, project_id: str) -> Optional[Project]:
+    def get_project_by_id(self, project_id: str) -> Project | None:
         """Fetches a single project by its ID."""
         # Using parameterized query for security
         query = f"SELECT * FROM `{settings.BIGQUERY_TABLE}` WHERE id = @project_id"
@@ -45,7 +44,7 @@ class ProjectService:
 
         return None
 
-    def get_project_by_slug(self, slug: str) -> Optional[Project]:
+    def get_project_by_slug(self, slug: str) -> Project | None:
         """Look up a project by its slug. Client-side scan over all projects.
 
         BigQuery's gn-blog table does not yet have a slug column. Until the one-time
@@ -58,7 +57,7 @@ class ProjectService:
                 return project
         return None
 
-    def get_projects_by_tag(self, tag: str, include_disabled: bool = False) -> List[Project]:
+    def get_projects_by_tag(self, tag: str, include_disabled: bool = False) -> list[Project]:
         """Fetches projects filtered by tag.
 
         By default, rows where `disabled = true` are filtered out at the SQL

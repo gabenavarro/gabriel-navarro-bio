@@ -1,4 +1,5 @@
-from fasthtml.common import Div, Style, Script
+from fasthtml.common import Div, Script, Style
+
 from src.styles import BALL_BACKGROUND_CSS, TRANSITION_CSS
 
 # ==============================================================================

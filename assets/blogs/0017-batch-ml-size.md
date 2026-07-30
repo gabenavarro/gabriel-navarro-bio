@@ -220,10 +220,9 @@ Here's how to implement the β₂ scaling rule in practice:
 import numpy as np
 from typing import Tuple
 
+
 def compute_beta2_from_halflife(
-    token_halflife: float,
-    batch_size: int,
-    sequence_length: int = 1024
+    token_halflife: float, batch_size: int, sequence_length: int = 1024
 ) -> float:
     """
     Compute β₂ (second moment decay) from desired token half-life.
@@ -257,9 +256,7 @@ def compute_beta2_from_halflife(
 
 
 def scale_beta2_for_new_batch_size(
-    current_beta2: float,
-    current_batch_size: int,
-    new_batch_size: int
+    current_beta2: float, current_batch_size: int, new_batch_size: int
 ) -> float:
     """
     Scale β₂ when changing batch size to maintain constant token half-life.
@@ -284,7 +281,7 @@ def scale_beta2_for_new_batch_size(
     batch_ratio = new_batch_size / current_batch_size
 
     # Scale β₂ by raising to the power of batch ratio
-    new_beta2 = current_beta2 ** batch_ratio
+    new_beta2 = current_beta2**batch_ratio
 
     return float(new_beta2)
 
@@ -292,11 +289,12 @@ def scale_beta2_for_new_batch_size(
 # Practical example: Setting up optimizers for different batch sizes
 # ===================================================================
 
+
 def setup_adam_for_batch_size(
     batch_size: int,
     token_halflife: float = 10_000_000,
     beta1: float = 0.9,
-    learning_rate: float = 0.001
+    learning_rate: float = 0.001,
 ) -> dict:
     """
     Configure Adam hyperparameters for a given batch size.
@@ -318,11 +316,11 @@ def setup_adam_for_batch_size(
     beta2 = compute_beta2_from_halflife(token_halflife, batch_size)
 
     config = {
-        'batch_size': batch_size,
-        'beta1': beta1,
-        'beta2': beta2,
-        'learning_rate': learning_rate,
-        'epsilon': 1e-8,
+        "batch_size": batch_size,
+        "beta1": beta1,
+        "beta2": beta2,
+        "learning_rate": learning_rate,
+        "epsilon": 1e-8,
     }
 
     print(f"Batch Size {batch_size:4d}: β₂ = {beta2:.8f}")
@@ -465,6 +463,7 @@ from typing import Tuple, List
 # Simple 2D optimization problem demonstrating batch size effects
 # ================================================================
 
+
 def loss_function(x: float, y: float) -> float:
     """
     Simple loss function that's steep in y, gradual in x.
@@ -505,12 +504,7 @@ def gradient(x: float, y: float, noise_scale: float = 0.0) -> Tuple[float, float
     return grad_x, grad_y
 
 
-def sgd_step(
-    x: float,
-    y: float,
-    learning_rate: float,
-    noise_scale: float
-) -> Tuple[float, float]:
+def sgd_step(x: float, y: float, learning_rate: float, noise_scale: float) -> Tuple[float, float]:
     """
     Take one SGD step.
 
@@ -531,7 +525,7 @@ def sgd_with_momentum_step(
     vy: float,
     learning_rate: float,
     momentum: float,
-    noise_scale: float
+    noise_scale: float,
 ) -> Tuple[float, float, float, float]:
     """
     Take one SGD step with momentum.
@@ -554,7 +548,7 @@ def sgd_with_momentum_step(
 def run_optimization_experiment(
     batch_size_type: str,  # "large" or "small"
     use_momentum: bool,
-    n_steps: int = 100
+    n_steps: int = 100,
 ) -> List[Tuple[float, float]]:
     """
     Run optimization experiment with specified configuration.
@@ -775,9 +769,11 @@ import numpy as np
 from dataclasses import dataclass
 from typing import Optional
 
+
 @dataclass
 class OptimizerConfig:
     """Configuration for Adam-style optimizer."""
+
     batch_size: int
     learning_rate: float
     beta1: float
@@ -800,7 +796,7 @@ class OptimizerConfig:
 def scale_optimizer_config(
     base_config: OptimizerConfig,
     new_batch_size: int,
-    learning_rate_scale_factor: Optional[float] = None
+    learning_rate_scale_factor: Optional[float] = None,
 ) -> OptimizerConfig:
     """
     Scale optimizer configuration to a new batch size.
@@ -826,7 +822,7 @@ def scale_optimizer_config(
 
     # Rule 2: Scale β₂ to maintain constant token half-life
     # Formula from Equation 2 in paper: β₂* = β₂^(B*/B)
-    new_beta2 = base_config.beta2 ** batch_ratio
+    new_beta2 = base_config.beta2**batch_ratio
 
     # Rule 3: Scale learning rate
     # The paper shows this is NOT sqrt scaling; it's sub-linear
@@ -835,7 +831,7 @@ def scale_optimizer_config(
     if learning_rate_scale_factor is None:
         # Heuristic: scale proportional to batch_ratio^0.3
         # (This is a rough approximation; tune for your use case)
-        learning_rate_scale_factor = batch_ratio ** 0.3
+        learning_rate_scale_factor = batch_ratio**0.3
 
     new_learning_rate = base_config.learning_rate * learning_rate_scale_factor
 
@@ -849,7 +845,7 @@ def scale_optimizer_config(
         learning_rate=new_learning_rate,
         beta1=new_beta1,
         beta2=new_beta2,
-        weight_decay=new_weight_decay
+        weight_decay=new_weight_decay,
     )
 
 
@@ -858,11 +854,7 @@ def scale_optimizer_config(
 
 # Start with GPT-3 baseline from Brown et al.
 gpt3_baseline = OptimizerConfig(
-    batch_size=512,
-    learning_rate=0.001,
-    beta1=0.9,
-    beta2=0.95,
-    weight_decay=0.1
+    batch_size=512, learning_rate=0.001, beta1=0.9, beta2=0.95, weight_decay=0.1
 )
 
 print("GPT-3 Baseline (Brown et al.):")
@@ -873,7 +865,7 @@ print("\n" + "=" * 60 + "\n")
 batch_1_config = scale_optimizer_config(
     gpt3_baseline,
     new_batch_size=1,
-    learning_rate_scale_factor=1.0  # Paper kept LR the same
+    learning_rate_scale_factor=1.0,  # Paper kept LR the same
 )
 
 print("Scaled to Batch Size 1:")
@@ -889,6 +881,7 @@ print(f"Computed: {batch_1_config.beta2:.8f}")
 print(f"Match: {np.isclose(theoretical_beta2, batch_1_config.beta2)}")
 print()
 
+
 # Calculate token half-life to verify it's constant
 def calculate_token_halflife(beta2: float, batch_size: int, seq_len: int = 1024):
     """Calculate token half-life from β₂."""
@@ -896,12 +889,9 @@ def calculate_token_halflife(beta2: float, batch_size: int, seq_len: int = 1024)
     tokens_per_step = batch_size * seq_len
     return steps_to_halflife * tokens_per_step
 
-halflife_baseline = calculate_token_halflife(
-    gpt3_baseline.beta2, gpt3_baseline.batch_size
-)
-halflife_batch1 = calculate_token_halflife(
-    batch_1_config.beta2, batch_1_config.batch_size
-)
+
+halflife_baseline = calculate_token_halflife(gpt3_baseline.beta2, gpt3_baseline.batch_size)
+halflife_batch1 = calculate_token_halflife(batch_1_config.beta2, batch_1_config.batch_size)
 
 print(f"Token half-life (baseline): {halflife_baseline:,.0f} tokens")
 print(f"Token half-life (batch=1):  {halflife_batch1:,.0f} tokens")
@@ -918,9 +908,11 @@ for bs in [1, 4, 16, 64, 256, 512, 1024, 4096]:
     config = scale_optimizer_config(gpt3_baseline, bs)
     halflife = calculate_token_halflife(config.beta2, config.batch_size)
 
-    print(f"BS={bs:4d}: β₂={config.beta2:.6f}, "
-          f"LR={config.learning_rate:.6f}, "
-          f"t₁/₂={halflife:>10,.0f} tokens")
+    print(
+        f"BS={bs:4d}: β₂={config.beta2:.6f}, "
+        f"LR={config.learning_rate:.6f}, "
+        f"t₁/₂={halflife:>10,.0f} tokens"
+    )
 ```
 
 Output:
@@ -1093,6 +1085,7 @@ from dataclasses import dataclass
 @dataclass
 class TrainingMetrics:
     """Track training metrics."""
+
     steps: List[int]
     losses: List[float]
     optimizer_name: str
@@ -1157,7 +1150,7 @@ class Adam(SimpleOptimizer):
         learning_rate: float = 0.001,
         beta1: float = 0.9,
         beta2: float = 0.999,
-        epsilon: float = 1e-8
+        epsilon: float = 1e-8,
     ):
         self.lr = learning_rate
         self.beta1 = beta1
@@ -1191,11 +1184,11 @@ class Adam(SimpleOptimizer):
         self.m = self.beta1 * self.m + (1 - self.beta1) * grads
 
         # Update biased second moment estimate
-        self.v = self.beta2 * self.v + (1 - self.beta2) * (grads ** 2)
+        self.v = self.beta2 * self.v + (1 - self.beta2) * (grads**2)
 
         # Bias correction
-        m_hat = self.m / (1 - self.beta1 ** self.t)
-        v_hat = self.v / (1 - self.beta2 ** self.t)
+        m_hat = self.m / (1 - self.beta1**self.t)
+        v_hat = self.v / (1 - self.beta2**self.t)
 
         # Parameter update
         return params - self.lr * m_hat / (np.sqrt(v_hat) + self.epsilon)
@@ -1203,6 +1196,7 @@ class Adam(SimpleOptimizer):
     def state_size_per_param(self) -> int:
         """Adam stores two floats (m and v) per parameter."""
         return 2
+
 
 def ill_conditioned_loss(params: np.ndarray) -> float:
     """
@@ -1214,7 +1208,8 @@ def ill_conditioned_loss(params: np.ndarray) -> float:
     # Different "eigenvalues" for different dimensions
     # Some dimensions have steep curvature, some have flat
     eigenvalues = np.array([1000, 100, 10, 1, 0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001])
-    return 0.5 * np.sum(eigenvalues * params ** 2)
+    return 0.5 * np.sum(eigenvalues * params**2)
+
 
 def ill_conditioned_gradient(params: np.ndarray, batch_size: int) -> np.ndarray:
     """Gradient with different curvatures per dimension + noise."""
@@ -1228,6 +1223,7 @@ def ill_conditioned_gradient(params: np.ndarray, batch_size: int) -> np.ndarray:
     noise = np.random.normal(0, noise_scale * 10, size=params.shape)  # Increased noise
 
     return true_grad + noise
+
 
 # Run comparison with better toy problem
 # ======================================

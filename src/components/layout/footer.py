@@ -1,6 +1,6 @@
 """Site footer rendered on every page below the main container."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from fasthtml.common import A, Div, P
 
@@ -14,7 +14,7 @@ def Footer():
     so the navigation, social buttons, and footer share a single source of
     truth. Outputs Factory-style monochrome markup that mirrors the navbar.
     """
-    year = datetime.now().year
+    year = datetime.now(tz=UTC).year
     return Div(
         Div(
             Div(

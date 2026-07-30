@@ -1,6 +1,6 @@
 """Tests for src.components.layout.footer."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from fasthtml.common import to_xml
 
@@ -26,7 +26,7 @@ def test_footer_contains_nav_links_in_bottom_row():
 def test_footer_contains_current_year_copyright():
     """Footer shows the current year in the copyright line."""
     html = to_xml(Footer())
-    assert f"© {datetime.now().year}" in html
+    assert f"© {datetime.now(tz=UTC).year}" in html
 
 
 def test_social_links_container_does_not_combine_col_and_row_classes():

@@ -18,6 +18,7 @@ A minimal BigQuery client using google-api-core and avoiding the full SDK.
 """
 
 import time
+
 from google.auth import default
 from google.auth.transport.requests import AuthorizedSession
 
