@@ -186,4 +186,5 @@ cython_debug/
 # Dev environment artifacts (per-developer; not shared)
 .claude/
 .devcontainer/
+.mcp.json
 .playwright-mcp/
