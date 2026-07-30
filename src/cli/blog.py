@@ -1,7 +1,7 @@
 """Blog subcommands for the ``src.cli`` CLI.
 
-Provides ``validate``, ``submit``, ``update``, ``disable``, and ``list``
-operations against the BigQuery-backed blog table. Parsing and validation
+Provides ``validate``, ``submit``, ``update``, ``disable``, ``enable``, and
+``list`` operations against the BigQuery-backed blog table. Parsing and validation
 use :mod:`src.services.blog_frontmatter`; BigQuery writes use the official
 ``google.cloud.bigquery`` SDK (the project's lightweight REST client only
 supports queries, not row inserts).
@@ -47,6 +47,10 @@ def register_blog_parser(p: argparse.ArgumentParser) -> None:
     d.add_argument("id", help="The blog post id (UUID)")
     d.add_argument("--table", default=None, help="Override settings.BIGQUERY_TABLE")
 
+    e = sub.add_parser("enable", help="Mark a blog post as enabled (inverse of disable)")
+    e.add_argument("id", help="The blog post id (UUID)")
+    e.add_argument("--table", default=None, help="Override settings.BIGQUERY_TABLE")
+
     lst = sub.add_parser(
         "list",
         help="List blog posts (id, title, disabled flag). --table is currently ignored.",
@@ -69,6 +73,8 @@ def run_blog(args: argparse.Namespace) -> int:
         return _cmd_update(args)
     if args.blog_cmd == "disable":
         return _cmd_disable(args)
+    if args.blog_cmd == "enable":
+        return _cmd_enable(args)
     if args.blog_cmd == "list":
         return _cmd_list(args)
     return 1
@@ -248,17 +254,42 @@ def _cmd_update(args: argparse.Namespace) -> int:
 
 
 def _cmd_disable(args: argparse.Namespace) -> int:
+    return _set_disabled(args, disabled=True)
+
+
+def _cmd_enable(args: argparse.Namespace) -> int:
+    return _set_disabled(args, disabled=False)
+
+
+def _set_disabled(args: argparse.Namespace, *, disabled: bool) -> int:
+    """Flip the ``disabled`` flag on one post via a single atomic UPDATE.
+
+    Backs both ``disable`` and ``enable`` so the two can never drift apart.
+    Deliberately not implemented on top of ``update``: that path is a DELETE
+    followed by an INSERT, which is not atomic and loses the row if the insert
+    fails.
+
+    Args:
+        args: Parsed namespace carrying ``id`` and optionally ``table``.
+        disabled: Value to write.
+
+    Returns:
+        Process exit code; 0 on success.
+    """
     table = args.table or settings.BIGQUERY_TABLE
 
     from google.cloud import bigquery
 
     client = _bq_client()
-    sql = f"UPDATE `{table}` SET disabled = true WHERE id = @id"
+    sql = f"UPDATE `{table}` SET disabled = @disabled WHERE id = @id"
     job_config = bigquery.QueryJobConfig(
-        query_parameters=[bigquery.ScalarQueryParameter("id", "STRING", args.id)]
+        query_parameters=[
+            bigquery.ScalarQueryParameter("id", "STRING", args.id),
+            bigquery.ScalarQueryParameter("disabled", "BOOL", disabled),
+        ]
     )
     client.query(sql, job_config=job_config).result()
-    print(f"disabled {args.id}")
+    print(f"{'disabled' if disabled else 'enabled'} {args.id}")
     return 0
 
 
